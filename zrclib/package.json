@@ -1,0 +1,13 @@
+{
+  "name": "@zrclib/client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "./scripts/build.sh transaction",
+    "postinstall": "./scripts/install.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

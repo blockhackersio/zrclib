@@ -1,0 +1,18 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.241.1/containers/typescript-node
+{
+  "name": "Node.js & TypeScript",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "VARIANT": "18-bullseye"
+    }
+  },
+  "remoteUser": "node",
+  "mounts": [
+    "type=bind,source=${localEnv:HOME}/.ssh,target=/home/node/.ssh",
+    "type=bind,source=${localEnv:HOME}/.config/git/config,target=/home/node/.config/git/config",
+    "type=bind,source=${localEnv:HOME}/.aliases,target=/home/node/.bash_aliases",
+    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix"
+  ]
+}
