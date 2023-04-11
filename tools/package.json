@@ -1,8 +1,11 @@
 {
-  "name": "@zrclib/client",
+  "name": "@zrclib/tools",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "files": [
+    "**/*.sol"
+  ],
   "scripts": {
     "build": "./scripts/build.sh transaction",
     "postinstall": "./scripts/install.sh"

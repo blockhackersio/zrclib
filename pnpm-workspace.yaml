@@ -1,4 +1,3 @@
 packages:
-  - "test"
-  - "circuits"
-  - "zrclib"
+  - "integration"
+  - "tools"

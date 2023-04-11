@@ -1,10 +1,9 @@
-
 #!/bin/bash
 
 mkdir -p pot
 
-if [ ! -f ./pot/pot.ptau ]; then 
-  curl -o pot/pot.ptau https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_16.ptau 
+if [ ! -f ./pot/pot.ptau ]; then
+  curl -o pot/pot.ptau https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_16.ptau
 fi
 
 B2_DOWNLOAD=$(b2sum pot/pot.ptau | awk '{ print $1 }')
