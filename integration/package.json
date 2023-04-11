@@ -15,7 +15,9 @@
     "@ethersproject/bytes": "^5.0.0",
     "@openzeppelin/contracts": "^4.8.2",
     "@zrclib/tools": "workspace:*",
-    "hardhat": "^2.13.1"
+    "dotenv": "^16.0.3",
+    "hardhat": "^2.13.1",
+    "snarkjs": "^0.6.10"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",

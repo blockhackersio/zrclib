@@ -103,7 +103,7 @@ contract TransactionVerifier {
     
     uint16 constant lastMem = 704;
 
-    function _verifyProof(bytes memory proof, uint[] memory pubSignals) internal view returns (bool) {
+    function verifyProof(bytes memory proof, uint[] memory pubSignals) public view returns (bool) {
         assembly {
             /////////
             // Computes the inverse using the extended euclidean algorithm
