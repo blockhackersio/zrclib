@@ -17,4 +17,6 @@ snarkjs plonk setup ./compiled/$FNAME.r1cs ./pot/pot.ptau ./compiled/$FNAME.zkey
 
 snarkjs zkey export solidityverifier ./compiled/${FNAME}.zkey ./contracts/${FNAME}_verifier.sol
 
+sed -i "s/contract PlonkVerifier/contract ${FNAME_CAPS}Verifier/g" ./contracts/${FNAME}_verifier.sol
+
 sed -i "s/function verifyProof(bytes memory proof, uint\[\] memory pubSignals) public view returns (bool)/function _verifyProof(bytes memory proof, uint\[\] memory pubSignals) internal view returns (bool)/g" ./contracts/${FNAME}_verifier.sol
