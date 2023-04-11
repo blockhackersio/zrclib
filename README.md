@@ -1,15 +1,20 @@
-# zrclib
+<p align="center"><h1 align="center">zrclib 🔮</h1></p>
+
+
 
 ## Installation
 
+A library to enable web3 developers to work with zero knowledge constructions within a solidity context.
+
 ### Prerequisites
 
-- pnpm 
+- pnpm (8.2.0+)
+- circom (2.1.5+)
 
 ### Install dependencies
 
 ```
-pnpm Install
+pnpm install
 ```
 
 ### Run tests
@@ -27,4 +32,4 @@ pnpm build
 ```
 
 - Build circuit artifacts
-- Bundle all keys encoded to json files 
+- Bundle all keys encoded to json files

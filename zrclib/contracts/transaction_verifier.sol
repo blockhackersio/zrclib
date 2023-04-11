@@ -21,7 +21,7 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-contract PlonkVerifier {
+contract TransactionVerifier {
     
     uint32 constant n =   8;
     uint16 constant nPublic =  1;
@@ -103,7 +103,7 @@ contract PlonkVerifier {
     
     uint16 constant lastMem = 704;
 
-    function verifyProof(bytes memory proof, uint[] memory pubSignals) public view returns (bool) {
+    function _verifyProof(bytes memory proof, uint[] memory pubSignals) internal view returns (bool) {
         assembly {
             /////////
             // Computes the inverse using the extended euclidean algorithm
