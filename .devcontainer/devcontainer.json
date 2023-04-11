@@ -1,11 +1,32 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.241.1/containers/typescript-node
 {
-  "name": "Node.js & TypeScript",
+  "name": "Circom env",
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
       "VARIANT": "18-bullseye"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "foxundermoon.shell-format",
+        "iden3.circom",
+        "JuanBlanco.solidity",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        "octref.vetur",
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml",
+        "tomoyukim.vscode-mermaid-editor",
+        "unifiedjs.vscode-mdx",
+        "vstirbu.vscode-mermaid-preview",
+        "Vue.volar"
+      ]
     }
   },
   "remoteUser": "node",
