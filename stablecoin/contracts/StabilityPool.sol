@@ -21,16 +21,16 @@ contract StabilityPool {
 
     function provideLiquidity(uint256 amount) external {
         // TODO: update accounting
-        // TODO: transfer LUSD from user to StabilityPool
+        // TODO: transfer ZUSD from user to StabilityPool
     }
 
     function withdrawLiquidity(uint256 amount) external {
         // TODO: update accounting
-        // TODO: transfer LUSD from StabilityPool to user
+        // TODO: transfer ZUSD from StabilityPool to user
     }
 
     /*
-    * Cancels out the specified debt against the LUSD contained in the Stability Pool (as far as possible)
+    * Cancels out the specified debt against the ZUSD contained in the Stability Pool (as far as possible)
     * and transfers the Trove's ETH collateral from ActivePool to StabilityPool.
     * Only called by liquidation functions in the TroveManager.
     */
