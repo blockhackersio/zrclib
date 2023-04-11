@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "hardhat test",
-    "build": "hardhat compile"
+    "build": "hardhat compile",
+    "clean": "./scripts/clean.sh"
   },
   "keywords": [],
   "author": "",

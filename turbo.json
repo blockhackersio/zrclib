@@ -8,8 +8,8 @@
     "test": {
       "dependsOn": ["^build", "^test"]
     },
-    "dev": {
-      "dependsOn": ["^build"]
+    "clean": {
+      "dependsOn": ["^clean"]
     }
   }
 }

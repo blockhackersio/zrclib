@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "turbo run build --force",
-    "test": "echo \"Not yet implemented\" && exit 1"
+    "build": "turbo run build --force --no-daemon",
+    "test": "turbo run test --force --no-daemon",
+    "clean": "turbo run clean --force --no-daemon"
   },
   "keywords": [],
   "author": "",
