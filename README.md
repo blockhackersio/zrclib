@@ -9,7 +9,7 @@
 ### Install dependencies
 
 ```
-pnpm Install
+pnpm install
 ```
 
 ### Run tests
