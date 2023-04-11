@@ -1,4 +1,6 @@
-# zrclib
+<p align="center"><h1 align="center">zrclib</h1></p>
+
+<h2 align="center">🔮</h2>
 
 ## Installation
 
