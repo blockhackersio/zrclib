@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import {TransactionVerifier} from "./transaction_verifier.sol";
+import {TransactionVerifier} from "./generated/TransactionVerifier.sol";
 
 contract ZRC20 is TransactionVerifier {
     string private _name;

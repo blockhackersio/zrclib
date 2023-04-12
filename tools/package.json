@@ -2,18 +2,25 @@
   "name": "@zrclib/tools",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "src/index.ts",
   "files": [
-    "**/*.sol"
+    "**/*.sol",
+    "dist"
   ],
   "scripts": {
-    "build": "./scripts/build.sh transaction",
+    "build": "./scripts/build.sh",
     "postinstall": "./scripts/install.sh"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "circomlib": "^2.0.5"
+    "circomlib": "^2.0.5",
+    "@rollup/plugin-commonjs": "^24.1.0",
+    "@rollup/plugin-node-resolve": "^15.0.2",
+    "@rollup/plugin-typescript": "^11.1.0",
+    "rollup": "^3.20.2"
   }
 }

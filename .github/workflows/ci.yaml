@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install pnpm
+        run: npm install -g pnpm && npm install -g snarkjs
+
+      - name: Install Rust
+        run: curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
+        env:
+          CARGO_HOME: ${{ runner.workspace }}/cargo
+          RUSTUP_HOME: ${{ runner.workspace }}/rustup
+
+      - name: Cache Rust and circom
+        uses: actions/cache@v2
+        id: circom-cache
+        with:
+          path: |
+            ${{ runner.workspace }}/cargo
+            ${{ runner.workspace }}/rustup
+          key: ${{ runner.os }}-rust-${{ hashFiles('**/circom/Cargo.toml') }}-${{ hashFiles('**/circom/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Clone Circom repository
+        run: git clone https://github.com/iden3/circom.git
+
+      - name: Build circom repository
+        run: cd circom && cargo build --release && cargo install --path circom
+        if: steps.circom-cache.outputs.cache_changed == 'true'
+        env:
+          CARGO_HOME: ${{ runner.workspace }}/cargo
+          RUSTUP_HOME: ${{ runner.workspace }}/rustup
+
+      - name: Add Circom to PATH
+        run: echo "${{ runner.workspace }}/cargo/bin" >> $GITHUB_PATH
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run tests
+        run: pnpm test

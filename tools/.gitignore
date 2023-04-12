@@ -1,4 +1,4 @@
 compiled
-compiled/*
-pot
-pot/*
+compiled/
+pot/
+dist/
