@@ -22,6 +22,7 @@ jobs:
 
       - name: Cache Rust and circom
         uses: actions/cache@v2
+        id: circom-cache
         with:
           path: |
             ${{ runner.workspace }}/cargo
@@ -39,7 +40,11 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Clone Circom repository
-        run: git clone https://github.com/iden3/circom.git && cd circom && cargo build --release && cargo install --path circom
+        run: git clone https://github.com/iden3/circom.git
+
+      - name: Build circom repository
+        run: cd circom && cargo build --release && cargo install --path circom
+        if: steps.circom-cache.outputs.cache_changed == 'true'
         env:
           CARGO_HOME: ${{ runner.workspace }}/cargo
           RUSTUP_HOME: ${{ runner.workspace }}/rustup
