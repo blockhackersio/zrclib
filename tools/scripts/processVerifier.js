@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const TransactionVerifier = {
-  filename: "./contracts/transaction_verifier.sol",
+  filename: "./contracts/generated/TransactionVerifier.sol",
   edits: [
     [`contract PlonkVerifier`, `contract TransactionVerifier`],
     [
