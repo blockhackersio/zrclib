@@ -8,7 +8,7 @@ contract MyPool is ZRC20 {
 
     uint256 public mintedAmount;
 
-    constructor() ZRC20("MyPool", "MP") {}
+    constructor(address verifierAddress) ZRC20("MyPool", "MP", verifierAddress) {}
 
     function mint(uint256 amount, bytes memory proof, uint[] memory pubSignals) public override {
         super.mint(amount, proof, pubSignals);
