@@ -28,7 +28,7 @@ jobs:
             ${{ runner.os }}-rust-
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: npm install -g pnpm && npm install -g snarkjs
 
       - name: Cache node_modules
         uses: actions/cache@v2
