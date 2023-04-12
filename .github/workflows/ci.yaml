@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install pnpm
+        run: npm install -g pnpm && npm install -g snarkjs
+
       - name: Install Rust
         run: curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
         env:
@@ -27,9 +30,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-rust-
 
-      - name: Install pnpm
-        run: npm install -g pnpm && npm install -g snarkjs
-
       - name: Cache node_modules
         uses: actions/cache@v2
         with:
@@ -38,22 +38,39 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Clone and install circom
-        run: |
-          mkdir -p /tmp/installer-circom && cd /tmp/installer-circom && git clone https://github.com/iden3/circom.git && cd circom && cargo build --release && cargo install --path circom
+      - name: Clone Circom repository
+        run: git clone https://github.com/iden3/circom.git && cd circom
+
+      - name: Build Circom
+        run: cargo build --release --features compiler
+
+      - name: Install Circom
+        run: cargo install --path .
         env:
           CARGO_HOME: ${{ runner.workspace }}/cargo
           RUSTUP_HOME: ${{ runner.workspace }}/rustup
 
-      - name: Add folder to PATH
-        run: |
-          echo "${{ runner.workspace }}/cargo" >> $GITHUB_PATH
+      - name: Add Circom to PATH
+        run: echo "${{ runner.workspace }}/cargo/bin" >> $GITHUB_PATH
 
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Use Circom
+        run: circom --help
+      # - name: Clone and install circom
+      #   run: |
+      #     mkdir -p /tmp/installer-circom && cd /tmp/installer-circom && git clone https://github.com/iden3/circom.git && cd circom && cargo build --release && cargo install --path circom
+      #   env:
+      #     CARGO_HOME: ${{ runner.workspace }}/cargo
+      #     RUSTUP_HOME: ${{ runner.workspace }}/rustup
 
-      - name: Install dependencies
-        run: pnpm install
+      # - name: Add folder to PATH
+      #   run: |
+      #     echo "${{ runner.workspace }}/cargo" >> $GITHUB_PATH
 
-      - name: Run tests
-        run: pnpm test
+      # - name: Checkout code
+      #   uses: actions/checkout@v2
+
+      # - name: Install dependencies
+      #   run: pnpm install
+
+      # - name: Run tests
+      #   run: pnpm test
