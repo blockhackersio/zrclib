@@ -5,6 +5,9 @@ dotenv.config();
 
 const config: HardhatUserConfig = {
   solidity: "0.8.18",
+  mocha: {
+    timeout: 100000 // sets the timeout to 10 seconds
+  }
   // networks: {
   //   goerli: {
   //     url: `https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,

@@ -1,30 +1,43 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { plonk } from "snarkjs";
+import Utxo from "../utils/utxo";
+import { Keypair } from "../utils/keypair";
+import { prepareTransaction } from "../utils/index";
 
-it("Should work", async function () {
+it("Test transfer", async function () {
+  const sender = (await ethers.getSigners())[0]
+
   const MyPool = await ethers.getContractFactory("MyPool");
   const pool = await MyPool.deploy();
 
-  const proof = await generateProof(1, 2, 3);
+  //deposit parameter
+  const depositAmount = 1e7
+  const keypair = await Keypair.create()
+  const deposit = new Utxo({ amount: depositAmount, keypair: keypair })
 
+  let { args, extData } = await prepareTransaction({
+    outputs: [deposit],
+    account: {
+      owner: sender.address,
+      publicKey: deposit.keypair.address(),
+    },
+  })
+
+  // prepare proof arguments to the correct format
+  const proof = args["proof"]
+  let pubSignals = []
+  pubSignals.push(args["root"])
+  pubSignals.push(args["publicAmount"])
+  pubSignals.push(args["extDataHash"])
+  for (const element of args["inputNullifiers"]) {
+    pubSignals.push(element)
+  }
+  for (const element of args["outputCommitments"]) {
+    pubSignals.push(element)
+  }
+
+  // call verify proof 
   const mintAmount = 10;
-  await pool.mint(mintAmount, proof, [2]);
-  const mintedAmount = await pool.mintedAmount();
-  console.log("mintedAmount: " + mintedAmount);
+  await pool.mint(mintAmount, proof, pubSignals);
 });
-
-async function generateProof(a: number, b: number, c: number): Promise<string> {
-  console.log("Generating proof using CIRCOM");
-
-  const { proof } = await plonk.fullProve(
-    { a, b },
-    `../tools/compiled/transaction_js/transaction.wasm`,
-    `../tools/compiled/transaction.zkey`
-  );
-
-  const calldata = await plonk.exportSolidityCallData(proof, [c]);
-  const [proofString] = calldata.split(",");
-
-  return proofString;
-}
