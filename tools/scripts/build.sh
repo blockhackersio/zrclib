@@ -17,13 +17,4 @@ snarkjs plonk setup ./compiled/$FNAME.r1cs ./pot/pot.ptau ./compiled/$FNAME.zkey
 
 snarkjs zkey export solidityverifier ./compiled/${FNAME}.zkey ./contracts/${FNAME}_verifier.sol
 
-# Detect OS type
-OS_TYPE="$(uname)"
-
-if [ "$OS_TYPE" = "Darwin" ]; then
-  # macOS
-  sed -i '' "s/contract PlonkVerifier/contract ${FNAME_CAPS}Verifier/g" ./contracts/${FNAME}_verifier.sol
-else
-  # Linux
-  sed -i "s/contract PlonkVerifier/contract ${FNAME_CAPS}Verifier/g" ./contracts/${FNAME}_verifier.sol
-fi
+node ./scripts/processVerifier.js

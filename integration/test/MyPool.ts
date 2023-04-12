@@ -4,13 +4,9 @@ import { plonk } from "snarkjs";
 
 it("Should work", async function () {
   const MyPool = await ethers.getContractFactory("MyPool");
-  const TransactionVerifier = await ethers.getContractFactory("TransactionVerifier");
-  const verifier = await TransactionVerifier.deploy();
-  console.log("verifier address: " + verifier.address);
-  const pool = await MyPool.deploy(verifier.address);
+  const pool = await MyPool.deploy();
 
-  const proof = await generateProof(1, 2, 2);
-  //console.log(proof);
+  const proof = await generateProof(1, 2, 3);
 
   const mintAmount = 10;
   await pool.mint(mintAmount, proof, [2]);

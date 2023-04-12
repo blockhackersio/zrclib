@@ -104,6 +104,7 @@ contract TransactionVerifier {
     uint16 constant lastMem = 704;
 
     function verifyProof(bytes memory proof, uint[] memory pubSignals) public view returns (bool) {
+        bool result;
         assembly {
             /////////
             // Computes the inverse using the extended euclidean algorithm
@@ -621,8 +622,8 @@ contract TransactionVerifier {
             
             mstore(0x40, sub(pMem, lastMem))
             mstore(0, isValid)
-            return(0,0x20)
+            result := mload(0)
         }
-        
+        return result;
     }
 }
