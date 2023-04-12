@@ -9,10 +9,10 @@ contract ZRC20 {
     string private _symbol;
     TransactionVerifier public verifier;
 
-    constructor(string memory name_, string memory symbol_) {
+    constructor(string memory name_, string memory symbol_, address verifierAddress) {
         _name = name_;
         _symbol = symbol_;
-        verifier = TransactionVerifier(0xA836380122e58Dff60D3404d8994671b0eF6CCd8);
+        verifier = TransactionVerifier(verifierAddress);
     }
 
     function mint(uint256 amount, bytes memory proof, uint[] memory pubSignals) public virtual {
