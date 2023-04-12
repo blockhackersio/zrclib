@@ -94,18 +94,18 @@ async function getProof({
     inputNullifier: inputNullifier,
     outputCommitment: outputCommitment,
     publicAmount: BigNumber.from(extAmount).sub(fee).add(FIELD_SIZE).mod(FIELD_SIZE).toString(),
-    extDataHash,
+    extDataHash: BigInt(extDataHash),
 
     // data for 2 transaction inputs
-    inAmount: inputs.map((x) => x.amount),
-    inPrivateKey: inputs.map((x) => x.keypair.privkey),
-    inBlinding: inputs.map((x) => x.blinding),
+    inAmount: inputs.map((x) => BigInt(x.amount)),
+    inPrivateKey: inputs.map((x) => BigInt(x.keypair.privkey)),
+    inBlinding: inputs.map((x) => BigInt(x.blinding)),
     inPathIndices: inputMerklePathIndices,
     inPathElements: inputMerklePathElements,
 
     // data for 2 transaction outputs
-    outAmount: outputs.map((x) => x.amount),
-    outBlinding: outputs.map((x) => x.blinding),
+    outAmount: outputs.map((x) => BigInt(x.amount)),
+    outBlinding: outputs.map((x) => BigInt(x.blinding)),
     outPubkey: outputs.map((x) => poseidon.F.toObject(x.keypair.pubkey)),
   }
 
