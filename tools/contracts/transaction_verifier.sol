@@ -24,25 +24,25 @@ pragma solidity >=0.7.0 <0.9.0;
 contract TransactionVerifier {
     
     uint32 constant n =   65536;
-    uint16 constant nPublic =  0;
-    uint16 constant nLagrange = 1;
+    uint16 constant nPublic =  7;
+    uint16 constant nLagrange = 7;
     
-    uint256 constant Qmx = 21790090376169006364668419722439366800166605721707113495670824958343252521649;
-    uint256 constant Qmy = 10154361580892875070493059940872527926043464437274734528449391210650347500683;
-    uint256 constant Qlx = 4949359690807906395083889538974728129523293473874170295057146963510716968905;
-    uint256 constant Qly = 4185346044822387912894661347266286453553836339121676225265764692457445046662;
-    uint256 constant Qrx = 5168974323262092044178212889762601685327309625533095443925621003623894095423;
-    uint256 constant Qry = 14434843058825254860859438095250369099376476797185578217764434354325349065633;
-    uint256 constant Qox = 7133495567735310149085556615839380282298981668526597051385036643142726700038;
-    uint256 constant Qoy = 10623082534167082160443445164583437687104741024628614083892573296881086857467;
-    uint256 constant Qcx = 63586476781274981399386393294996956237054932941868764185517041996747010781;
-    uint256 constant Qcy = 15594009086943473521131019331108263696807754533280386128346412818301980186559;
-    uint256 constant S1x = 18465535890634031238395983119658078760359680825555427794079581880638826511952;
-    uint256 constant S1y = 12522512998289121022627833696733538831576543592280484196929669230225120612493;
-    uint256 constant S2x = 2521875577352074141773943358306839554807564885082333934563115018985275730793;
-    uint256 constant S2y = 11554509110487917288754907379252207261155337087146595787549124002639178718755;
-    uint256 constant S3x = 9742196406332411196195486650659927817654694479722107299642222029009034539011;
-    uint256 constant S3y = 14176308149051758284198836340831945502768234927500706226213236475825886276458;
+    uint256 constant Qmx = 7380196718602265725028101904250899289547409634828767414201408131213365186006;
+    uint256 constant Qmy = 19526428607535090885985085160302598644935414428337784466537024949716424142035;
+    uint256 constant Qlx = 15894380397127771444686292692537577329537209187046061145708642525921358647240;
+    uint256 constant Qly = 20743842437836971300378417063018597813205251522359729266015735574558734316679;
+    uint256 constant Qrx = 9852938910751168323822071357290378327647123076866318982859748840989075479803;
+    uint256 constant Qry = 13664780782122591536998944108720786827014253365173182000477508762723574772496;
+    uint256 constant Qox = 11767349150660671308080864666250618245116706676403065123195305618460470397506;
+    uint256 constant Qoy = 18093381136727139340227445976888814488908042037857692571959607631784243043153;
+    uint256 constant Qcx = 12051770379647439158380562555602478296981328815352213251219020728140368580499;
+    uint256 constant Qcy = 7193257875758051084250104365460352250754303082649724839732359092557654520695;
+    uint256 constant S1x = 3970687479655053825581421325853217096374547068432559607915419884942743172567;
+    uint256 constant S1y = 7513015605964959641820304101793097003468133497138408252089631502220946936573;
+    uint256 constant S2x = 11087183802833620669882681694724873354449949322574730022803425172938144199684;
+    uint256 constant S2y = 1508516585840187588722777295232117354079298154598483149269790769109342499311;
+    uint256 constant S3x = 11610922750953451053118230315875425568978436408368456866140629525456567965298;
+    uint256 constant S3y = 8680557376601792755609867943427500044576015905391619992957451576201037679316;
     uint256 constant k1 = 2;
     uint256 constant k2 = 3;
     uint256 constant X2x1 = 21831381940315734285607113342023901060522397560371972897001948545212302161822;
@@ -99,9 +99,21 @@ contract TransactionVerifier {
     
     uint16 constant pEval_l1 = 672;
     
+    uint16 constant pEval_l2 = 704;
+    
+    uint16 constant pEval_l3 = 736;
+    
+    uint16 constant pEval_l4 = 768;
+    
+    uint16 constant pEval_l5 = 800;
+    
+    uint16 constant pEval_l6 = 832;
+    
+    uint16 constant pEval_l7 = 864;
     
     
-    uint16 constant lastMem = 704;
+    
+    uint16 constant lastMem = 896;
 
     function verifyProof(bytes memory proof, uint[] memory pubSignals) public view returns (bool) {
         bool result;
@@ -205,14 +217,28 @@ contract TransactionVerifier {
                 let b
 
                 
-                mstore( add(pMem, 704 ), mload( add( pProof, pA)))
-                mstore( add(pMem, 736 ), mload( add( pProof, add(pA,32))))
-                mstore( add(pMem, 768 ), mload( add( pProof, add(pA,64))))
-                mstore( add(pMem, 800 ), mload( add( pProof, add(pA,96))))
-                mstore( add(pMem, 832 ), mload( add( pProof, add(pA,128))))
-                mstore( add(pMem, 864 ), mload( add( pProof, add(pA,160))))
+                mstore( add(pMem, 896 ), mload( add( pPublic, 32)))
                 
-                b := mod(keccak256(add(pMem, lastMem), 192), q) 
+                mstore( add(pMem, 928 ), mload( add( pPublic, 64)))
+                
+                mstore( add(pMem, 960 ), mload( add( pPublic, 96)))
+                
+                mstore( add(pMem, 992 ), mload( add( pPublic, 128)))
+                
+                mstore( add(pMem, 1024 ), mload( add( pPublic, 160)))
+                
+                mstore( add(pMem, 1056 ), mload( add( pPublic, 192)))
+                
+                mstore( add(pMem, 1088 ), mload( add( pPublic, 224)))
+                
+                mstore( add(pMem, 1120 ), mload( add( pProof, pA)))
+                mstore( add(pMem, 1152 ), mload( add( pProof, add(pA,32))))
+                mstore( add(pMem, 1184 ), mload( add( pProof, add(pA,64))))
+                mstore( add(pMem, 1216 ), mload( add( pProof, add(pA,96))))
+                mstore( add(pMem, 1248 ), mload( add( pProof, add(pA,128))))
+                mstore( add(pMem, 1280 ), mload( add( pProof, add(pA,160))))
+                
+                b := mod(keccak256(add(pMem, lastMem), 416), q) 
                 mstore( add(pMem, pBeta), b)
                 mstore( add(pMem, pGamma), mod(keccak256(add(pMem, pBeta), 32), q))
                 mstore( add(pMem, pAlpha), mod(keccak256(add(pProof, pZ), 64), q))
@@ -296,9 +322,135 @@ contract TransactionVerifier {
                     )
                 )
                 
+                w := mulmod(w, w1, q)
                 
                 
-                inverseArray(add(pMem, pZhInv), 2 )
+                mstore(
+                    add(pMem, pEval_l2), 
+                    mulmod(
+                        n, 
+                        mod(
+                            add(
+                                sub(
+                                    mload(add(pMem, pXi)), 
+                                    w
+                                ), 
+                                q
+                            ),
+                            q
+                        ), 
+                        q
+                    )
+                )
+                
+                w := mulmod(w, w1, q)
+                
+                
+                mstore(
+                    add(pMem, pEval_l3), 
+                    mulmod(
+                        n, 
+                        mod(
+                            add(
+                                sub(
+                                    mload(add(pMem, pXi)), 
+                                    w
+                                ), 
+                                q
+                            ),
+                            q
+                        ), 
+                        q
+                    )
+                )
+                
+                w := mulmod(w, w1, q)
+                
+                
+                mstore(
+                    add(pMem, pEval_l4), 
+                    mulmod(
+                        n, 
+                        mod(
+                            add(
+                                sub(
+                                    mload(add(pMem, pXi)), 
+                                    w
+                                ), 
+                                q
+                            ),
+                            q
+                        ), 
+                        q
+                    )
+                )
+                
+                w := mulmod(w, w1, q)
+                
+                
+                mstore(
+                    add(pMem, pEval_l5), 
+                    mulmod(
+                        n, 
+                        mod(
+                            add(
+                                sub(
+                                    mload(add(pMem, pXi)), 
+                                    w
+                                ), 
+                                q
+                            ),
+                            q
+                        ), 
+                        q
+                    )
+                )
+                
+                w := mulmod(w, w1, q)
+                
+                
+                mstore(
+                    add(pMem, pEval_l6), 
+                    mulmod(
+                        n, 
+                        mod(
+                            add(
+                                sub(
+                                    mload(add(pMem, pXi)), 
+                                    w
+                                ), 
+                                q
+                            ),
+                            q
+                        ), 
+                        q
+                    )
+                )
+                
+                w := mulmod(w, w1, q)
+                
+                
+                mstore(
+                    add(pMem, pEval_l7), 
+                    mulmod(
+                        n, 
+                        mod(
+                            add(
+                                sub(
+                                    mload(add(pMem, pXi)), 
+                                    w
+                                ), 
+                                q
+                            ),
+                            q
+                        ), 
+                        q
+                    )
+                )
+                
+                
+                
+                inverseArray(add(pMem, pZhInv), 8 )
                 
                 let zh := mload(add(pMem, pZh))
                 w := 1
@@ -314,6 +466,114 @@ contract TransactionVerifier {
                 )
                 
                 
+                w := mulmod(w, w1, q)
+                
+                
+                
+                mstore(
+                    add(pMem, pEval_l2), 
+                    mulmod(
+                        w,
+                        mulmod(
+                            mload(add(pMem, pEval_l2)),
+                            zh,
+                            q
+                        ),
+                        q
+                    )
+                )
+                
+                
+                w := mulmod(w, w1, q)
+                
+                
+                
+                mstore(
+                    add(pMem, pEval_l3), 
+                    mulmod(
+                        w,
+                        mulmod(
+                            mload(add(pMem, pEval_l3)),
+                            zh,
+                            q
+                        ),
+                        q
+                    )
+                )
+                
+                
+                w := mulmod(w, w1, q)
+                
+                
+                
+                mstore(
+                    add(pMem, pEval_l4), 
+                    mulmod(
+                        w,
+                        mulmod(
+                            mload(add(pMem, pEval_l4)),
+                            zh,
+                            q
+                        ),
+                        q
+                    )
+                )
+                
+                
+                w := mulmod(w, w1, q)
+                
+                
+                
+                mstore(
+                    add(pMem, pEval_l5), 
+                    mulmod(
+                        w,
+                        mulmod(
+                            mload(add(pMem, pEval_l5)),
+                            zh,
+                            q
+                        ),
+                        q
+                    )
+                )
+                
+                
+                w := mulmod(w, w1, q)
+                
+                
+                
+                mstore(
+                    add(pMem, pEval_l6), 
+                    mulmod(
+                        w,
+                        mulmod(
+                            mload(add(pMem, pEval_l6)),
+                            zh,
+                            q
+                        ),
+                        q
+                    )
+                )
+                
+                
+                w := mulmod(w, w1, q)
+                
+                
+                
+                mstore(
+                    add(pMem, pEval_l7), 
+                    mulmod(
+                        w,
+                        mulmod(
+                            mload(add(pMem, pEval_l7)),
+                            zh,
+                            q
+                        ),
+                        q
+                    )
+                )
+                
+                
                 
 
 
@@ -322,6 +582,111 @@ contract TransactionVerifier {
             function calculatePl(pMem, pPub) {
                 let pl := 0
                 
+                 
+                pl := mod(
+                    add(
+                        sub(
+                            pl,  
+                            mulmod(
+                                mload(add(pMem, pEval_l1)),
+                                mload(add(pPub, 32)),
+                                q
+                            )
+                        ),
+                        q
+                    ),
+                    q
+                )
+                 
+                pl := mod(
+                    add(
+                        sub(
+                            pl,  
+                            mulmod(
+                                mload(add(pMem, pEval_l2)),
+                                mload(add(pPub, 64)),
+                                q
+                            )
+                        ),
+                        q
+                    ),
+                    q
+                )
+                 
+                pl := mod(
+                    add(
+                        sub(
+                            pl,  
+                            mulmod(
+                                mload(add(pMem, pEval_l3)),
+                                mload(add(pPub, 96)),
+                                q
+                            )
+                        ),
+                        q
+                    ),
+                    q
+                )
+                 
+                pl := mod(
+                    add(
+                        sub(
+                            pl,  
+                            mulmod(
+                                mload(add(pMem, pEval_l4)),
+                                mload(add(pPub, 128)),
+                                q
+                            )
+                        ),
+                        q
+                    ),
+                    q
+                )
+                 
+                pl := mod(
+                    add(
+                        sub(
+                            pl,  
+                            mulmod(
+                                mload(add(pMem, pEval_l5)),
+                                mload(add(pPub, 160)),
+                                q
+                            )
+                        ),
+                        q
+                    ),
+                    q
+                )
+                 
+                pl := mod(
+                    add(
+                        sub(
+                            pl,  
+                            mulmod(
+                                mload(add(pMem, pEval_l6)),
+                                mload(add(pPub, 192)),
+                                q
+                            )
+                        ),
+                        q
+                    ),
+                    q
+                )
+                 
+                pl := mod(
+                    add(
+                        sub(
+                            pl,  
+                            mulmod(
+                                mload(add(pMem, pEval_l7)),
+                                mload(add(pPub, 224)),
+                                q
+                            )
+                        ),
+                        q
+                    ),
+                    q
+                )
                 
                 
                 mstore(add(pMem, pPl), pl)
