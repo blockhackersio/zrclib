@@ -47,24 +47,11 @@ jobs:
       - name: Add Circom to PATH
         run: echo "${{ runner.workspace }}/cargo/bin" >> $GITHUB_PATH
 
-      - name: Use Circom
-        run: circom --help
-      # - name: Clone and install circom
-      #   run: |
-      #     mkdir -p /tmp/installer-circom && cd /tmp/installer-circom && git clone https://github.com/iden3/circom.git && cd circom && cargo build --release && cargo install --path circom
-      #   env:
-      #     CARGO_HOME: ${{ runner.workspace }}/cargo
-      #     RUSTUP_HOME: ${{ runner.workspace }}/rustup
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      # - name: Add folder to PATH
-      #   run: |
-      #     echo "${{ runner.workspace }}/cargo" >> $GITHUB_PATH
+      - name: Install dependencies
+        run: pnpm install
 
-      # - name: Checkout code
-      #   uses: actions/checkout@v2
-
-      # - name: Install dependencies
-      #   run: pnpm install
-
-      # - name: Run tests
-      #   run: pnpm test
+      - name: Run tests
+        run: pnpm test
