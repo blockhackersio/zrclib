@@ -9,13 +9,9 @@ const { Keypair }  = require('./keypair')
 const { plonk } = require("snarkjs");
 const ff = require('ffjavascript');
 
-
-// const { prove } = require('./prover')
 const MERKLE_TREE_HEIGHT = 5
 
 async function generateProof(inputs) {
-  console.log("Generating proof using CIRCOM");
-
   const { proof } = await plonk.fullProve(
     inputs,
     `../tools/compiled/transaction_js/transaction.wasm`,
@@ -23,9 +19,7 @@ async function generateProof(inputs) {
   );
 
   const calldata = await plonk.exportSolidityCallData(proof, []);
-  console.log("Calldata: ", calldata)
   const [proofString] = calldata.split(",");
-  console.log("Proof: ", proofString)
 
   return proofString;
 }
@@ -115,11 +109,8 @@ async function getProof({
     outPubkey: outputs.map((x) => poseidon.F.toObject(x.keypair.pubkey)),
   }
 
-  console.log("Input: ", input)
-
   // const proof = await prove(input, `./artifacts/circuits/transaction${inputs.length}`)
   const proof = await generateProof(ff.utils.stringifyBigInts(input))
-  console.log("Proof: ", proof)
 
   const args = {
     proof,
@@ -129,7 +120,6 @@ async function getProof({
     publicAmount: toFixedHex(input.publicAmount),
     extDataHash: toFixedHex(extDataHash),
   }
-  console.log('Solidity args', args)
 
   return {
     extData,

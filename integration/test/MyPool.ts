@@ -5,7 +5,6 @@ import Utxo from "../utils/utxo";
 import { Keypair } from "../utils/keypair";
 import { prepareTransaction } from "../utils/index";
 
-
 it("Test transfer", async function () {
   const sender = (await ethers.getSigners())[0]
 
@@ -17,7 +16,7 @@ it("Test transfer", async function () {
   const keypair = await Keypair.create()
   const deposit = new Utxo({ amount: depositAmount, keypair: keypair })
 
-  await prepareTransaction({
+  let { args, extData } = await prepareTransaction({
     outputs: [deposit],
     account: {
       owner: sender.address,
@@ -25,9 +24,20 @@ it("Test transfer", async function () {
     },
   })
 
+  // prepare proof arguments to the correct format
+  const proof = args["proof"]
+  let pubSignals = []
+  pubSignals.push(args["root"])
+  pubSignals.push(args["publicAmount"])
+  pubSignals.push(args["extDataHash"])
+  for (const element of args["inputNullifiers"]) {
+    pubSignals.push(element)
+  }
+  for (const element of args["outputCommitments"]) {
+    pubSignals.push(element)
+  }
 
-  // const mintAmount = 10;
-  // await pool.mint(mintAmount, proof, [2]);
-  // const mintedAmount = await pool.mintedAmount();
-  // console.log("mintedAmount: " + mintedAmount);
+  // call verify proof 
+  const mintAmount = 10;
+  await pool.mint(mintAmount, proof, pubSignals);
 });
