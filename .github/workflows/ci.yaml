@@ -53,8 +53,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Compile circuit
-        run: circom circuit.circom -o circuit.json
-
       - name: Run tests
         run: pnpm test
