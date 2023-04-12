@@ -1,54 +1,54 @@
 const fs = require("fs");
 const path = require("path");
+const util = require("util");
+const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
 
-const TransactionVerifier = {
-  filename: "./contracts/generated/TransactionVerifier.sol",
-  edits: [
-    [`contract PlonkVerifier`, `contract TransactionVerifier`],
-    [
-      `        assembly {`,
-      `        bool result;
+const FILE_TANSFORMS = [
+  {
+    filename: "./contracts/generated/TransactionVerifier.sol",
+    edits: [
+      [`contract PlonkVerifier`, `contract TransactionVerifier`],
+      [
+        `        assembly {`,
+        `        bool result;
         assembly {`,
-    ],
-    [
-      `            mstore(0, isValid)
+      ],
+      [
+        `            mstore(0, isValid)
             return(0,0x20)
         }
         
     }
 }`,
-      `            mstore(0, isValid)
+        `            mstore(0, isValid)
             result := mload(0)
         }
         return result;
     }
 }`,
+      ],
     ],
-  ],
-};
+  },
+];
 
-async function transformFile(transformationSpec) {
-  return new Promise((resolve, reject) => {
-    const filename = path.resolve(process.cwd(), transformationSpec.filename);
+async function transformFile(specs) {
+  for (const spec of specs) {
+    process.stdout.write("Transforming " + spec.filename + "... ");
+    const filename = path.resolve(process.cwd(), spec.filename);
 
-    fs.readFile(filename, "utf8", (err, data) => {
-      if (err) {
-        return reject();
-      }
+    const data = await readFile(filename, "utf8");
 
-      const result = transformationSpec.edits.reduce(
-        (acc, pair) => acc.replace(pair[0], pair[1]),
-        data
-      );
+    const result = spec.edits.reduce(
+      (acc, pair) => acc.replace(pair[0], pair[1]),
+      data
+    );
 
-      fs.writeFile(filename, result, (err) => {
-        if (err) return reject();
-        resolve("ok");
-      });
-    });
-  });
+    await writeFile(filename, result);
+    process.stdout.write("done\n");
+  }
 }
 
-transformFile(TransactionVerifier)
+transformFile(FILE_TANSFORMS)
   .then(() => console.log("Verifier Processed Successfully"))
   .catch((err) => console.error(err));
