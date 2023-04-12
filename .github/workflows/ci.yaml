@@ -47,8 +47,7 @@ jobs:
 
       - name: Add folder to PATH
         run: |
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          ls -la $HOME/.cargo/bin
+          echo "${{ runner.workspace }}/cargo" >> $GITHUB_PATH
 
       - name: Checkout code
         uses: actions/checkout@v2
