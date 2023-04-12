@@ -43,6 +43,7 @@ jobs:
           git clone https://github.com/iden3/circom.git
           cd circom
           cargo install --path circom
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
         env:
           CARGO_HOME: ${{ runner.workspace }}/cargo
           RUSTUP_HOME: ${{ runner.workspace }}/rustup
