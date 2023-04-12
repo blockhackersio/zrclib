@@ -40,13 +40,16 @@ jobs:
 
       - name: Clone and install circom
         run: |
-          git clone https://github.com/iden3/circom.git
-          cd circom
-          cargo install --path circom
+          mkdir -p /tmp/installer-circom && cd /tmp/installer-circom && git clone https://github.com/iden3/circom.git && cd circom && cargo build --release && cargo install --path circom && rm -rf /tmp/installer-circom
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
         env:
           CARGO_HOME: ${{ runner.workspace }}/cargo
           RUSTUP_HOME: ${{ runner.workspace }}/rustup
+
+      - name: Add folder to PATH
+        run: |
+          echo 'export PATH="$PATH:$HOME/.cargo/bin"' >> $HOME/.bashrc
+          source $HOME/.bashrc
 
       - name: Checkout code
         uses: actions/checkout@v2
