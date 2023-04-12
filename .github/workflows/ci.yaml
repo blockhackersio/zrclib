@@ -39,13 +39,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Clone Circom repository
-        run: git clone https://github.com/iden3/circom.git && cd circom
-
-      - name: Build Circom
-        run: cargo build --release --features compiler
-
-      - name: Install Circom
-        run: cargo install --path .
+        run: git clone https://github.com/iden3/circom.git && cd circom && cargo build --release --features compiler && cargo install --path .
         env:
           CARGO_HOME: ${{ runner.workspace }}/cargo
           RUSTUP_HOME: ${{ runner.workspace }}/rustup
