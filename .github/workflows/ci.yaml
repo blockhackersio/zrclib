@@ -11,11 +11,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install Rust
+        run: curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
+        env:
+          CARGO_HOME: ${{ runner.workspace }}/cargo
+          RUSTUP_HOME: ${{ runner.workspace }}/rustup
+
+      - name: Cache Rust and circom
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ runner.workspace }}/cargo
+            ${{ runner.workspace }}/rustup
+          key: ${{ runner.os }}-rust-${{ hashFiles('**/circom/Cargo.toml') }}-${{ hashFiles('**/circom/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-
+
       - name: Install pnpm
         run: npm install -g pnpm
-
-      - name: Checkout code
-        uses: actions/checkout@v2
 
       - name: Cache node_modules
         uses: actions/cache@v2
@@ -25,8 +38,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      - name: Clone and install circom
+        run: |
+          git clone https://github.com/iden3/circom.git
+          cd circom
+          cargo install --path circom
+        env:
+          CARGO_HOME: ${{ runner.workspace }}/cargo
+          RUSTUP_HOME: ${{ runner.workspace }}/rustup
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Install dependencies
         run: pnpm install
+
+      - name: Compile circuit
+        run: circom circuit.circom -o circuit.json
 
       - name: Run tests
         run: pnpm test
