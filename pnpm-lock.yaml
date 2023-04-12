@@ -100,7 +100,11 @@ importers:
         specifier: ^2.13.1
         version: 2.13.1(ts-node@8.0.0)(typescript@4.5.2)
 
-  tools: {}
+  tools:
+    dependencies:
+      circomlib:
+        specifier: ^2.0.5
+        version: 2.0.5
 
 packages:
 
@@ -2005,6 +2009,10 @@ packages:
     hasBin: true
     dependencies:
       ffjavascript: 0.2.57
+    dev: false
+
+  /circomlib@2.0.5:
+    resolution: {integrity: sha512-O7NQ8OS+J4eshBuoy36z/TwQU0YHw8W3zxZcs4hVwpEll3e4hDm3mgkIPqItN8FDeLEKZFK3YeT/+k8TiLF3/A==}
     dev: false
 
   /classic-level@1.3.0:
