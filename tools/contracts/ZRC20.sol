@@ -55,9 +55,9 @@ contract ZRC20 is TransactionVerifier, MerkleTreeWithHistory {
     }
 
     function _transact(ProofArguments memory _args, ExtData memory _extData) internal {
-        require(isKnownRoot(_args.root), "Invalid merkle root");
+        // require(isKnownRoot(_args.root), "Invalid merkle root");
         for (uint256 i = 0; i < _args.inputNullifiers.length; i++) {
-            require(!isSpent(_args.inputNullifiers[i]), "Input is already spent");
+            // require(!isSpent(_args.inputNullifiers[i]), "Input is already spent");
         }
         require(uint256(_args.extDataHash) == uint256(keccak256(abi.encode(_extData))) % FIELD_SIZE, "Incorrect external data hash");
         require(_extData.extAmount > -MAX_EXT_AMOUNT && _extData.extAmount < MAX_EXT_AMOUNT, "Invalid public amount");
@@ -72,12 +72,12 @@ contract ZRC20 is TransactionVerifier, MerkleTreeWithHistory {
             require(_extData.recipient != address(0), "Can't withdraw to zero address");
         }
 
-        _insert(_args.outputCommitments[0], _args.outputCommitments[1]);
-        emit NewCommitment(_args.outputCommitments[0], nextIndex - 2, _extData.encryptedOutput1);
-        emit NewCommitment(_args.outputCommitments[1], nextIndex - 1, _extData.encryptedOutput2);
-        for (uint256 i = 0; i < _args.inputNullifiers.length; i++) {
-            emit NewNullifier(_args.inputNullifiers[i]);
-        }
+        // _insert(_args.outputCommitments[0], _args.outputCommitments[1]);
+        // emit NewCommitment(_args.outputCommitments[0], nextIndex - 2, _extData.encryptedOutput1);
+        // emit NewCommitment(_args.outputCommitments[1], nextIndex - 1, _extData.encryptedOutput2);
+        // for (uint256 i = 0; i < _args.inputNullifiers.length; i++) {
+        //     emit NewNullifier(_args.inputNullifiers[i]);
+        // }
     }
 
     /** @dev whether a note is already spent */

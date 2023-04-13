@@ -78,12 +78,8 @@ async function getProof({
   const extData = {
     recipient: toFixedHex(recipient, 20),
     extAmount: toFixedHex(extAmount),
-    relayer: toFixedHex(relayer, 20),
-    fee: toFixedHex(fee),
     encryptedOutput1: outputs[0].encrypt(),
     encryptedOutput2: outputs[1].encrypt(),
-    isL1Withdrawal,
-    l1Fee,
   };
 
   inputNullifier = [];
@@ -161,7 +157,6 @@ async function prepareTransaction({
   let extAmount = BigNumber.from(fee)
     .add(outputs.reduce((sum, x) => sum.add(x.amount), BigNumber.from(0)))
     .sub(inputs.reduce((sum, x) => sum.add(x.amount), BigNumber.from(0)));
-  console.log({ extAmount: `${extAmount}` });
 
   const { args, extData } = await getProof({
     inputs,

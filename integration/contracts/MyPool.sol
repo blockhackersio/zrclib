@@ -7,14 +7,13 @@ import "@zrclib/tools/contracts/ZRC20.sol";
 contract MyPool is ZRC20 {
     uint256 public mintedAmount;
 
-    constructor() ZRC20("MyPool", "MP") {}
+    constructor(address hasherAddress) ZRC20("MyPool", "MP", 5, hasherAddress) {}
 
     function mint(
         uint256 amount,
-        bytes memory proof,
-        uint[] memory pubSignals
+        Proof memory proof
     ) public {
-        _mint(amount, proof, pubSignals);
+        _mint(amount, proof);
         mintedAmount += amount;
     }
 }
