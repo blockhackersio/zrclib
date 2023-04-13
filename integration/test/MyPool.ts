@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { plonk } from "snarkjs";
 // @ts-ignore-line
 import Utxo from "../utils/utxo";
 // @ts-ignore-line
