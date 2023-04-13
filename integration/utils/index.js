@@ -114,11 +114,11 @@ async function getProof({
 
   const args = {
     proof,
-    root: toFixedHex(input.root),
-    inputNullifiers: inputNullifierArgs,
-    outputCommitments: outputCommitmentArgs,
-    publicAmount: toFixedHex(input.publicAmount),
-    extDataHash: toFixedHex(extDataHash),
+    root: input.root,
+    inputNullifiers: inputNullifier,
+    outputCommitments: outputCommitment,
+    publicAmount: input.publicAmount,
+    extDataHash: extDataHash,
   }
 
   return {
