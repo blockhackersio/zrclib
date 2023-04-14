@@ -12,7 +12,12 @@ export function poseidonHash(items: BigNumberish[]) {
 }
 
 export function poseidonHash2(a: BigNumberish, b: BigNumberish) {
-  return poseidonHash([a, b]);
+  return BigNumber.from(poseidonHash([a, b])).toString();
+}
+
+export function fieldToObject(input: BigNumberish): bigint {
+  // poseidon has the Field attached to the function
+  return (poseidon as any).F.toObject(input);
 }
 
 // This needs to be run ahead of time to ensure that

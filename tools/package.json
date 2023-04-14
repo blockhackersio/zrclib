@@ -21,7 +21,8 @@
     "@ethersproject/bytes": "^5.0.0",
     "circomlibjs": "^0.1.7",
     "eth-sig-util": "^3.0.1",
-    "ethers": "^5.4.7"
+    "ethers": "^5.4.7",
+    "fixed-merkle-tree": "^0.7.3"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.1.0",
