@@ -6,6 +6,10 @@ import { fieldToObject } from "./poseidon";
 import { plonk } from "snarkjs";
 import MerkleTree from "fixed-merkle-tree";
 
+// XXX: bundle as data url
+// XXX: NODE dependency remove!!
+import path from "path";
+
 export type ProofParams = {
   inputs: BaseUtxo[];
   outputs: BaseUtxo[];
@@ -21,8 +25,9 @@ export type ProofParams = {
 async function generateProof(inputs: object) {
   const { proof } = await plonk.fullProve(
     inputs,
-    `../tools/compiled/transaction_js/transaction.wasm`,
-    `../tools/compiled/transaction.zkey`
+    // XXX: bundle as data url
+    path.resolve(__dirname, `../compiled/transaction_js/transaction.wasm`),
+    path.resolve(__dirname, `../compiled/transaction.zkey`)
   );
 
   const calldata = await plonk.exportSolidityCallData(proof, []);
@@ -31,13 +36,34 @@ async function generateProof(inputs: object) {
   return proofString as string;
 }
 
+type ProofArgs = {
+  proof: string;
+  root: bigint;
+  inputNullifiers: bigint[];
+  outputCommitments: bigint[];
+  publicAmount: string;
+  extDataHash: bigint;
+};
+
+type ProofExtData = {
+  recipient: string;
+  extAmount: string;
+  encryptedOutput1: string;
+  encryptedOutput2: string;
+};
+
+export type ZrcProof = {
+  args: ProofArgs;
+  extData: ProofExtData;
+};
+
 export async function getProof({
   inputs,
   outputs,
   tree,
   extAmount,
   recipient,
-}: ProofParams) {
+}: ProofParams): Promise<ZrcProof> {
   inputs = shuffle(inputs);
   outputs = shuffle(outputs);
 
@@ -121,7 +147,7 @@ export async function getProof({
 
   return {
     extData,
-    proof,
+    // proof,
     args,
   };
 }
