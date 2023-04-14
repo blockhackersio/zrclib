@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers";
 import { Keypair } from "./keypair";
 import { Utxo } from "./utxo";
-import { ZrcProof, getProof } from "./getProof";
+import { ZrcProof, getProof } from "./get_proof";
 import { MerkleTree } from "fixed-merkle-tree";
 import { poseidonHash2 } from "./poseidon";
 

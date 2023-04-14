@@ -1,27 +1,9 @@
 import { BigNumber, Contract, providers } from "ethers";
-import { ZrcProof } from "./getProof";
-import { prepareTransaction } from "./prepareTransaction";
-import { Utxo, UtxoStore } from ".";
+import { ZrcProof } from "./get_proof";
+import { prepareTransaction } from "./prepare_transaction";
+import { Utxo } from ".";
 import { Keypair } from "./keypair";
-
-export class Account {
-  constructor(
-    private keypair: Keypair,
-    private utxoStore: UtxoStore = UtxoStore.create()
-  ) {}
-
-  getKeypair() {
-    return this.keypair;
-  }
-
-  async getUtxosUpTo(amount: number) {
-    return await this.utxoStore.getUtxosUpTo(amount);
-  }
-
-  fromKeypair(keypair: Keypair) {
-    return new Account(keypair);
-  }
-}
+import { Account } from "./account";
 
 export class Zrc20 {
   constructor(private account: Account) {}
