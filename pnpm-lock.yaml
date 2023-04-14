@@ -114,12 +114,18 @@ importers:
       '@ethersproject/bytes':
         specifier: ^5.0.0
         version: 5.7.0
+      circomlibjs:
+        specifier: ^0.1.7
+        version: 0.1.7
       eth-sig-util:
         specifier: ^3.0.1
         version: 3.0.1
       ethers:
         specifier: ^5.4.7
         version: 5.7.2
+      fixed-merkle-tree:
+        specifier: ^0.7.3
+        version: 0.7.3
     devDependencies:
       '@rollup/plugin-commonjs':
         specifier: ^24.1.0

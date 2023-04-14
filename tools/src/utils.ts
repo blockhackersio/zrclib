@@ -1,11 +1,7 @@
 import crypto from "crypto";
-
+import ff from "ffjavascript";
 import { BigNumber, utils } from "ethers";
-// @ts-expect-error
-import { poseidon } from "circomlib";
-
 import { numbers, FIELD_SIZE } from "./constants";
-
 import { BaseUtxo } from "./types";
 import { EthEncryptedData } from "eth-sig-util";
 
@@ -13,37 +9,28 @@ const BYTES_31 = 31;
 const BYTES_32 = 32;
 const ADDRESS_BYTES_LENGTH = 20;
 
-// eslint-disable-next-line
-function poseidonHash(items: any[]) {
-  return BigNumber.from(poseidon(items).toString());
-}
-
-function poseidonHash2(a: string, b: string) {
-  return poseidonHash([a, b]);
-}
-
 function randomBN(nbytes = BYTES_31) {
   return BigNumber.from(crypto.randomBytes(nbytes));
 }
 
 interface Params {
   recipient: string; // address || 0
-  relayer: string; // address || 0
+  // relayer: string; // address || 0
   encryptedOutput1: string;
   extAmount: string;
-  fee: string;
-  l1Fee: string;
-  isL1Withdrawal: boolean;
+  // fee: string;
+  // l1Fee: string;
+  // isL1Withdrawal: boolean;
   encryptedOutput2: string;
 }
 
 function getExtDataHash({
   recipient,
   extAmount,
-  isL1Withdrawal,
-  relayer,
-  fee,
-  l1Fee,
+  // isL1Withdrawal,
+  // relayer,
+  // fee,
+  // l1Fee,
   encryptedOutput1,
   encryptedOutput2,
 }: Params) {
@@ -51,23 +38,19 @@ function getExtDataHash({
 
   const encodedData = abi.encode(
     [
-      "tuple(address recipient,int256 extAmount,address relayer,uint256 fee,bytes encryptedOutput1,bytes encryptedOutput2,bool isL1Withdrawal,uint256 l1Fee)",
+      "tuple(address recipient,int256 extAmount,bytes encryptedOutput1,bytes encryptedOutput2)",
     ],
     [
       {
         recipient: toFixedHex(recipient, ADDRESS_BYTES_LENGTH),
         extAmount: toFixedHex(extAmount),
-        relayer: toFixedHex(relayer, ADDRESS_BYTES_LENGTH),
-        fee: toFixedHex(fee),
         encryptedOutput1: encryptedOutput1,
         encryptedOutput2: encryptedOutput2,
-        isL1Withdrawal: isL1Withdrawal,
-        l1Fee: toFixedHex(l1Fee),
       },
     ]
   );
   const hash = utils.keccak256(encodedData);
-  return BigNumber.from(hash).mod(FIELD_SIZE);
+  return BigNumber.from(hash).mod(FIELD_SIZE).toBigInt();
 }
 
 function toFixedHex(
@@ -155,12 +138,8 @@ export function unpackEncryptedMessage(encryptedMessage: string) {
   };
 }
 
-export {
-  randomBN,
-  toFixedHex,
-  toBuffer,
-  poseidonHash,
-  poseidonHash2,
-  getExtDataHash,
-  shuffle,
-};
+export function stringifyBigInts<T>(input: T): T {
+  return ff.utils.stringifyBigInts(input) as T;
+}
+
+export { randomBN, toFixedHex, toBuffer, getExtDataHash, shuffle };
