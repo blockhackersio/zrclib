@@ -6,7 +6,7 @@ import { packEncryptedMessage, unpackEncryptedMessage } from "./utils";
 
 import { toFixedHex } from "./utils";
 import { BaseKeypair } from "./types";
-import { poseidonHash } from "./poseidon";
+import { ensurePoseidon, poseidonHash } from "./poseidon";
 
 const PUB_KEY_LENGTH = 64;
 const STRING_WITH_0X_LENGTH = 130;
@@ -36,25 +36,6 @@ class Keypair implements BaseKeypair {
     return this.toString();
   }
 
-  public static fromString(str: string) {
-    if (str.length === STRING_WITH_0X_LENGTH) {
-      str = str.slice(numbers.OX_LENGTH);
-    }
-
-    if (str.length !== ENCRYPTION_KEY_LENGTH) {
-      throw new Error("Invalid key length");
-    }
-
-    return Object.assign(new Keypair(), {
-      privkey: null,
-      pubkey: BigNumber.from("0x" + str.slice(numbers.ZERO, PUB_KEY_LENGTH)),
-      encryptionKey: Buffer.from(
-        str.slice(PUB_KEY_LENGTH, ENCRYPTION_KEY_LENGTH),
-        "hex"
-      ).toString("base64"),
-    });
-  }
-
   public encrypt(bytes: Buffer) {
     return packEncryptedMessage(
       encrypt(
@@ -77,6 +58,30 @@ class Keypair implements BaseKeypair {
 
   public sign(commitment: BigNumber, merklePath: BigNumberish) {
     return poseidonHash([this.privkey, commitment, merklePath]);
+  }
+
+  public static fromString(str: string) {
+    if (str.length === STRING_WITH_0X_LENGTH) {
+      str = str.slice(numbers.OX_LENGTH);
+    }
+
+    if (str.length !== ENCRYPTION_KEY_LENGTH) {
+      throw new Error("Invalid key length");
+    }
+
+    return Object.assign(new Keypair(), {
+      privkey: null,
+      pubkey: BigNumber.from("0x" + str.slice(numbers.ZERO, PUB_KEY_LENGTH)),
+      encryptionKey: Buffer.from(
+        str.slice(PUB_KEY_LENGTH, ENCRYPTION_KEY_LENGTH),
+        "hex"
+      ).toString("base64"),
+    });
+  }
+
+  public static async generate() {
+    await ensurePoseidon();
+    return new Keypair();
   }
 }
 

@@ -22,6 +22,7 @@ export function fieldToObject(input: BigNumberish): bigint {
 
 // This needs to be run ahead of time to ensure that
 // the poseidon function is initialized
-export async function setupPoseidon() {
-  poseidon = await buildPoseidon();
+const promise = buildPoseidon().then((fn) => (poseidon = fn));
+export async function ensurePoseidon() {
+  await promise;
 }

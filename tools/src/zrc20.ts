@@ -4,11 +4,13 @@ import { prepareTransaction } from "./prepare_transaction";
 import { Utxo } from ".";
 import { Keypair } from "./keypair";
 import { Account } from "./account";
+import { ensurePoseidon } from "./poseidon";
 
 export class Zrc20 {
   constructor(private account: Account) {}
 
   async mint(amount: number, recipient: string): Promise<ZrcProof> {
+    await ensurePoseidon();
     const deposit = new Utxo({ amount, keypair: this.account.getKeypair() });
     const proof = await prepareTransaction({
       outputs: [deposit],
@@ -18,6 +20,7 @@ export class Zrc20 {
   }
 
   async transfer(amount: number, recipient: string): Promise<ZrcProof> {
+    await ensurePoseidon();
     const inputs = await this.account.getUtxosUpTo(amount);
     const inputsTotal = inputs.reduce(
       (sum, x) => sum.add(x.amount),
@@ -43,6 +46,7 @@ export class Zrc20 {
   }
 
   async burn(amount: number, recipient: string): Promise<ZrcProof> {
+    await ensurePoseidon();
     const inputs = await this.account.getUtxosUpTo(amount);
 
     const inputsTotal = inputs.reduce(

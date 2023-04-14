@@ -15,7 +15,7 @@ export class Account {
     return await this.utxoStore.getUtxosUpTo(amount);
   }
 
-  fromKeypair(keypair: Keypair) {
+  async fromKeypair(keypair: Keypair) {
     return new Account(keypair);
   }
 }
