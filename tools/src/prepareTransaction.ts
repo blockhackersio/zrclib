@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers";
 import { Keypair } from "./keypair";
 import { Utxo } from "./utxo";
-import { getProof } from "./getProof";
+import { ZrcProof, getProof } from "./getProof";
 import { MerkleTree } from "fixed-merkle-tree";
 import { poseidonHash2 } from "./poseidon";
 
@@ -21,10 +21,10 @@ export async function prepareTransaction({
   outputs = [],
   recipient = 0,
 }: {
-  inputs: Utxo[];
-  outputs: Utxo[];
-  recipient: string | 0;
-}) {
+  inputs?: Utxo[];
+  outputs?: Utxo[];
+  recipient?: string | 0;
+}): Promise<ZrcProof> {
   while (inputs.length < 2) {
     const keypair = new Keypair();
     inputs.push(new Utxo({ keypair: keypair }));

@@ -39,14 +39,10 @@ pnpm build
 // Get the standard ethers contract
 const token = await ethers.Contract(address, abi, signer);
 
-// Create a UTXOStore to store and decrypt our encrypted transactions
-const store = UtxoStore.new(signer);
+const account = Account.fromKeypair(Keypair.generate());
 
 //
-const zrc20 = Zrc20.fromEthers({
-  contract: myContract,
-  utxoStore: store,
-});
+const zrc20 = new Zrc20(account);
 
 // Deposit
 let proof: Zrc20Proof;
