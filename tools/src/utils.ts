@@ -1,8 +1,6 @@
 import crypto from "crypto";
 
 import { BigNumber, utils } from "ethers";
-// @ts-expect-error
-import { poseidon } from "circomlib";
 
 import { numbers, FIELD_SIZE } from "./constants";
 
@@ -12,15 +10,6 @@ import { EthEncryptedData } from "eth-sig-util";
 const BYTES_31 = 31;
 const BYTES_32 = 32;
 const ADDRESS_BYTES_LENGTH = 20;
-
-// eslint-disable-next-line
-function poseidonHash(items: any[]) {
-  return BigNumber.from(poseidon(items).toString());
-}
-
-function poseidonHash2(a: string, b: string) {
-  return poseidonHash([a, b]);
-}
 
 function randomBN(nbytes = BYTES_31) {
   return BigNumber.from(crypto.randomBytes(nbytes));
@@ -155,12 +144,4 @@ export function unpackEncryptedMessage(encryptedMessage: string) {
   };
 }
 
-export {
-  randomBN,
-  toFixedHex,
-  toBuffer,
-  poseidonHash,
-  poseidonHash2,
-  getExtDataHash,
-  shuffle,
-};
+export { randomBN, toFixedHex, toBuffer, getExtDataHash, shuffle };

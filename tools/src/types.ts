@@ -52,12 +52,6 @@ export interface BaseKeypair {
   sign: (commitment: BigNumber, merklePath: BigNumberish) => BigNumber;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-export abstract class KeypairStatic {
-  // @ts-expect-error
-  static fromString(str: string): BaseKeypair;
-}
-
 export type PrepareTxParams = {
   outputs?: BaseUtxo[];
   inputs?: BaseUtxo[];

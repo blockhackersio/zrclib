@@ -4,7 +4,8 @@ import { numbers, BG_ZERO } from "./constants";
 import { UtxoStatic, BaseUtxo, BaseKeypair, UtxoOptions } from "./types";
 
 import { Keypair } from "./keypair";
-import { randomBN, poseidonHash, toBuffer } from "./utils";
+import { randomBN, toBuffer } from "./utils";
+import { poseidonHash } from "./poseidon";
 
 const BYTES_31 = 31;
 const BYTES_62 = 62;

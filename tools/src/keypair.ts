@@ -4,21 +4,20 @@ import { encrypt, decrypt, getEncryptionPublicKey } from "eth-sig-util";
 import { numbers } from "./constants";
 import { packEncryptedMessage, unpackEncryptedMessage } from "./utils";
 
-import { poseidonHash, toFixedHex } from "./utils";
-import { BaseKeypair, KeypairStatic } from "./types";
+import { toFixedHex } from "./utils";
+import { BaseKeypair } from "./types";
+import { poseidonHash } from "./poseidon";
 
 const PUB_KEY_LENGTH = 64;
 const STRING_WITH_0X_LENGTH = 130;
 const ENCRYPTION_KEY_LENGTH = 128;
 
-class Keypair extends KeypairStatic implements BaseKeypair {
+class Keypair implements BaseKeypair {
   public privkey: string;
   public pubkey: BigNumber;
   public encryptionKey: string;
 
   public constructor(privkey = Wallet.createRandom().privateKey) {
-    super();
-
     this.privkey = privkey;
     this.pubkey = poseidonHash([privkey]);
     this.encryptionKey = getEncryptionPublicKey(
