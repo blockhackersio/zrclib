@@ -8,12 +8,18 @@ import { Keypair } from "../utils/keypair";
 import { prepareTransaction } from "../utils/index";
 // @ts-ignore-line
 import { toFixedHex } from "../utils/utils";
+import path from 'path';
+const artifactPath = path.join(__dirname, '..', '..', 'tools', 'contracts', 'generated', 'Hasher.json');
+const artifact = require(artifactPath);
 
 it("Test transfer", async function () {
   const sender = (await ethers.getSigners())[0];
 
+  const Hasher = await ethers.getContractFactory(artifact.abi, artifact.bytecode);
+  const hasher = await Hasher.deploy();
+
   const MyPool = await ethers.getContractFactory("MyPool");
-  const pool = await MyPool.deploy(ethers.constants.AddressZero);
+  const pool = await MyPool.deploy(hasher.address);
 
   //deposit parameter
   const depositAmount = 1e7;
