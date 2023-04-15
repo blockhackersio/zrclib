@@ -14,8 +14,6 @@ async function buildMerkleTree() {
     zeroElement:
       "21663839004416932945382355908790599225266501822907911457504978515578255421292",
   });
-
-  console.log(`t.root: ${t.root}`);
   return t;
 }
 

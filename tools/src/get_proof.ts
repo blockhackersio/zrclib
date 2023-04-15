@@ -14,12 +14,8 @@ export type ProofParams = {
   inputs: Utxo[];
   outputs: Utxo[];
   tree: MerkleTree;
-  // isL1Withdrawal: boolean;
-  // l1Fee: BigNumber;
   extAmount: BigNumber;
-  // fee: BigNumber;
   recipient: string | 0;
-  // relayer: string | BigNumber;
 };
 
 async function generateProof(inputs: object) {
