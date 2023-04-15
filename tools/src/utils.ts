@@ -4,6 +4,7 @@ import { BigNumber, utils } from "ethers";
 import { numbers, FIELD_SIZE } from "./constants";
 import { BaseUtxo } from "./types";
 import { EthEncryptedData } from "eth-sig-util";
+import { Utxo } from "./utxo";
 
 const BYTES_31 = 31;
 const BYTES_32 = 32;
@@ -78,12 +79,12 @@ function toBuffer(value: string | number | BigNumber, length: number) {
   return Buffer.from(number, "hex");
 }
 
-function shuffle(array: BaseUtxo[]) {
+function shuffle(array: Utxo[]) {
   let currentIndex = array.length;
   let randomIndex;
 
   // While there remain elements to shuffle...
-  while (currentIndex !== numbers.ZERO) {
+  while (currentIndex !== 0) {
     // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
@@ -105,11 +106,10 @@ export function packEncryptedMessage(encryptedData: EthEncryptedData) {
   const nonceBuf = Buffer.from(encryptedData.nonce, "base64");
   const ephemPublicKeyBuf = Buffer.from(encryptedData.ephemPublicKey, "base64");
   const ciphertextBuf = Buffer.from(encryptedData.ciphertext, "base64");
-
   const messageBuff = Buffer.concat([
-    Buffer.alloc(NONCE_BUF_LENGTH - nonceBuf.length),
+    Buffer.alloc(24 - nonceBuf.length),
     nonceBuf,
-    Buffer.alloc(BYTES_32 - ephemPublicKeyBuf.length),
+    Buffer.alloc(32 - ephemPublicKeyBuf.length),
     ephemPublicKeyBuf,
     ciphertextBuf,
   ]);
@@ -118,17 +118,14 @@ export function packEncryptedMessage(encryptedData: EthEncryptedData) {
 }
 
 export function unpackEncryptedMessage(encryptedMessage: string) {
-  if (encryptedMessage.slice(numbers.ZERO, numbers.OX_LENGTH) === "0x") {
-    encryptedMessage = encryptedMessage.slice(numbers.OX_LENGTH);
+  if (encryptedMessage.slice(0, 2) === "0x") {
+    encryptedMessage = encryptedMessage.slice(2);
   }
 
   const messageBuff = Buffer.from(encryptedMessage, "hex");
-  const nonceBuf = messageBuff.slice(numbers.ZERO, NONCE_BUF_LENGTH);
-  const ephemPublicKeyBuf = messageBuff.slice(
-    NONCE_BUF_LENGTH,
-    EPHEM_PUBLIC_KEY_BUF_LENGTH
-  );
-  const ciphertextBuf = messageBuff.slice(EPHEM_PUBLIC_KEY_BUF_LENGTH);
+  const nonceBuf = messageBuff.slice(0, 24);
+  const ephemPublicKeyBuf = messageBuff.slice(24, 56);
+  const ciphertextBuf = messageBuff.slice(56);
 
   return {
     version: "x25519-xsalsa20-poly1305",

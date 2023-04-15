@@ -128,7 +128,7 @@ async function getProof({
     outputCommitments: outputCommitment,
     publicAmount: input.publicAmount,
     extDataHash: extDataHash,
-  }
+  };
 
   return {
     extData,

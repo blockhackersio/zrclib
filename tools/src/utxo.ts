@@ -1,51 +1,35 @@
 import { BigNumber } from "ethers";
-
-import { numbers, BG_ZERO } from "./constants";
-import { UtxoStatic, BaseUtxo, BaseKeypair, UtxoOptions } from "./types";
-
+import { UtxoOptions } from "./types";
 import { Keypair } from "./keypair";
 import { randomBN, toBuffer } from "./utils";
 import { poseidonHash } from "./poseidon";
 
-const BYTES_31 = 31;
-const BYTES_62 = 62;
-
-class Utxo extends UtxoStatic implements BaseUtxo {
-  public keypair: BaseKeypair;
+class Utxo {
+  public keypair: Keypair | null;
   public amount: BigNumber;
   public transactionHash?: string;
   public blinding: BigNumber;
-  public index: number;
+  public index: number | null;
   public commitment?: BigNumber;
   public nullifier?: BigNumber;
 
-  public static decrypt(
-    keypair: BaseKeypair,
-    data: string,
-    index: number
-  ): BaseUtxo {
+  public static decrypt(keypair: Keypair, data: string, index: number): Utxo {
     const buf = keypair.decrypt(data);
 
     return new Utxo({
-      amount: BigNumber.from(
-        "0x" + buf.slice(numbers.ZERO, BYTES_31).toString("hex")
-      ),
-      blinding: BigNumber.from(
-        "0x" + buf.slice(BYTES_31, BYTES_62).toString("hex")
-      ),
+      amount: BigNumber.from("0x" + buf.slice(0, 31).toString("hex")),
+      blinding: BigNumber.from("0x" + buf.slice(31, 62).toString("hex")),
       keypair,
       index,
     });
   }
 
   public constructor({
-    amount = BG_ZERO,
-    keypair = new Keypair(),
+    amount = 0,
+    keypair = null,
     blinding = randomBN(),
-    index = numbers.ZERO,
+    index = null,
   }: UtxoOptions = {}) {
-    super();
-
     this.amount = BigNumber.from(amount);
     this.blinding = BigNumber.from(blinding);
     this.keypair = keypair;
@@ -53,7 +37,7 @@ class Utxo extends UtxoStatic implements BaseUtxo {
   }
 
   public getCommitment() {
-    if (this.commitment == null) {
+    if (this.commitment == null && this.keypair) {
       this.commitment = poseidonHash([
         this.amount,
         this.keypair.pubkey,
@@ -64,32 +48,32 @@ class Utxo extends UtxoStatic implements BaseUtxo {
   }
 
   public getNullifier() {
-    if (this.nullifier == null) {
+    if (!this.nullifier) {
       // eslint-disable-next-line eqeqeq
       if (
-        this.amount.gt(numbers.ZERO) &&
-        (this.index == undefined || this.keypair.privkey == undefined)
+        this.amount.gt(0) &&
+        (typeof this.index === "undefined" ||
+          typeof this.keypair?.privkey === "undefined")
       ) {
         throw new Error(
           "Can not compute nullifier without utxo index or shielded key"
         );
       }
-      const signature = this.keypair.privkey
-        ? this.keypair.sign(this.getCommitment(), this.index || numbers.ZERO)
-        : numbers.ZERO;
-      this.nullifier = poseidonHash([
-        this.getCommitment(),
-        this.index || numbers.ZERO,
-        signature,
-      ]);
+
+      const commitment = this.getCommitment()!;
+      const signature = this.keypair?.privkey
+        ? this.keypair.sign(commitment, this.index || 0)
+        : 0;
+      this.nullifier = poseidonHash([commitment, this.index || 0, signature]);
     }
     return this.nullifier;
   }
 
   public encrypt() {
+    if (!this.keypair) throw new Error("Cannot encrypt without keypair");
     const bytes = Buffer.concat([
-      toBuffer(this.amount, BYTES_31),
-      toBuffer(this.blinding, BYTES_31),
+      toBuffer(this.amount, 31),
+      toBuffer(this.blinding, 31),
     ]);
     return this.keypair.encrypt(bytes);
   }

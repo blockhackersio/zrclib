@@ -26,11 +26,11 @@ export async function prepareTransaction({
   recipient?: string | 0;
 }): Promise<ZrcProof> {
   while (inputs.length < 2) {
-    const keypair = new Keypair();
+    const keypair = await Keypair.generate();
     inputs.push(new Utxo({ keypair: keypair }));
   }
   while (outputs.length < 2) {
-    const keypair = new Keypair();
+    const keypair = await Keypair.generate();
     outputs.push(new Utxo({ keypair: keypair }));
   }
 

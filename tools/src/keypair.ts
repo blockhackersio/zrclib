@@ -1,18 +1,12 @@
 import { BigNumber, Wallet, BigNumberish } from "ethers";
 import { encrypt, decrypt, getEncryptionPublicKey } from "eth-sig-util";
 
-import { numbers } from "./constants";
 import { packEncryptedMessage, unpackEncryptedMessage } from "./utils";
 
 import { toFixedHex } from "./utils";
-import { BaseKeypair } from "./types";
 import { ensurePoseidon, poseidonHash } from "./poseidon";
 
-const PUB_KEY_LENGTH = 64;
-const STRING_WITH_0X_LENGTH = 130;
-const ENCRYPTION_KEY_LENGTH = 128;
-
-class Keypair implements BaseKeypair {
+class Keypair {
   public privkey: string;
   public pubkey: BigNumber;
   public encryptionKey: string;
@@ -20,9 +14,7 @@ class Keypair implements BaseKeypair {
   public constructor(privkey = Wallet.createRandom().privateKey) {
     this.privkey = privkey;
     this.pubkey = poseidonHash([privkey]);
-    this.encryptionKey = getEncryptionPublicKey(
-      privkey.slice(numbers.OX_LENGTH)
-    );
+    this.encryptionKey = getEncryptionPublicKey(privkey.slice(2));
   }
 
   public toString() {
@@ -48,34 +40,31 @@ class Keypair implements BaseKeypair {
 
   public decrypt(data: string) {
     return Buffer.from(
-      decrypt(
-        unpackEncryptedMessage(data),
-        this.privkey.slice(numbers.OX_LENGTH)
-      ),
+      decrypt(unpackEncryptedMessage(data), this.privkey.slice(2)),
       "base64"
     );
   }
 
-  public sign(commitment: BigNumber, merklePath: BigNumberish) {
+  public sign(
+    commitment: string | number | BigNumber,
+    merklePath: string | number | BigNumber
+  ): BigNumber {
     return poseidonHash([this.privkey, commitment, merklePath]);
   }
 
   public static fromString(str: string) {
-    if (str.length === STRING_WITH_0X_LENGTH) {
-      str = str.slice(numbers.OX_LENGTH);
+    if (str.length === 130) {
+      str = str.slice(2);
     }
 
-    if (str.length !== ENCRYPTION_KEY_LENGTH) {
+    if (str.length !== 128) {
       throw new Error("Invalid key length");
     }
 
     return Object.assign(new Keypair(), {
       privkey: null,
-      pubkey: BigNumber.from("0x" + str.slice(numbers.ZERO, PUB_KEY_LENGTH)),
-      encryptionKey: Buffer.from(
-        str.slice(PUB_KEY_LENGTH, ENCRYPTION_KEY_LENGTH),
-        "hex"
-      ).toString("base64"),
+      pubkey: BigNumber.from("0x" + str.slice(0, 64)),
+      encryptionKey: Buffer.from(str.slice(64, 128), "hex").toString("base64"),
     });
   }
 

@@ -1,6 +1,7 @@
 import { BigNumber, BigNumberish } from "ethers";
 
 import { BytesLike } from "@ethersproject/bytes";
+import { Keypair } from "./keypair";
 
 export type CommitmentEvent = {
   blockNumber: number;
@@ -15,8 +16,8 @@ export type CommitmentEvents = CommitmentEvent[];
 export interface UtxoOptions {
   amount?: BigNumber | number | string;
   blinding?: BigNumber;
-  index?: number;
-  keypair?: BaseKeypair;
+  index?: number | null;
+  keypair?: Keypair | null;
 }
 
 export interface BaseUtxo {

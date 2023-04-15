@@ -1,5 +1,4 @@
 import { BigNumber } from "ethers";
-import { BaseUtxo } from "./types";
 import { getExtDataHash, shuffle, stringifyBigInts, toFixedHex } from "./utils";
 import { FIELD_SIZE, numbers } from "./constants";
 import { fieldToObject } from "./poseidon";
@@ -8,10 +7,11 @@ import MerkleTree from "fixed-merkle-tree";
 
 // XXX: NODE dependency remove!!
 import * as path from "path";
+import { Utxo } from "./utxo";
 
 export type ProofParams = {
-  inputs: BaseUtxo[];
-  outputs: BaseUtxo[];
+  inputs: Utxo[];
+  outputs: Utxo[];
   tree: MerkleTree;
   // isL1Withdrawal: boolean;
   // l1Fee: BigNumber;
@@ -22,14 +22,12 @@ export type ProofParams = {
 };
 
 async function generateProof(inputs: object) {
-
   const { proof } = await plonk.fullProve(
     inputs,
     // XXX: need to handle this path based on implementation
     path.resolve(__dirname, `../compiled/transaction_js/transaction.wasm`),
     path.resolve(__dirname, `../compiled/transaction.zkey`)
   );
-
 
   const calldata = await plonk.exportSolidityCallData(proof, []);
   const [proofString] = calldata.split(",");
@@ -105,7 +103,7 @@ export async function getProof({
   }
   const outputCommitment: bigint[] = [];
   for (const output of outputs) {
-    const commitment = output.getCommitment();
+    const commitment = output.getCommitment()!;
     outputCommitment.push(fieldToObject(commitment));
   }
 
@@ -127,7 +125,7 @@ export async function getProof({
 
     // data for 2 transaction inputs
     inAmount: inputs.map((x) => BigInt(x.amount.toString())),
-    inPrivateKey: inputs.map((x) => BigInt(x.keypair.privkey)),
+    inPrivateKey: inputs.map((x) => BigInt(x.keypair!.privkey)),
     inBlinding: inputs.map((x) => BigInt(x.blinding.toString())),
     inPathIndices: inputMerklePathIndices,
     inPathElements: inputMerklePathElements,
@@ -135,7 +133,7 @@ export async function getProof({
     // data for 2 transaction outputs
     outAmount: outputs.map((x) => BigInt(x.amount.toString())),
     outBlinding: outputs.map((x) => BigInt(x.blinding.toString())),
-    outPubkey: outputs.map((x) => fieldToObject(x.keypair.pubkey)),
+    outPubkey: outputs.map((x) => fieldToObject(x.keypair!.pubkey)),
   };
 
   const proof = await generateProof(stringifyBigInts(input));
