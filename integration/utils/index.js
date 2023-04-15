@@ -34,11 +34,13 @@ async function buildMerkleTree() {
   poseidon = await circomlib.buildPoseidon();
   const poseidonHash2 = (a, b) => poseidon([a, b]);
   // TODO: get the leaves, if any
-  return new MerkleTree(MERKLE_TREE_HEIGHT, [], {
+  const t = new MerkleTree(MERKLE_TREE_HEIGHT, [], {
     hashFunction: poseidonHash2,
     zeroElement:
       "21663839004416932945382355908790599225266501822907911457504978515578255421292",
   });
+  console.log(`t.root: ${t.root}`);
+  return t;
 }
 
 async function getProof({
@@ -58,7 +60,10 @@ async function getProof({
 
   let inputMerklePathIndices = [];
   let inputMerklePathElements = [];
-
+  console.log(
+    "getProof:inputs",
+    inputs.map((i) => `${i.amount}`)
+  );
   for (const input of inputs) {
     if (input.amount > 0) {
       input.index = tree.indexOf(toFixedHex(input.getCommitment()));
@@ -74,7 +79,10 @@ async function getProof({
       inputMerklePathElements.push(new Array(tree.levels).fill(0));
     }
   }
-
+  console.log(
+    "getProof:inputs2",
+    inputs.map((i) => `${i.amount}`)
+  );
   const extData = {
     recipient: toFixedHex(recipient, 20),
     extAmount: toFixedHex(extAmount),
@@ -118,7 +126,7 @@ async function getProof({
     outBlinding: outputs.map((x) => BigInt(x.blinding)),
     outPubkey: outputs.map((x) => poseidon.F.toObject(x.keypair.pubkey)),
   };
-
+  console.log(input);
   const proof = await generateProof(ff.utils.stringifyBigInts(input));
 
   const args = {
@@ -129,7 +137,7 @@ async function getProof({
     publicAmount: input.publicAmount,
     extDataHash: extDataHash,
   };
-
+  console.log(args);
   return {
     extData,
     args,

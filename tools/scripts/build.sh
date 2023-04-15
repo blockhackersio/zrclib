@@ -3,4 +3,4 @@
 ./scripts/compile_circuit.sh transaction
 node ./scripts/process_output.js
 node ./scripts/generate_hasher_contract.js
-rollup -c
+pnpm tsc

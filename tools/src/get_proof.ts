@@ -8,6 +8,7 @@ import MerkleTree from "fixed-merkle-tree";
 // XXX: NODE dependency remove!!
 import * as path from "path";
 import { Utxo } from "./utxo";
+import { Element } from "fixed-merkle-tree";
 
 export type ProofParams = {
   inputs: Utxo[];
@@ -22,13 +23,14 @@ export type ProofParams = {
 };
 
 async function generateProof(inputs: object) {
+  console.log("start fullProve");
   const { proof } = await plonk.fullProve(
     inputs,
     // XXX: need to handle this path based on implementation
     path.resolve(__dirname, `../compiled/transaction_js/transaction.wasm`),
     path.resolve(__dirname, `../compiled/transaction.zkey`)
   );
-
+  console.log("end fullProve");
   const calldata = await plonk.exportSolidityCallData(proof, []);
   const [proofString] = calldata.split(",");
 
@@ -41,7 +43,7 @@ type ProofArgs = {
   inputNullifiers: bigint[];
   outputCommitments: bigint[];
   publicAmount: string;
-  extDataHash: bigint;
+  extDataHash: BigNumber;
 };
 
 type ProofExtData = {
@@ -66,14 +68,14 @@ export async function getProof({
   inputs = shuffle(inputs);
   outputs = shuffle(outputs);
 
-  const inputMerklePathIndices = [];
-  const inputMerklePathElements = [];
+  const inputMerklePathIndices: number[] = [];
+  const inputMerklePathElements: Element[][] = [];
 
   for (const input of inputs) {
-    if (input.amount.gt(numbers.ZERO)) {
+    if (input.amount.gt(0)) {
       input.index = tree.indexOf(toFixedHex(input.getCommitment()));
 
-      if (input.index < numbers.ZERO) {
+      if (input.index < 0) {
         throw new Error(
           `Input commitment ${toFixedHex(input.getCommitment())} was not found`
         );
@@ -81,10 +83,8 @@ export async function getProof({
       inputMerklePathIndices.push(input.index);
       inputMerklePathElements.push(tree.path(input.index).pathElements);
     } else {
-      inputMerklePathIndices.push(numbers.ZERO);
-      inputMerklePathElements.push(
-        new Array(numbers.MERKLE_TREE_HEIGHT).fill(numbers.ZERO)
-      );
+      inputMerklePathIndices.push(0);
+      inputMerklePathElements.push(new Array(tree.levels).fill(0));
     }
   }
 
@@ -109,10 +109,7 @@ export async function getProof({
 
   let input = {
     root: fieldToObject(
-      BigNumber.from(
-        (tree as any)._layers[tree.levels][0] ??
-          (tree as any)._zeros[tree.levels]
-      )
+      (tree as any)._layers[tree.levels][0] ?? (tree as any)._zeros[tree.levels]
     ),
     inputNullifier: inputNullifier,
     outputCommitment: outputCommitment,
@@ -121,11 +118,11 @@ export async function getProof({
       .add(FIELD_SIZE)
       .mod(FIELD_SIZE)
       .toString(),
-    extDataHash: BigInt(extDataHash),
+    extDataHash: extDataHash.toBigInt(),
 
     // data for 2 transaction inputs
-    inAmount: inputs.map((x) => BigInt(x.amount.toString())),
-    inPrivateKey: inputs.map((x) => BigInt(x.keypair!.privkey)),
+    inAmount: inputs.map((x) => x.amount.toBigInt()),
+    inPrivateKey: inputs.map((x) => BigInt(x.keypair.privkey)),
     inBlinding: inputs.map((x) => BigInt(x.blinding.toString())),
     inPathIndices: inputMerklePathIndices,
     inPathElements: inputMerklePathElements,
@@ -135,10 +132,11 @@ export async function getProof({
     outBlinding: outputs.map((x) => BigInt(x.blinding.toString())),
     outPubkey: outputs.map((x) => fieldToObject(x.keypair!.pubkey)),
   };
+  console.log(input);
+  const istring = stringifyBigInts(input);
+  const proof = await generateProof(istring);
 
-  const proof = await generateProof(stringifyBigInts(input));
-
-  const args = {
+  const args: ZrcProof["args"] = {
     proof,
     root: input.root,
     inputNullifiers: inputNullifier,

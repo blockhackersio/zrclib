@@ -3,8 +3,8 @@ import crypto from "crypto";
 (globalThis as any).crypto = crypto;
 
 import { ethers } from "hardhat";
-import { prepareTx } from "../utils/old";
-// import { prepareTx } from "../utils/new";
+// import { prepareTx } from "../utils/old";
+import { prepareTx } from "../utils/new";
 
 import path from "path";
 

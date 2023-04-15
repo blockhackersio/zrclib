@@ -1,15 +1,18 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "noEmitOnError": true,
     "lib": ["es2017"],
     "strict": true,
+    "declaration": true,
     "resolveJsonModule": true,
     "esModuleInterop": false,
+    "sourceMap": true,
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": ["./src/**/*.ts"]
+  "include": ["./src/**/*.ts"],
+  "exclude": ["./src/**/*.test.ts"]
 }

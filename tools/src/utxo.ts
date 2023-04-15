@@ -5,13 +5,13 @@ import { randomBN, toBuffer } from "./utils";
 import { poseidonHash } from "./poseidon";
 
 class Utxo {
-  public keypair: Keypair | null;
+  public keypair: Keypair;
   public amount: BigNumber;
   public transactionHash?: string;
   public blinding: BigNumber;
   public index: number | null;
-  public commitment?: BigNumber;
-  public nullifier?: BigNumber;
+  public commitment?: Uint8Array;
+  public nullifier?: Uint8Array;
 
   public static decrypt(keypair: Keypair, data: string, index: number): Utxo {
     const buf = keypair.decrypt(data);
@@ -26,7 +26,7 @@ class Utxo {
 
   public constructor({
     amount = 0,
-    keypair = null,
+    keypair = new Keypair(),
     blinding = randomBN(),
     index = null,
   }: UtxoOptions = {}) {
@@ -37,7 +37,7 @@ class Utxo {
   }
 
   public getCommitment() {
-    if (this.commitment == null && this.keypair) {
+    if (!this.commitment) {
       this.commitment = poseidonHash([
         this.amount,
         this.keypair.pubkey,
@@ -49,11 +49,12 @@ class Utxo {
 
   public getNullifier() {
     if (!this.nullifier) {
-      // eslint-disable-next-line eqeqeq
       if (
         this.amount.gt(0) &&
-        (typeof this.index === "undefined" ||
-          typeof this.keypair?.privkey === "undefined")
+        (this.index === null ||
+          this.index === undefined ||
+          this.keypair.privkey === undefined ||
+          this.keypair.privkey === null)
       ) {
         throw new Error(
           "Can not compute nullifier without utxo index or shielded key"

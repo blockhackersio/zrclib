@@ -6,6 +6,7 @@ import { Keypair } from "./keypair";
 import { prepareTransaction } from "./index";
 // @ts-ignore-line
 import { toFixedHex } from "./utils";
+
 export async function prepareTx(depositAmount: number, address: string) {
   const keypair = await Keypair.create();
   const deposit = new Utxo({ amount: depositAmount, keypair: keypair });

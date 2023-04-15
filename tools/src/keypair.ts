@@ -8,18 +8,19 @@ import { ensurePoseidon, poseidonHash } from "./poseidon";
 
 class Keypair {
   public privkey: string;
-  public pubkey: BigNumber;
+  public pubkey: Uint8Array;
   public encryptionKey: string;
 
   public constructor(privkey = Wallet.createRandom().privateKey) {
-    this.privkey = privkey;
+    console.log({ privkey });
+    this.privkey = BigInt(privkey).toString();
     this.pubkey = poseidonHash([privkey]);
     this.encryptionKey = getEncryptionPublicKey(privkey.slice(2));
   }
 
   public toString() {
     return (
-      toFixedHex(this.pubkey) +
+      toFixedHex(Buffer.from(this.pubkey)) +
       Buffer.from(this.encryptionKey, "base64").toString("hex")
     );
   }
@@ -46,9 +47,9 @@ class Keypair {
   }
 
   public sign(
-    commitment: string | number | BigNumber,
-    merklePath: string | number | BigNumber
-  ): BigNumber {
+    commitment: string | number | BigNumber | Uint8Array,
+    merklePath: string | number | BigNumber | Uint8Array
+  ): Uint8Array {
     return poseidonHash([this.privkey, commitment, merklePath]);
   }
 

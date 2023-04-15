@@ -1,8 +1,8 @@
-declare module "circomlibjs" {
-  export = circomlibjs;
+import { BigNumber, BigNumberish } from "ethers";
 
-  type PoseidonFn = (a: BigNumberish[]) => BigNumber;
-  declare const circomlibjs: {
-    buildPoseidon: () => Promise<PoseidonFn>;
-  };
+declare module "circomlibjs" {
+  // export = circomlibjs;
+
+  type PoseidonFn = (a: BigNumberish[]) => Uint8Array;
+  export const buildPoseidon: () => Promise<PoseidonFn>;
 }

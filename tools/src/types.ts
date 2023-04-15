@@ -17,7 +17,7 @@ export interface UtxoOptions {
   amount?: BigNumber | number | string;
   blinding?: BigNumber;
   index?: number | null;
-  keypair?: Keypair | null;
+  keypair?: Keypair;
 }
 
 export interface BaseUtxo {

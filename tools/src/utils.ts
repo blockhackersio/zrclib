@@ -1,37 +1,25 @@
 import * as crypto from "crypto";
 import * as ff from "ffjavascript";
 import { BigNumber, utils } from "ethers";
-import { numbers, FIELD_SIZE } from "./constants";
-import { BaseUtxo } from "./types";
+import { FIELD_SIZE } from "./constants";
 import { EthEncryptedData } from "eth-sig-util";
 import { Utxo } from "./utxo";
 
-const BYTES_31 = 31;
-const BYTES_32 = 32;
-const ADDRESS_BYTES_LENGTH = 20;
-
-function randomBN(nbytes = BYTES_31) {
+function randomBN(nbytes = 31) {
+  console.log("randomBN");
   return BigNumber.from(crypto.randomBytes(nbytes));
 }
 
 interface Params {
-  recipient: string; // address || 0
-  // relayer: string; // address || 0
+  recipient: string;
   encryptedOutput1: string;
   extAmount: string;
-  // fee: string;
-  // l1Fee: string;
-  // isL1Withdrawal: boolean;
   encryptedOutput2: string;
 }
 
 function getExtDataHash({
   recipient,
   extAmount,
-  // isL1Withdrawal,
-  // relayer,
-  // fee,
-  // l1Fee,
   encryptedOutput1,
   encryptedOutput2,
 }: Params) {
@@ -43,7 +31,7 @@ function getExtDataHash({
     ],
     [
       {
-        recipient: toFixedHex(recipient, ADDRESS_BYTES_LENGTH),
+        recipient: toFixedHex(recipient, 20),
         extAmount: toFixedHex(extAmount),
         encryptedOutput1: encryptedOutput1,
         encryptedOutput2: encryptedOutput2,
@@ -51,32 +39,33 @@ function getExtDataHash({
     ]
   );
   const hash = utils.keccak256(encodedData);
-  return BigNumber.from(hash).mod(FIELD_SIZE).toBigInt();
+  return BigNumber.from(hash).mod(FIELD_SIZE);
 }
 
 function toFixedHex(
-  number?: number | Buffer | BigNumber | string | bigint,
-  length = BYTES_32
+  number?: number | Buffer | BigNumber | string | bigint | Uint8Array,
+  length = 32
 ) {
   let result =
     "0x" +
-    (number instanceof Buffer
+    (number instanceof Buffer || number instanceof Uint8Array
       ? number.toString("hex")
       : BigNumber.from(number).toHexString().replace("0x", "")
-    ).padStart(length * numbers.TWO, "0");
-  if (result.includes("-")) {
+    ).padStart(length * 2, "0");
+  if (result.indexOf("-") > -1) {
     result = "-" + result.replace("-", "");
   }
   return result;
 }
 
 function toBuffer(value: string | number | BigNumber, length: number) {
-  const number = BigNumber.from(value)
-    .toHexString()
-    .slice(numbers.TWO)
-    .padStart(length * numbers.TWO, "0");
-
-  return Buffer.from(number, "hex");
+  return Buffer.from(
+    BigNumber.from(value)
+      .toHexString()
+      .slice(2)
+      .padStart(length * 2, "0"),
+    "hex"
+  );
 }
 
 function shuffle(array: Utxo[]) {
@@ -98,9 +87,6 @@ function shuffle(array: Utxo[]) {
 
   return array;
 }
-
-const NONCE_BUF_LENGTH = 24;
-const EPHEM_PUBLIC_KEY_BUF_LENGTH = 56;
 
 export function packEncryptedMessage(encryptedData: EthEncryptedData) {
   const nonceBuf = Buffer.from(encryptedData.nonce, "base64");
@@ -136,6 +122,7 @@ export function unpackEncryptedMessage(encryptedMessage: string) {
 }
 
 export function stringifyBigInts<T>(input: T): T {
+  console.log("stringifyBigInts");
   return ff.utils.stringifyBigInts(input) as T;
 }
 

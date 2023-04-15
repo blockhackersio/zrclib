@@ -2,18 +2,21 @@ import { BigNumber } from "ethers";
 import { Keypair } from "./keypair";
 import { Utxo } from "./utxo";
 import { ZrcProof, getProof } from "./get_proof";
-import { MerkleTree } from "fixed-merkle-tree";
+import { Element, HashFunction, MerkleTree } from "fixed-merkle-tree";
 import { poseidonHash2 } from "./poseidon";
 
 const MERKLE_TREE_HEIGHT = 5;
 
 async function buildMerkleTree() {
   // TODO: get the leaves, if any
-  return new MerkleTree(MERKLE_TREE_HEIGHT, [], {
-    hashFunction: poseidonHash2,
+  const t = new MerkleTree(MERKLE_TREE_HEIGHT, [], {
+    hashFunction: poseidonHash2 as any as HashFunction<Element>,
     zeroElement:
       "21663839004416932945382355908790599225266501822907911457504978515578255421292",
   });
+
+  console.log(`t.root: ${t.root}`);
+  return t;
 }
 
 export async function prepareTransaction({
@@ -45,6 +48,8 @@ export async function prepareTransaction({
     extAmount,
     recipient,
   });
+
+  console.log(args);
   return {
     args,
     extData,
