@@ -1,10 +1,15 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "module": "NodeNext",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "target": "es5",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "lib": ["es2017"],
     "strict": true,
-    "skipLibCheck": true
-  }
+    "resolveJsonModule": true,
+    "esModuleInterop": false,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["./src/**/*.ts"]
 }

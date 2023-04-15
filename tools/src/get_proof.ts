@@ -6,9 +6,8 @@ import { fieldToObject } from "./poseidon";
 import { plonk } from "snarkjs";
 import MerkleTree from "fixed-merkle-tree";
 
-// XXX: bundle as data url
 // XXX: NODE dependency remove!!
-import path from "path";
+import * as path from "path";
 
 export type ProofParams = {
   inputs: BaseUtxo[];
@@ -23,12 +22,14 @@ export type ProofParams = {
 };
 
 async function generateProof(inputs: object) {
+
   const { proof } = await plonk.fullProve(
     inputs,
-    // XXX: bundle as data url
+    // XXX: need to handle this path based on implementation
     path.resolve(__dirname, `../compiled/transaction_js/transaction.wasm`),
     path.resolve(__dirname, `../compiled/transaction.zkey`)
   );
+
 
   const calldata = await plonk.exportSolidityCallData(proof, []);
   const [proofString] = calldata.split(",");
@@ -110,7 +111,10 @@ export async function getProof({
 
   let input = {
     root: fieldToObject(
-      (tree as any)._layers[tree.levels][0] ?? (tree as any)._zeros[tree.levels]
+      BigNumber.from(
+        (tree as any)._layers[tree.levels][0] ??
+          (tree as any)._zeros[tree.levels]
+      )
     ),
     inputNullifier: inputNullifier,
     outputCommitment: outputCommitment,

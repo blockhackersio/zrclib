@@ -1,3 +1,7 @@
+declare module "webcrypto" {
+  export const Crypto: any;
+}
+
 declare module "snarkjs" {
   export = snarkjs;
 

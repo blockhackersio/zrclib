@@ -1,3 +1,7 @@
+// Need this or ethers fails in node
+import crypto from "crypto";
+(globalThis as any).crypto = crypto;
+
 import { expect } from "chai";
 import { ethers } from "hardhat";
 // @ts-ignore-line
@@ -8,18 +12,38 @@ import { Keypair } from "../utils/keypair";
 import { prepareTransaction } from "../utils/index";
 // @ts-ignore-line
 import { toFixedHex } from "../utils/utils";
-import path from 'path';
-const artifactPath = path.join(__dirname, '..', '..', 'tools', 'contracts', 'generated', 'Hasher.json');
+
+// // XXX:NEW
+// import { Account, Keypair, Zrc20, toFixedHex } from "@zrclib/tools";
+// // XXX:NEW
+
+import path from "path";
+
+const artifactPath = path.join(
+  __dirname,
+  "../../tools/contracts/generated/Hasher.json"
+);
 const artifact = require(artifactPath);
 
 it("Test transfer", async function () {
   const sender = (await ethers.getSigners())[0];
 
-  const Hasher = await ethers.getContractFactory(artifact.abi, artifact.bytecode);
+  const Hasher = await ethers.getContractFactory(
+    artifact.abi,
+    artifact.bytecode
+  );
   const hasher = await Hasher.deploy();
 
   const MyPool = await ethers.getContractFactory("MyPool");
   const pool = await MyPool.deploy(hasher.address);
+
+  // THE FOLLOWING IS NEW CODE
+  // const keypair = await Keypair.generate();
+  // const account = new Account(keypair);
+  // const zrc20 = new Zrc20(account);
+
+  // const { args, extData } = await zrc20.mint(1e7);
+  // END NEW CODE
 
   //deposit parameter
   const depositAmount = 1e7;
@@ -51,16 +75,18 @@ it("Test transfer", async function () {
     proof: proof,
     pubSignals: pubSignals,
     root: toFixedHex(args["root"]),
-    inputNullifiers: args["inputNullifiers"].map((x: number) => toFixedHex(x)),
-    outputCommitments: args["outputCommitments"].map((x: number) => toFixedHex(x)),
+    inputNullifiers: args["inputNullifiers"].map((x: bigint) => toFixedHex(x)),
+    outputCommitments: args["outputCommitments"].map((x: bigint) =>
+      toFixedHex(x)
+    ),
     publicAmount: args["publicAmount"],
-    extDataHash: toFixedHex(args["extDataHash"])
-  }
+    extDataHash: toFixedHex(args["extDataHash"]),
+  };
 
   const input = {
     proofArguments: proofArguments,
-    extData: extData
-  }
+    extData: extData,
+  };
 
   // call verify proof
   const mintAmount = 10;

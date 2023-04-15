@@ -16,8 +16,9 @@ export function poseidonHash2(a: BigNumberish, b: BigNumberish) {
 }
 
 export function fieldToObject(input: BigNumberish): bigint {
+  console.log(`fieldToObject:${input}`);
   // poseidon has the Field attached to the function
-  return (poseidon as any).F.toObject(input);
+  return BigInt((poseidon as any).F.toObject(input));
 }
 
 // This needs to be run ahead of time to ensure that

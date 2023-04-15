@@ -1,4 +1,4 @@
-import { UtxoStore } from ".";
+import { UtxoStore } from "./utxo_store";
 import { Keypair } from "./keypair";
 
 export class Account {

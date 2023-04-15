@@ -1,4 +1,4 @@
-import { Utxo } from "./index";
+import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
 import { ensurePoseidon } from "./poseidon";
 // import { buildPoseidon } from "circomlibjs";

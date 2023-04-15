@@ -1,5 +1,5 @@
-import crypto from "crypto";
-import ff from "ffjavascript";
+import * as crypto from "crypto";
+import * as ff from "ffjavascript";
 import { BigNumber, utils } from "ethers";
 import { numbers, FIELD_SIZE } from "./constants";
 import { BaseUtxo } from "./types";
@@ -54,7 +54,7 @@ function getExtDataHash({
 }
 
 function toFixedHex(
-  number?: number | Buffer | BigNumber | string,
+  number?: number | Buffer | BigNumber | string | bigint,
   length = BYTES_32
 ) {
   let result =
