@@ -3,7 +3,7 @@ import crypto from "crypto";
 (globalThis as any).crypto = crypto;
 
 import { ethers } from "hardhat";
-import { prepareTx } from "../utils/new";
+import { Account, Keypair, Zrc20, toFixedHex } from "@zrclib/tools";
 
 import path from "path";
 
@@ -14,8 +14,6 @@ const artifactPath = path.join(
 const artifact = require(artifactPath);
 
 it("Test transfer", async function () {
-  const sender = (await ethers.getSigners())[0];
-
   const Hasher = await ethers.getContractFactory(
     artifact.abi,
     artifact.bytecode
@@ -27,10 +25,11 @@ it("Test transfer", async function () {
 
   //deposit parameter
   const depositAmount = 1e7;
-  const { args, extData, toFixedHex } = await prepareTx(
-    depositAmount,
-    sender.address
-  );
+  const keypair = await Keypair.generate();
+  const account = new Account(keypair);
+  const zrc20 = new Zrc20(account);
+
+  const { args, extData } = await zrc20.mint(depositAmount);
 
   // prepare proof arguments to the correct format
   const proof = args["proof"];
