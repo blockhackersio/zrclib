@@ -1,5 +1,9 @@
 <p align="center"><h1 align="center">zrclib 🔮</h1></p>
 
+## Mission
+
+To bring zero knowledge privacy primitives to all web3 developers.
+
 ## Installation
 
 A library to enable web3 developers to work with zero knowledge constructions within a solidity context.
