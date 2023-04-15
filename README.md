@@ -4,6 +4,13 @@
 
 To bring zero knowledge privacy primitives to all web3 developers.
 
+## Roadmap
+
+- [ ] ZRC-20 (Token & Payment)
+- [ ] Stable Coin Example
+- [ ] ZRC-1155 (Payment / Swap / NFTS / Airdrops)
+
+
 ### Prerequisites
 
 - pnpm (8.2.0+)
