@@ -1,6 +1,4 @@
 // Need this or ethers fails in node
-import crypto from "crypto";
-(globalThis as any).crypto = crypto;
 
 import { ethers } from "hardhat";
 import { Account, Keypair, Zrc20, toFixedHex } from "@zrclib/tools";
