@@ -4,10 +4,6 @@
 
 To bring zero knowledge privacy primitives to all web3 developers.
 
-## Installation
-
-A library to enable web3 developers to work with zero knowledge constructions within a solidity context.
-
 ### Prerequisites
 
 - pnpm (8.2.0+)
