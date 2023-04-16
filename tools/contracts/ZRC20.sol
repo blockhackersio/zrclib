@@ -67,7 +67,7 @@ contract ZRC20 is TransactionVerifier, MerkleTreeWithHistory {
         _transact(proof.proofArguments, proof.extData);
     }
 
-    function getTotalSupply() public view returns (uint256) {
+    function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
 

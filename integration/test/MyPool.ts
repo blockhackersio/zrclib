@@ -4,6 +4,7 @@ import { ethers } from "hardhat";
 import { Account, Keypair, Zrc20, toFixedHex, ZrcProof } from "@zrclib/tools";
 
 import path from "path";
+import { expect } from "chai";
 
 const artifactPath = path.join(
   __dirname,
@@ -33,6 +34,7 @@ it("Test transfer", async function () {
   // call verify proof
   const mintAmount = 10;
   await pool.mint(mintAmount, input);
+  expect(await pool.totalSupply()).to.be.equal(mintAmount);
 });
 
 async function formatArguments(zrcProof: ZrcProof) {
