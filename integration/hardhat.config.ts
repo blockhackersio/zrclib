@@ -7,7 +7,7 @@ dotenv.config();
 const config: HardhatUserConfig = {
   solidity: "0.8.18",
   mocha: {
-    timeout: 100000, // sets the timeout to 10 seconds
+    timeout: 100_000_000, // sets the timeout to 10 seconds
   },
 };
 
