@@ -10,7 +10,6 @@ To bring zero knowledge privacy primitives to all web3 developers.
 - [ ] Stable Coin Example
 - [ ] ZRC-1155 (Payment / Swap / NFTS / Airdrops)
 
-
 ### Prerequisites
 
 - pnpm (8.2.0+)
@@ -46,42 +45,35 @@ pnpm build
 // Get the standard ethers contract
 const token = await ethers.Contract(address, abi, signer);
 
-const account = Account.fromKeypair(Keypair.generate());
+const account = ShieldedAccount.from(signer);
 
-//
-const zrc20 = new Zrc20(account);
+if (!account.loggedIn()) {
+  await account.login(); // Request Wallet to sign message
+}
 
-// Deposit
-let proof: Zrc20Proof;
+// create shieldedPool object
+const prover = ShieldedPool.getProver(account);
 
-// Generate proof that mints 1 token
-proof = await zrc20.mint(1e18, receiver);
-
+// Generate proof that shields 1 token
 // Call the deposit method on the contract which will
 // call `transferFrom` to spend 1 of your ERC-20 tokens and
 // commit the transaction. If the transfer fails the transaction will fail
-token.deposit(proof);
+const shieldProof = await prover.proveShield(1e18);
+await token.deposit(shieldProof);
 
 // Generate proof that sends 0.5 tokens to toAddress
-proof = await zrc20.transfer(5e17, receiver);
+const transferProof = await prover.proveTransfer(5e17, receiver);
 
 // Call the transfer method on the contract which will
 // verify and commit the transaction
-token.tranfer(proof);
+await token.tranfer(transferProof);
 
 // Generate proof that burns 0.5 tokens to the receiver address
-proof = await zrc20.burn(5e17, receiver);
+const unshieldProof = await prover.proveUnshield(5e17, receiver);
 
 // Call the withdraw method on the contract which will
 // call `transferFrom` to return 0.5 of your ERC-20 tokens to your public account
-token.withdraw(proof);
-
-// Generate proof that mints 1 token to the receiver address
-proof = await zrc20.mint(1e18, receiver);
-
-// Let's say this function has an onlyOwner modifier
-// Assuming the signer is the owner of the contract this call will
-// create tokens in the shielded pool in a similar way to OpenZeppelins
-// ERC-20 _mint function
-token.mint(proof);
+await token.withdraw(unshieldProof);
 ```
+
+

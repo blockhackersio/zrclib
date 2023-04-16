@@ -3,6 +3,28 @@ import { BigNumber, BigNumberish } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
 import { Keypair } from "./keypair";
 
+export type ProofArguments = {
+  proof: string;
+  pubSignals: string[];
+  root: string;
+  inputNullifiers: string[];
+  outputCommitments: string[];
+  publicAmount: BigNumber;
+  extDataHash: string;
+};
+
+export type ExtData = {
+  recipient: string;
+  extAmount: BigNumber;
+  encryptedOutput1: string;
+  encryptedOutput2: string;
+};
+
+export type FormattedProof = {
+  proofArguments: ProofArguments;
+  extData: ExtData;
+};
+
 export type CommitmentEvent = {
   blockNumber: number;
   transactionHash: string;
@@ -76,17 +98,6 @@ export type ProofParams = {
   fee: BigNumber;
   recipient: string | BigNumber;
   relayer: string | BigNumber;
-};
-
-export type ExtData = {
-  recipient: string;
-  extAmount: string;
-  relayer: string;
-  fee: string;
-  encryptedOutput1: BytesLike;
-  encryptedOutput2: BytesLike;
-  isL1Withdrawal: boolean;
-  l1Fee: string;
 };
 
 export type ArgsProof = {

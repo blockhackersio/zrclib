@@ -3,10 +3,18 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "build/**", "cache/**", "artifacts/**"]
+      "outputs": [
+        "dist/**",
+        "build/**",
+        "cache/**",
+        "artifacts/**",
+        "typechain-types/**",
+        "contracts/generated/**",
+        "pot/**"
+      ]
     },
     "test": {
-      "dependsOn": ["build", "^test"]
+      "dependsOn": ["^test"]
     },
     "clean": {
       "dependsOn": ["^clean"]

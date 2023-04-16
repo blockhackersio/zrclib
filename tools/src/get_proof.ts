@@ -9,6 +9,7 @@ import MerkleTree from "fixed-merkle-tree";
 import * as path from "path";
 import { Utxo } from "./utxo";
 import { Element } from "fixed-merkle-tree";
+import { FormattedProof, ProofArguments } from "./types";
 
 export type ProofParams = {
   inputs: Utxo[];
@@ -58,7 +59,7 @@ export async function getProof({
   tree,
   extAmount,
   recipient,
-}: ProofParams): Promise<ZrcProof> {
+}: ProofParams): Promise<FormattedProof> {
   inputs = shuffle(inputs);
   outputs = shuffle(outputs);
 
@@ -138,9 +139,47 @@ export async function getProof({
     extDataHash: extDataHash,
   };
 
-  return {
+  return formatArguments({
     extData,
-    // proof,
     args,
+  });
+}
+
+async function formatArguments(zrcProof: ZrcProof): Promise<FormattedProof> {
+  const args = zrcProof.args;
+  const extData = zrcProof.extData;
+  const {
+    proof,
+    root,
+    publicAmount,
+    extDataHash,
+    inputNullifiers,
+    outputCommitments,
+  } = args;
+
+  // prepare proof arguments to the correct format
+  let pubSignals: string[] = [
+    root.toString(),
+    publicAmount,
+    extDataHash.toString(),
+    ...inputNullifiers.map((e) => e.toString()),
+    ...outputCommitments.map((e) => e.toString()),
+  ];
+
+  const proofArguments: ProofArguments = {
+    proof,
+    pubSignals,
+    root: toFixedHex(root),
+    inputNullifiers: inputNullifiers.map(toFixedHex),
+    outputCommitments: outputCommitments.map(toFixedHex),
+    publicAmount: BigNumber.from(publicAmount),
+    extDataHash: toFixedHex(extDataHash),
   };
+
+  const input = {
+    proofArguments: proofArguments,
+    extData: { ...extData, extAmount: BigNumber.from(extData.extAmount) },
+  };
+
+  return input;
 }
