@@ -1,10 +1,17 @@
-import { BigNumber, Wallet, BigNumberish } from "ethers";
+import { BigNumber, Wallet, ethers } from "ethers";
 import { encrypt, decrypt, getEncryptionPublicKey } from "eth-sig-util";
 
 import { packEncryptedMessage, unpackEncryptedMessage } from "./utils";
 
 import { toFixedHex } from "./utils";
 import { ensurePoseidon, poseidonHash } from "./poseidon";
+import {
+  entropyToMnemonic,
+  hashMessage,
+  keccak256,
+  recoverAddress,
+} from "ethers/lib/utils";
+import { SignatureLike, hexDataSlice } from "@ethersproject/bytes";
 
 class Keypair {
   public privkey: string;
@@ -72,6 +79,32 @@ class Keypair {
     await ensurePoseidon();
     return new Keypair();
   }
+
+  public static async fromSigner(signer: ethers.Signer): Promise<Keypair> {
+    await ensurePoseidon();
+    const signedMessage = await signer.signMessage(LOGIN_MESSAGE);
+    const addressFromSign = verifyMessage(LOGIN_MESSAGE, signedMessage);
+    const signerAddress = await signer.getAddress();
+    if (signerAddress !== addressFromSign) {
+      throw new Error("INVALID_SIGNATURE");
+    }
+    const privKey = generatePrivateKeyFromEntropy(signedMessage);
+    return new Keypair(privKey);
+  }
 }
 
 export { Keypair };
+
+function verifyMessage(message: string, signature: SignatureLike): string {
+  return recoverAddress(hashMessage(message), signature);
+}
+
+export function generatePrivateKeyFromEntropy(entropy: string) {
+  const hexData = hexDataSlice(keccak256(entropy), 0, 16);
+
+  const mnemonic = entropyToMnemonic(hexData);
+
+  return Wallet.fromMnemonic(mnemonic).privateKey;
+}
+
+const LOGIN_MESSAGE = "LOG ME IN!";
