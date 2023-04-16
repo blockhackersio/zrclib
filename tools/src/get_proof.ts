@@ -19,14 +19,12 @@ export type ProofParams = {
 };
 
 async function generateProof(inputs: object) {
-  console.log("start fullProve");
   const { proof } = await plonk.fullProve(
     inputs,
     // XXX: need to handle this path based on implementation
     path.resolve(__dirname, `../compiled/transaction_js/transaction.wasm`),
     path.resolve(__dirname, `../compiled/transaction.zkey`)
   );
-  console.log("end fullProve");
   const calldata = await plonk.exportSolidityCallData(proof, []);
   const [proofString] = calldata.split(",");
 
@@ -128,7 +126,6 @@ export async function getProof({
     outBlinding: outputs.map((x) => BigInt(x.blinding.toString())),
     outPubkey: outputs.map((x) => fieldToObject(x.keypair!.pubkey)),
   };
-  console.log(input);
   const istring = stringifyBigInts(input);
   const proof = await generateProof(istring);
 

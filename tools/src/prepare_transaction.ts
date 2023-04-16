@@ -47,7 +47,6 @@ export async function prepareTransaction({
     recipient,
   });
 
-  console.log(args);
   return {
     args,
     extData,

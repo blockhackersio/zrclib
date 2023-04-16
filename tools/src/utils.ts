@@ -6,7 +6,6 @@ import { EthEncryptedData } from "eth-sig-util";
 import { Utxo } from "./utxo";
 
 function randomBN(nbytes = 31) {
-  console.log("randomBN");
   return BigNumber.from(crypto.randomBytes(nbytes));
 }
 
@@ -122,7 +121,6 @@ export function unpackEncryptedMessage(encryptedMessage: string) {
 }
 
 export function stringifyBigInts<T>(input: T): T {
-  console.log("stringifyBigInts");
   return ff.utils.stringifyBigInts(input) as T;
 }
 
