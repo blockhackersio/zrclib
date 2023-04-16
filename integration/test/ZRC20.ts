@@ -44,11 +44,14 @@ it("Test transfer", async function () {
 
   expect(await mockErc20.balanceOf(owner.address)).to.eq(0);
 
-  // transfer 
+  // transfer
   const transferAmount = 5e6;
   // receiver has to send sender a public keypair
   const receiverKeypair = await Keypair.generate();
   const receiverAddress = receiverKeypair.address(); // contains only the public key
-  const zrcTransferProof = await prover.transfer(transferAmount, receiverAddress);
+  const zrcTransferProof = await prover.transfer(
+    transferAmount,
+    receiverAddress
+  );
   await token.transfer(zrcTransferProof);
 });
