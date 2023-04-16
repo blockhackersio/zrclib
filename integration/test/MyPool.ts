@@ -1,7 +1,7 @@
 // Need this or ethers fails in node
 
 import { ethers } from "hardhat";
-import { Account, Keypair, Zrc20 } from "@zrclib/tools";
+import { Account, Keypair, ShieldedPool } from "@zrclib/tools";
 
 import path from "path";
 import { expect } from "chai";
@@ -26,7 +26,7 @@ it("Test transfer", async function () {
   const depositAmount = 1e7;
   const keypair = await Keypair.generate();
   const account = new Account(keypair);
-  const zrc20 = new Zrc20(account);
+  const zrc20 = new ShieldedPool(account);
 
   const zrcProof = await zrc20.mint(depositAmount);
 

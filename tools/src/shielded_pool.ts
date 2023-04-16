@@ -6,20 +6,26 @@ import { Account } from "./account";
 import { ensurePoseidon } from "./poseidon";
 import { FormattedProof } from "./types";
 
-export class Zrc20 {
+export class ShieldedPool {
   constructor(private account: Account) {}
 
-  async mint(amount: number, recipient?: string): Promise<FormattedProof> {
+  async mint(amount: number): Promise<FormattedProof> {
     await ensurePoseidon();
     const deposit = new Utxo({ amount, keypair: this.account.getKeypair() });
     const proof = await prepareTransaction({
       outputs: [deposit],
-      recipient,
     });
     return proof;
   }
 
-  async transfer(amount: number, recipient: string): Promise<FormattedProof> {
+  /**
+   * Generate a proof to transfer tokens in the shielded pool
+   *
+   * @param amount
+   * @param toPubKey Keypair public key to send the note to
+   * @returns
+   */
+  async transfer(amount: number, toPubKey: string): Promise<FormattedProof> {
     await ensurePoseidon();
     const inputs = await this.account.getUtxosUpTo(amount);
     const inputsTotal = inputs.reduce(
@@ -29,7 +35,7 @@ export class Zrc20 {
 
     const toSend = new Utxo({
       amount: BigNumber.from(amount),
-      keypair: Keypair.fromString(recipient),
+      keypair: Keypair.fromString(toPubKey),
     });
 
     const change = new Utxo({
@@ -39,13 +45,22 @@ export class Zrc20 {
     const proof = await prepareTransaction({
       inputs,
       outputs: [toSend, change],
-      recipient,
     });
 
     return proof;
   }
 
-  async burn(amount: number, recipient: string): Promise<FormattedProof> {
+  /**
+   * Generate a proof to burn tokens in the shielded pool
+   *
+   * @param amount The amount
+   * @param recipientEthAddress the recippient address to burn in the proof to ensure the funds cannot be withdrawn elsewhere
+   * @returns
+   */
+  async burn(
+    amount: number,
+    recipientEthAddress: string
+  ): Promise<FormattedProof> {
     await ensurePoseidon();
     const inputs = await this.account.getUtxosUpTo(amount);
 
@@ -63,7 +78,7 @@ export class Zrc20 {
     const proof = await prepareTransaction({
       inputs,
       outputs,
-      recipient,
+      recipient: recipientEthAddress,
     });
 
     return proof;
