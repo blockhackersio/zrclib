@@ -75,5 +75,3 @@ const unshieldProof = await prover.proveUnshield(5e17, receiver);
 // call `transferFrom` to return 0.5 of your ERC-20 tokens to your public account
 await token.withdraw(unshieldProof);
 ```
-
-

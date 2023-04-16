@@ -1,7 +1,7 @@
 import { UtxoStore } from "./utxo_store";
 import { Keypair } from "./keypair";
 
-export class Account {
+export class ShieldedAccount {
   constructor(
     private keypair: Keypair,
     private utxoStore: UtxoStore = UtxoStore.create()
@@ -16,6 +16,6 @@ export class Account {
   }
 
   async fromKeypair(keypair: Keypair) {
-    return new Account(keypair);
+    return new ShieldedAccount(keypair);
   }
 }

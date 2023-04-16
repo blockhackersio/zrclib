@@ -1,18 +1,29 @@
 // Need this or ethers fails in node
 
 import { ethers } from "hardhat";
-import { Account, Keypair, ShieldedPool } from "@zrclib/tools";
+import { ShieldedAccount, Keypair, ShieldedPool } from "@zrclib/tools";
 
 import path from "path";
 import { MockToken__factory, ZRC20__factory } from "../typechain-types";
 import { expect } from "chai";
+
+async function t<T>(
+  log: string,
+  promiseOrFn: Promise<T> | (() => Promise<T>)
+): Promise<T> {
+  const prom = typeof promiseOrFn === "function" ? promiseOrFn() : promiseOrFn;
+  const started = Date.now();
+  process.stdout.write(`${log}... `);
+  const result = await prom;
+  console.log(`${Date.now() - started}ms`);
+  return result;
+}
 
 const artifactPath = path.join(
   __dirname,
   "../../tools/contracts/generated/Hasher.json"
 );
 const artifact = require(artifactPath);
-
 it("Test transfer", async function () {
   const Hasher = await ethers.getContractFactory(
     artifact.abi,
@@ -21,51 +32,50 @@ it("Test transfer", async function () {
   const [owner] = await ethers.getSigners();
 
   // Deploy contracts
-  console.log("Deploying contracts...");
-  const hasher = await Hasher.deploy();
-  const tokenFactory = new MockToken__factory(owner);
-
   const deposit = 10 * 1_000_000;
+  const { zrc20, mockErc20 } = await t("Deploying contracts", async () => {
+    const hasher = await Hasher.deploy();
+    const tokenFactory = new MockToken__factory(owner);
 
-  const mockErc20 = await tokenFactory.deploy(deposit);
-  await mockErc20.deployed();
+    const mockErc20 = await tokenFactory.deploy(deposit);
+    await mockErc20.deployed();
 
-  const zrc20Factory = new ZRC20__factory(owner);
-  const zrc20 = await zrc20Factory.deploy(hasher.address, mockErc20.address);
+    const zrc20Factory = new ZRC20__factory(owner);
+    const zrc20 = await zrc20Factory.deploy(hasher.address, mockErc20.address);
+    return { zrc20, mockErc20 };
+  });
 
   expect(await mockErc20.balanceOf(owner.address)).to.eq(deposit);
 
   // Create approver
   const keypair = await Keypair.generate();
-  const account = new Account(keypair);
+  const account = new ShieldedAccount(keypair);
   const prover = ShieldedPool.getProver(account);
 
   // Create proof
-  console.log("Creating shield proof...");
-  const shieldProof = await prover.shield(deposit);
+  const shieldProof = await t("Creating shield proof", prover.shield(deposit));
 
   // call verify proof
-  console.log("Approving ERC20 payment...");
-  await mockErc20.approve(zrc20.address, deposit);
+  await t("Approving ERC20 payment", mockErc20.approve(zrc20.address, deposit));
+  await t("Submitting transaction", zrc20.transact(shieldProof));
 
-  console.log("Submitting transaction...");
-  await zrc20.transact(shieldProof);
+  const bal = await t(
+    "Getting ERC20 balance",
+    mockErc20.balanceOf(owner.address)
+  );
 
-  console.log("Checking ERC20 balance...");
-  expect(await mockErc20.balanceOf(owner.address)).to.eq(0);
+  expect(bal).to.eq(0);
 
   // transfer
   const transferAmount = 5 * 1_000_000;
   // receiver has to send sender a public keypair
   const receiverKeypair = await Keypair.generate();
   const receiverAddress = receiverKeypair.address(); // contains only the public key
-  console.log("Creating transfer proof...");
-  const zrcTransferProof = await prover.transfer(
-    transferAmount,
-    receiverAddress
+  const zrcTransferProof = await t(
+    "Creating transfer proof",
+    prover.transfer(transferAmount, receiverAddress)
   );
-  console.log("Submitting transaction...");
-  console.log(zrcTransferProof);
-  await zrc20.transfer(zrcTransferProof);
+
+  await t("Submitting transaction", zrc20.transfer(zrcTransferProof));
   console.log("Ok");
 });
