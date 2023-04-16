@@ -13,28 +13,38 @@ const artifactPath = path.join(
 const artifact = require(artifactPath);
 
 it("Test transfer", async function () {
+  // initialize contracts
   const Hasher = await ethers.getContractFactory(
     artifact.abi,
     artifact.bytecode
   );
   const hasher = await Hasher.deploy();
-
   const MyPool = await ethers.getContractFactory("MyPool");
   const pool = await MyPool.deploy(hasher.address);
 
-  //deposit parameter
+  // deposit and zrc20 parameter
   const depositAmount = 1e7;
   const keypair = await Keypair.generate();
   const account = new Account(keypair);
   const zrc20 = new Zrc20(account);
 
-  const zrcProof = await zrc20.mint(depositAmount);
-  const input = await formatArguments(zrcProof);
+  // generate proof through zrc20 sdk
+  const zrcMintProof = await zrc20.mint(depositAmount);
+  const mintInput = await formatArguments(zrcMintProof);
 
-  // call verify proof
+  // send transaction to contract
   const mintAmount = 10;
-  await pool.mint(mintAmount, input);
+  await pool.mint(mintAmount, mintInput);
   expect(await pool.totalSupply()).to.be.equal(mintAmount);
+
+  // transfer 
+  const transferAmount = 5;
+  // receiver has to send sender a public keypair
+  const receiverKeypair = await Keypair.generate();
+  const receiverAddress = receiverKeypair.address(); // contains only the public key
+  const zrcTransferProof = await zrc20.transfer(transferAmount, receiverAddress);
+  const transferInput = await formatArguments(zrcTransferProof);
+  await pool.transfer(transferInput);
 });
 
 async function formatArguments(zrcProof: ZrcProof) {

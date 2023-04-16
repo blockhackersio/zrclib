@@ -34,12 +34,12 @@ export class Zrc20 {
 
     const change = new Utxo({
       amount: BigNumber.from(amount).sub(inputsTotal),
+      keypair: this.account.getKeypair(),
     });
 
     const proof = await prepareTransaction({
       inputs,
-      outputs: [toSend, change],
-      recipient,
+      outputs: [toSend, change]
     });
 
     return proof;

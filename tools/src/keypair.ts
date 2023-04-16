@@ -63,7 +63,7 @@ class Keypair {
 
     return Object.assign(new Keypair(), {
       privkey: null,
-      pubkey: BigNumber.from("0x" + str.slice(0, 64)),
+      pubkey: new Uint8Array(Buffer.from(str.slice(0, 64), "hex")),
       encryptionKey: Buffer.from(str.slice(64, 128), "hex").toString("base64"),
     });
   }
