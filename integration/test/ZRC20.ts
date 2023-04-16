@@ -24,13 +24,16 @@ it("Test transfer", async function () {
   console.log("Deploying contracts...");
   const hasher = await Hasher.deploy();
   const tokenFactory = new MockToken__factory(owner);
-  const mockErc20 = await tokenFactory.deploy(1e7);
+
+  const deposit = 10 * 1_000_000;
+
+  const mockErc20 = await tokenFactory.deploy(deposit);
   await mockErc20.deployed();
 
   const zrc20Factory = new ZRC20__factory(owner);
   const zrc20 = await zrc20Factory.deploy(hasher.address, mockErc20.address);
 
-  expect(await mockErc20.balanceOf(owner.address)).to.eq(1e7);
+  expect(await mockErc20.balanceOf(owner.address)).to.eq(deposit);
 
   // Create approver
   const keypair = await Keypair.generate();
@@ -39,11 +42,11 @@ it("Test transfer", async function () {
 
   // Create proof
   console.log("Creating shield proof...");
-  const shieldProof = await prover.shield(1e7);
+  const shieldProof = await prover.shield(deposit);
 
   // call verify proof
   console.log("Approving ERC20 payment...");
-  await mockErc20.approve(zrc20.address, 1e7);
+  await mockErc20.approve(zrc20.address, deposit);
 
   console.log("Submitting transaction...");
   await zrc20.transact(shieldProof);
@@ -52,7 +55,7 @@ it("Test transfer", async function () {
   expect(await mockErc20.balanceOf(owner.address)).to.eq(0);
 
   // transfer
-  const transferAmount = 5e6;
+  const transferAmount = 5 * 1_000_000;
   // receiver has to send sender a public keypair
   const receiverKeypair = await Keypair.generate();
   const receiverAddress = receiverKeypair.address(); // contains only the public key
@@ -62,6 +65,7 @@ it("Test transfer", async function () {
     receiverAddress
   );
   console.log("Submitting transaction...");
+  console.log(zrcTransferProof);
   await zrc20.transfer(zrcTransferProof);
   console.log("Ok");
 });
