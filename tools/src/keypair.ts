@@ -12,7 +12,6 @@ class Keypair {
   public encryptionKey: string;
 
   public constructor(privkey = Wallet.createRandom().privateKey) {
-    console.log({ privkey });
     this.privkey = BigInt(privkey).toString();
     this.pubkey = poseidonHash([privkey]);
     this.encryptionKey = getEncryptionPublicKey(privkey.slice(2));
