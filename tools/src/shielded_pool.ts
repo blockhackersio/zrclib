@@ -51,7 +51,7 @@ export class ShieldedPoolProver {
 
     const proof = await prepareTransaction({
       inputs,
-      outputs: [toSend, change]
+      outputs: [toSend, change],
     });
 
     return proof;
