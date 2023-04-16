@@ -29,26 +29,26 @@ it("Test transfer", async function () {
     artifact.abi,
     artifact.bytecode
   );
-  const [owner] = await ethers.getSigners();
+  const [source, reciever] = await ethers.getSigners();
 
   // Deploy contracts
   const deposit = 10 * 1_000_000;
   const { zrc20, mockErc20 } = await t("Deploying contracts", async () => {
     const hasher = await Hasher.deploy();
-    const tokenFactory = new MockToken__factory(owner);
+    const tokenFactory = new MockToken__factory(source);
 
     const mockErc20 = await tokenFactory.deploy(deposit);
     await mockErc20.deployed();
 
-    const zrc20Factory = new ZRC20__factory(owner);
+    const zrc20Factory = new ZRC20__factory(source);
     const zrc20 = await zrc20Factory.deploy(hasher.address, mockErc20.address);
     return { zrc20, mockErc20 };
   });
 
-  expect(await mockErc20.balanceOf(owner.address)).to.eq(deposit);
+  expect(await mockErc20.balanceOf(source.address)).to.eq(deposit);
 
   // Create approver
-  const keypair = await Keypair.generate();
+  const keypair = await Keypair.fromSigner(source);
   const account = new ShieldedAccount(keypair);
   const prover = ShieldedPool.getProver(account);
 
@@ -61,7 +61,7 @@ it("Test transfer", async function () {
 
   const bal = await t(
     "Getting ERC20 balance",
-    mockErc20.balanceOf(owner.address)
+    mockErc20.balanceOf(source.address)
   );
 
   expect(bal).to.eq(0);
@@ -69,7 +69,7 @@ it("Test transfer", async function () {
   // transfer
   const transferAmount = 5 * 1_000_000;
   // receiver has to send sender a public keypair
-  const receiverKeypair = await Keypair.generate();
+  const receiverKeypair = await Keypair.fromSigner(reciever);
   const receiverAddress = receiverKeypair.address(); // contains only the public key
   const zrcTransferProof = await t(
     "Creating transfer proof",

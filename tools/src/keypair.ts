@@ -89,7 +89,9 @@ class Keypair {
       throw new Error("INVALID_SIGNATURE");
     }
     const privKey = generatePrivateKeyFromEntropy(signedMessage);
-    return new Keypair(privKey);
+    const keypair = new Keypair(privKey);
+    console.log(`keypair: ${keypair.address()}`);
+    return keypair;
   }
 }
 
