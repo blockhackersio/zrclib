@@ -24,6 +24,7 @@ const artifactPath = path.join(
   "../../tools/contracts/generated/Hasher.json"
 );
 const artifact = require(artifactPath);
+
 it("Test transfer", async function () {
   const Hasher = await ethers.getContractFactory(
     artifact.abi,
@@ -48,8 +49,7 @@ it("Test transfer", async function () {
   expect(await mockErc20.balanceOf(source.address)).to.eq(deposit);
 
   // Create approver
-  const keypair = await Keypair.fromSigner(source);
-  const account = new ShieldedAccount(keypair);
+  const account = await ShieldedAccount.fromSigner(source);
   const prover = ShieldedPool.getProver(account);
 
   // Create proof
@@ -68,6 +68,7 @@ it("Test transfer", async function () {
 
   // transfer
   const transferAmount = 5 * 1_000_000;
+
   // receiver has to send sender a public keypair
   const receiverKeypair = await Keypair.fromSigner(reciever);
   const receiverAddress = receiverKeypair.address(); // contains only the public key

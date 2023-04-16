@@ -1,5 +1,6 @@
 import { UtxoStore } from "./utxo_store";
 import { Keypair } from "./keypair";
+import { ethers } from "ethers";
 
 export class ShieldedAccount {
   constructor(
@@ -17,5 +18,9 @@ export class ShieldedAccount {
 
   async fromKeypair(keypair: Keypair) {
     return new ShieldedAccount(keypair);
+  }
+
+  static async fromSigner(signer: ethers.Signer): Promise<ShieldedAccount> {
+    return new ShieldedAccount(await Keypair.fromSigner(signer));
   }
 }
