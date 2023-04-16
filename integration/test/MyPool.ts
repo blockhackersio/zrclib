@@ -1,7 +1,7 @@
 // Need this or ethers fails in node
 
 import { ethers } from "hardhat";
-import { Account, Keypair, Zrc20, toFixedHex } from "@zrclib/tools";
+import { Account, Keypair, Zrc20, toFixedHex, ZrcProof } from "@zrclib/tools";
 
 import path from "path";
 
@@ -27,7 +27,17 @@ it("Test transfer", async function () {
   const account = new Account(keypair);
   const zrc20 = new Zrc20(account);
 
-  const { args, extData } = await zrc20.mint(depositAmount);
+  const zrcProof = await zrc20.mint(depositAmount);
+  const input = await formatArguments(zrcProof);
+
+  // call verify proof
+  const mintAmount = 10;
+  await pool.mint(mintAmount, input);
+});
+
+async function formatArguments(zrcProof: ZrcProof) {
+  const args = zrcProof.args;
+  const extData = zrcProof.extData;
 
   // prepare proof arguments to the correct format
   const proof = args["proof"];
@@ -59,7 +69,5 @@ it("Test transfer", async function () {
     extData: extData,
   };
 
-  // call verify proof
-  const mintAmount = 10;
-  await pool.mint(mintAmount, input);
-});
+  return input;
+}

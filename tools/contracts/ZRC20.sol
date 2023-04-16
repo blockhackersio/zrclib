@@ -10,6 +10,7 @@ contract ZRC20 is TransactionVerifier, MerkleTreeWithHistory {
     string private _symbol;
 
     int256 public MAX_EXT_AMOUNT = 2 ** 248;
+    uint256 private _totalSupply;
     mapping(bytes32 => bool) public nullifierHashes;
 
     struct Proof {
@@ -52,8 +53,22 @@ contract ZRC20 is TransactionVerifier, MerkleTreeWithHistory {
         _initialize(); // initialize the merkle tree
     }
 
-    function _mint(uint256 _amount, Proof calldata proof) public {
+    function _mint(uint256 amount, Proof calldata proof) internal {
         _transact(proof.proofArguments, proof.extData);
+        _totalSupply += amount;
+    }
+
+    function _burn(uint256 amount, Proof calldata proof) internal {
+        _transact(proof.proofArguments, proof.extData);
+        _totalSupply -= amount;
+    }
+
+    function _transfer(Proof calldata proof) internal {
+        _transact(proof.proofArguments, proof.extData);
+    }
+
+    function getTotalSupply() public view returns (uint256) {
+        return _totalSupply;
     }
 
     function _transact(
