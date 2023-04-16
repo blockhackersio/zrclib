@@ -1,9 +1,10 @@
 import { BigNumber } from "ethers";
 import { Keypair } from "./keypair";
 import { Utxo } from "./utxo";
-import { ZrcProof, getProof } from "./get_proof";
+import { getProof } from "./get_proof";
 import { Element, HashFunction, MerkleTree } from "fixed-merkle-tree";
 import { poseidonHash2 } from "./poseidon";
+import { FormattedProof } from "./types";
 
 const MERKLE_TREE_HEIGHT = 5;
 
@@ -25,7 +26,7 @@ export async function prepareTransaction({
   inputs?: Utxo[];
   outputs?: Utxo[];
   recipient?: string | 0;
-}): Promise<ZrcProof> {
+}): Promise<FormattedProof> {
   while (inputs.length < 2) {
     const keypair = await Keypair.generate();
     inputs.push(new Utxo({ keypair: keypair }));
@@ -39,7 +40,7 @@ export async function prepareTransaction({
     .add(outputs.reduce((sum, x) => sum.add(x.amount), BigNumber.from(0)))
     .sub(inputs.reduce((sum, x) => sum.add(x.amount), BigNumber.from(0)));
 
-  const { args, extData } = await getProof({
+  const zrcProof = await getProof({
     inputs,
     outputs,
     tree: await buildMerkleTree(),
@@ -47,8 +48,5 @@ export async function prepareTransaction({
     recipient,
   });
 
-  return {
-    args,
-    extData,
-  };
+  return zrcProof;
 }

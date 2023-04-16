@@ -1,7 +1,7 @@
 // Need this or ethers fails in node
 
 import { ethers } from "hardhat";
-import { Account, Keypair, Zrc20, toFixedHex, ZrcProof } from "@zrclib/tools";
+import { Account, Keypair, Zrc20 } from "@zrclib/tools";
 
 import path from "path";
 import { expect } from "chai";
@@ -29,47 +29,9 @@ it("Test transfer", async function () {
   const zrc20 = new Zrc20(account);
 
   const zrcProof = await zrc20.mint(depositAmount);
-  const input = await formatArguments(zrcProof);
 
   // call verify proof
   const mintAmount = 10;
-  await pool.mint(mintAmount, input);
+  await pool.mint(mintAmount, zrcProof);
   expect(await pool.totalSupply()).to.be.equal(mintAmount);
 });
-
-async function formatArguments(zrcProof: ZrcProof) {
-  const args = zrcProof.args;
-  const extData = zrcProof.extData;
-
-  // prepare proof arguments to the correct format
-  const proof = args["proof"];
-  let pubSignals = [];
-  pubSignals.push(args["root"]);
-  pubSignals.push(args["publicAmount"]);
-  pubSignals.push(args["extDataHash"]);
-  for (const element of args["inputNullifiers"]) {
-    pubSignals.push(element);
-  }
-  for (const element of args["outputCommitments"]) {
-    pubSignals.push(element);
-  }
-
-  const proofArguments = {
-    proof: proof,
-    pubSignals: pubSignals,
-    root: toFixedHex(args["root"]),
-    inputNullifiers: args["inputNullifiers"].map((x: bigint) => toFixedHex(x)),
-    outputCommitments: args["outputCommitments"].map((x: bigint) =>
-      toFixedHex(x)
-    ),
-    publicAmount: args["publicAmount"],
-    extDataHash: toFixedHex(args["extDataHash"]),
-  };
-
-  const input = {
-    proofArguments: proofArguments,
-    extData: extData,
-  };
-
-  return input;
-}

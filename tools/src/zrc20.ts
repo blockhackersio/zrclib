@@ -1,15 +1,15 @@
-import { BigNumber, Contract, providers } from "ethers";
-import { ZrcProof } from "./get_proof";
+import { BigNumber } from "ethers";
 import { prepareTransaction } from "./prepare_transaction";
 import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
 import { Account } from "./account";
 import { ensurePoseidon } from "./poseidon";
+import { FormattedProof } from "./types";
 
 export class Zrc20 {
   constructor(private account: Account) {}
 
-  async mint(amount: number, recipient?: string): Promise<ZrcProof> {
+  async mint(amount: number, recipient?: string): Promise<FormattedProof> {
     await ensurePoseidon();
     const deposit = new Utxo({ amount, keypair: this.account.getKeypair() });
     const proof = await prepareTransaction({
@@ -19,7 +19,7 @@ export class Zrc20 {
     return proof;
   }
 
-  async transfer(amount: number, recipient: string): Promise<ZrcProof> {
+  async transfer(amount: number, recipient: string): Promise<FormattedProof> {
     await ensurePoseidon();
     const inputs = await this.account.getUtxosUpTo(amount);
     const inputsTotal = inputs.reduce(
@@ -45,7 +45,7 @@ export class Zrc20 {
     return proof;
   }
 
-  async burn(amount: number, recipient: string): Promise<ZrcProof> {
+  async burn(amount: number, recipient: string): Promise<FormattedProof> {
     await ensurePoseidon();
     const inputs = await this.account.getUtxosUpTo(amount);
 
