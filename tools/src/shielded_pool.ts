@@ -9,7 +9,13 @@ import { FormattedProof } from "./types";
 export class ShieldedPoolProver {
   constructor(private account: Account) {}
 
-  async mint(amount: number): Promise<FormattedProof> {
+  /**
+   * Generate a proof to add tokens to the shielded pool
+   *
+   * @param amount
+   * @returns
+   */
+  async shield(amount: number): Promise<FormattedProof> {
     await ensurePoseidon();
     const deposit = new Utxo({ amount, keypair: this.account.getKeypair() });
     const proof = await prepareTransaction({
@@ -32,7 +38,7 @@ export class ShieldedPoolProver {
       (sum, x) => sum.add(x.amount),
       BigNumber.from(0)
     );
-    //
+
     const toSend = new Utxo({
       amount: BigNumber.from(amount),
       keypair: Keypair.fromString(toPubKey),
@@ -51,13 +57,13 @@ export class ShieldedPoolProver {
   }
 
   /**
-   * Generate a proof to burn tokens in the shielded pool
+   * Generate a proof to remove tokens in the shielded pool
    *
    * @param amount The amount
    * @param recipientEthAddress the recippient address to burn in the proof to ensure the funds cannot be withdrawn elsewhere
    * @returns
    */
-  async burn(
+  async unshield(
     amount: number,
     recipientEthAddress: string
   ): Promise<FormattedProof> {
