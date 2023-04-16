@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
 import { getExtDataHash, shuffle, stringifyBigInts, toFixedHex } from "./utils";
-import { FIELD_SIZE, numbers } from "./constants";
+import { FIELD_SIZE } from "./constants";
 import { fieldToObject } from "./poseidon";
 import { plonk } from "snarkjs";
 import MerkleTree from "fixed-merkle-tree";
@@ -171,7 +171,7 @@ async function formatArguments(zrcProof: ZrcProof): Promise<FormattedProof> {
     pubSignals,
     root: toFixedHex(root),
     inputNullifiers: inputNullifiers.map(toFixedHex),
-    outputCommitments: outputCommitments.map(toFixedHex),
+    outputCommitments: outputCommitments.map(toFixedHex) as [string, string],
     publicAmount: BigNumber.from(publicAmount),
     extDataHash: toFixedHex(extDataHash),
   };

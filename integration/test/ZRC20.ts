@@ -4,7 +4,7 @@ import { ethers } from "hardhat";
 import { Account, Keypair, ShieldedPool } from "@zrclib/tools";
 
 import path from "path";
-import { MockToken__factory } from "../typechain-types";
+import { MockToken__factory, ZRC20__factory } from "../typechain-types";
 import { expect } from "chai";
 
 const artifactPath = path.join(
@@ -25,8 +25,9 @@ it("Test transfer", async function () {
   const tokenFactory = new MockToken__factory(owner);
   const mockErc20 = await tokenFactory.deploy(1e7);
   await mockErc20.deployed();
-  const ZRC20 = await ethers.getContractFactory("ZRC20");
-  const token = await ZRC20.deploy(hasher.address, mockErc20.address);
+
+  const zrc20Factory = new ZRC20__factory(owner);
+  const zrc20 = await zrc20Factory.deploy(hasher.address, mockErc20.address);
 
   expect(await mockErc20.balanceOf(owner.address)).to.eq(1e7);
 
@@ -39,8 +40,8 @@ it("Test transfer", async function () {
   const proof = await prover.shield(1e7);
 
   // call verify proof
-  await mockErc20.approve(token.address, 1e7);
-  await token.transact(proof);
+  await mockErc20.approve(zrc20.address, 1e7);
+  await zrc20.transact(proof);
 
   expect(await mockErc20.balanceOf(owner.address)).to.eq(0);
 
@@ -53,5 +54,5 @@ it("Test transfer", async function () {
     transferAmount,
     receiverAddress
   );
-  await token.transfer(zrcTransferProof);
+  await zrc20.transfer(zrcTransferProof);
 });

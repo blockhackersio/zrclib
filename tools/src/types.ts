@@ -8,7 +8,7 @@ export type ProofArguments = {
   pubSignals: string[];
   root: string;
   inputNullifiers: string[];
-  outputCommitments: string[];
+  outputCommitments: [string, string];
   publicAmount: BigNumber;
   extDataHash: string;
 };
