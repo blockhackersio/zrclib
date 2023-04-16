@@ -6,7 +6,7 @@ import { Account } from "./account";
 import { ensurePoseidon } from "./poseidon";
 import { FormattedProof } from "./types";
 
-export class ShieldedPool {
+export class ShieldedPoolProver {
   constructor(private account: Account) {}
 
   async mint(amount: number): Promise<FormattedProof> {
@@ -32,7 +32,7 @@ export class ShieldedPool {
       (sum, x) => sum.add(x.amount),
       BigNumber.from(0)
     );
-
+    //
     const toSend = new Utxo({
       amount: BigNumber.from(amount),
       keypair: Keypair.fromString(toPubKey),
@@ -82,5 +82,11 @@ export class ShieldedPool {
     });
 
     return proof;
+  }
+}
+
+export class ShieldedPool {
+  static getProver(account: Account): ShieldedPoolProver {
+    return new ShieldedPoolProver(account);
   }
 }

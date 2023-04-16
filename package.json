@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "turbo run build --force --no-daemon",
-    "test": "turbo run test --force --no-daemon",
-    "clean": "turbo run clean --force --no-daemon"
+    "build": "turbo run build --no-daemon",
+    "test": "pnpm build && turbo run test --no-daemon",
+    "clean": "turbo run clean --no-daemon"
   },
   "keywords": [],
   "author": "",

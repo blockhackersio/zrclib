@@ -26,12 +26,12 @@ it("Test transfer", async function () {
   const depositAmount = 1e7;
   const keypair = await Keypair.generate();
   const account = new Account(keypair);
-  const zrc20 = new ShieldedPool(account);
+  const prover = ShieldedPool.getProver(account);
 
-  const zrcProof = await zrc20.mint(depositAmount);
+  const proof = await prover.mint(depositAmount);
 
   // call verify proof
   const mintAmount = 10;
-  await pool.mint(mintAmount, zrcProof);
+  await pool.mint(mintAmount, proof);
   expect(await pool.totalSupply()).to.be.equal(mintAmount);
 });
