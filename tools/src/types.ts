@@ -3,6 +3,14 @@ import { BigNumber, BigNumberish } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
 import { Keypair } from "./keypair";
 
+export type Store<T> = {
+  add(id: string, data: T): Promise<boolean>;
+  get(id: string): Promise<T | undefined>;
+  getAll(): Promise<T[]>;
+  remove(id: string): Promise<boolean>;
+  removeAll(): Promise<boolean>;
+};
+
 export type ProofArguments = {
   proof: string;
   pubSignals: string[];
