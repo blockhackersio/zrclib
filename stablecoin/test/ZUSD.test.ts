@@ -4,7 +4,7 @@ import { ethers } from "hardhat";
 import { FakeContract, smock } from '@defi-wonderland/smock';
 import { AggregatorV3Interface, TroveManager, StabilityPool, ZUSD } from "../typechain-types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-
+import { ShieldedAccount, ShieldedPool } from "@zrclib/tools";
 
 const artifactPath = path.join(
   __dirname,
@@ -19,6 +19,7 @@ describe("ZUSD", function () {
   let stabilityPool: StabilityPool;
   let zusd: ZUSD;
   let user: SignerWithAddress;
+  let zusdDecimals: number;
 
   before(async function() {
     [user] = await ethers.getSigners();
@@ -49,6 +50,7 @@ describe("ZUSD", function () {
     const ZUSD = await ethers.getContractFactory("ZUSD");
     zusd = await ZUSD.deploy(hasher.address, troveManager.address);
     await zusd.deployed();
+    zusdDecimals = await zusd.decimals();
 
     // set addresses
     await troveManager.setAddresses(zusd.address, stabilityPool.address, fakePriceFeed.address);
@@ -65,7 +67,6 @@ describe("ZUSD", function () {
     expect(initialZUSDBalance).to.equal(0);
 
     // Deposit 1 ETH and mint 1000 ZUSD in public pool
-    const zusdDecimals = await zusd.decimals();
     const zusdMintAmount = ethers.utils.parseUnits("1000", zusdDecimals);
     await troveManager.openTrove(zusdMintAmount, { value: ethers.utils.parseEther("1") });
 
@@ -75,7 +76,22 @@ describe("ZUSD", function () {
   });
 
   it("Should be able to shield ZUSD", async function() {
-      
+    // Create shielded pool account
+    const account = await ShieldedAccount.fromSigner(user);
+    const prover = ShieldedPool.getProver(account);
+    const initialZUSDBalance = await zusd.balanceOf(user.address);
+
+    // Create proof
+    const deposit = ethers.utils.parseUnits("500", zusdDecimals);
+    const shieldProof = await prover.shield(deposit);
+
+    // call verify proof
+    await zusd.approve(zusd.address, ethers.utils.parseEther("1000"));
+    await zusd.transact(shieldProof);
+    const newZUSDBalance = await zusd.balanceOf(user.address);
+
+    // check balance
+    expect(newZUSDBalance).to.equal(initialZUSDBalance.sub(deposit));
   });
-    
+  
 });

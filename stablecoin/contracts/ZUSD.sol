@@ -28,11 +28,8 @@ contract ZUSD is ShieldedPool, ERC20 {
     function transact(Proof calldata _proof) public {
         // Deposit functionality
         if (_proof.extData.extAmount > 0) {
-            transferFrom(
-                msg.sender,
-                address(this),
-                uint256(_proof.extData.extAmount)
-            );
+            _spendAllowance(msg.sender, address(this), uint256(_proof.extData.extAmount));
+            _transfer(msg.sender, address(this), uint256(_proof.extData.extAmount));
         }
 
         // Proof determines whether we add to or remove from pool
