@@ -2,10 +2,12 @@
 pragma solidity ^0.8.9;
 
 import "./TroveManager.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract StabilityPool {
+contract StabilityPool is Ownable {
 
     TroveManager public troveManager;
+    ZUSD public zusd;
 
     struct Snapshots {
         uint S;
@@ -19,14 +21,23 @@ contract StabilityPool {
         troveManager = TroveManager(_troveManagerAddress);
     }
 
+    function setZUSDAddress(address _zusdAddress) public onlyOwner {
+        zusd = ZUSD(_zusdAddress);
+    }
+
     function provideLiquidity(uint256 amount) external {
         // TODO: update accounting
-        // TODO: transfer ZUSD from user to StabilityPool
+        deposits[msg.sender] += amount;
+        // transfer ZUSD from user to StabilityPool
+        zusd.transferFrom(msg.sender, address(this), amount);
     }
 
     function withdrawLiquidity(uint256 amount) external {
         // TODO: update accounting
-        // TODO: transfer ZUSD from StabilityPool to user
+        // transfer ZUSD from StabilityPool to user
+        require(deposits[msg.sender] >= amount, "StabilityPool: Withdraw amount larger than deposit");
+        deposits[msg.sender] -= amount;
+        zusd.transfer(msg.sender, amount);
     }
 
     /*

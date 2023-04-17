@@ -1,8 +1,9 @@
+import { BigNumber } from "ethers";
 import { Utxo } from "./utxo";
 
 // TBD
 export class UtxoStore {
-  async getUtxosUpTo(_amount: number): Promise<Utxo[]> {
+  async getUtxosUpTo(_amount: number | BigNumber): Promise<Utxo[]> {
     return [];
   }
 

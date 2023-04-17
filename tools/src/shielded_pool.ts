@@ -65,7 +65,7 @@ export class ShieldedPoolProver {
    * @returns
    */
   async unshield(
-    amount: number,
+    amount: number | BigNumber,
     recipientEthAddress: string
   ): Promise<FormattedProof> {
     await ensurePoseidon();

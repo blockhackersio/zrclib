@@ -1,6 +1,6 @@
 import { UtxoStore } from "./utxo_store";
 import { Keypair } from "./keypair";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 export class ShieldedAccount {
   constructor(
@@ -12,7 +12,7 @@ export class ShieldedAccount {
     return this.keypair;
   }
 
-  async getUtxosUpTo(amount: number) {
+  async getUtxosUpTo(amount: number | BigNumber) {
     return await this.utxoStore.getUtxosUpTo(amount);
   }
 

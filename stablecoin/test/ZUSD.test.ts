@@ -93,5 +93,21 @@ describe("ZUSD", function () {
     // check balance
     expect(newZUSDBalance).to.equal(initialZUSDBalance.sub(deposit));
   });
-  
+
+  // it("Should be able to unshield ZUSD", async function() {
+  //   // initial balance
+  //   const initialZUSDBalance = await zusd.balanceOf(user.address);
+
+  //   // create unshield proof
+  //   const account = await ShieldedAccount.fromSigner(user);
+  //   const prover = ShieldedPool.getProver(account);
+  //   const withdraw = ethers.utils.parseUnits("250", zusdDecimals);
+  //   const unshieldProof = await prover.unshield(withdraw, user.address);
+  //   console.log("Unshield proof: ", unshieldProof);
+  //   await zusd.transact(unshieldProof);
+
+  //   // new balance
+  //   const newZUSDBalance = await zusd.balanceOf(user.address);
+  //   expect(newZUSDBalance).to.equal(initialZUSDBalance.add(withdraw));
+  // })
 });
