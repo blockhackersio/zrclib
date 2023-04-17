@@ -67,9 +67,9 @@ contract TroveManager is Ownable {
         uint256 minETHAmount = trove.debt * uint256(getLatestPrice()) * minCollaterizationRatio / collateraizationScaleFactor / (10**priceFeed.decimals());
         require(trove.coll < minETHAmount, "TroveManager: Trove is not undercollateralized");
 
-        // TODO: transfer ETH in trove to stability pool and call liquidate function
-        (bool success, ) = address(stabilityPool).call{value: trove.coll}("");
-        require(success, "TroveManager: Sending ETH to StabilityPool failed");
+        // call offset function in stability pool
+        stabilityPool.offset(trove.debt, trove.coll); // TODO: check whether parameters passed are correct
+
         // TODO: transfer a liquidation premium to liquidator
     }
 
@@ -85,9 +85,19 @@ contract TroveManager is Ownable {
         require(troves[_borrower].status == Status.active, "TroveManager: Trove does not exist or is closed");
     }
 
+    function _requireCallerIsStabilityPool() internal view {
+        require(msg.sender == address(stabilityPool), "LUSDToken: Caller is not StabilityPool");
+    }
+
     function getLatestPrice() public view returns (int) {
         (,int price,,,) = priceFeed.latestRoundData();
         return price;
+    }
+
+    function sendETH(address to, uint256 amount) public {
+        _requireCallerIsStabilityPool();
+        (bool success, ) = to.call{value: amount}("");
+        require(success, "TroveManager: Sending ETH failed");
     }
 
     receive() external payable {}

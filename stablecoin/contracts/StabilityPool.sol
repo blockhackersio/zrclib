@@ -26,6 +26,9 @@ contract StabilityPool is Ownable {
     uint128 public currentScale;
     // With each offset that fully empties the Pool, the epoch is incremented by 1
     uint128 public currentEpoch;
+    // Error trackers for the error correction in the offset calculation
+    uint public lastETHError_Offset;
+    uint public lastZUSDLossError_Offset;
 
     uint256 public totalLiquidity;
 
@@ -78,8 +81,16 @@ contract StabilityPool is Ownable {
     * Only called by liquidation functions in the TroveManager.
     */
     function offset(uint _debtToOffset, uint _collToAdd) external {
-        // TODO: make sure it's only callable by Trove manager
-        // TODO: Update the value of P and S
+        _requireCallerIsTroveManager();
+        uint totalZUSD = totalLiquidity; // cached to save an SLOAD
+        if (totalZUSD == 0 || _debtToOffset == 0) { return; }
+
+        (uint ETHGainPerUnitStaked,
+            uint ZUSDLossPerUnitStaked) = _computeRewardsPerUnitStaked(_collToAdd, _debtToOffset, totalZUSD);
+
+        _updateRewardSumAndProduct(ETHGainPerUnitStaked, ZUSDLossPerUnitStaked);  // updates S and P
+
+        _moveOffsetCollAndDebt(_collToAdd, _debtToOffset);
     }
 
     function getDepositorETHGain(address _depositor) public view returns (uint) {
@@ -178,6 +189,101 @@ contract StabilityPool is Ownable {
         depositSnapshots[_depositor].S = currentS;
         depositSnapshots[_depositor].scale = currentScaleCached;
         depositSnapshots[_depositor].epoch = currentEpochCached;
+    }
+
+    function _requireCallerIsTroveManager() internal view {
+        require(msg.sender == address(troveManager), "StabilityPool: Caller is not TroveManager");
+    }
+
+    function _computeRewardsPerUnitStaked(
+        uint _collToAdd,
+        uint _debtToOffset,
+        uint _totalZUSDDeposits
+    ) internal returns (uint ETHGainPerUnitStaked, uint ZUSDLossPerUnitStaked) {
+        /*
+        * Compute the LUSD and ETH rewards. Uses a "feedback" error correction, to keep
+        * the cumulative error in the P and S state variables low:
+        *
+        * 1) Form numerators which compensate for the floor division errors that occurred the last time this 
+        * function was called.  
+        * 2) Calculate "per-unit-staked" ratios.
+        * 3) Multiply each ratio back by its denominator, to reveal the current floor division error.
+        * 4) Store these errors for use in the next correction when this function is called.
+        * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
+        */
+        uint ETHNumerator = _collToAdd * DECIMAL_PRECISION + lastETHError_Offset;
+
+        assert(_debtToOffset <= _totalZUSDDeposits);
+        if (_debtToOffset == _totalZUSDDeposits) {
+            ZUSDLossPerUnitStaked = DECIMAL_PRECISION;  // When the Pool depletes to 0, so does each deposit 
+            lastZUSDLossError_Offset = 0;
+        } else {
+            uint ZUSDLossNumerator = _debtToOffset * DECIMAL_PRECISION - lastZUSDLossError_Offset;
+            /*
+            * Add 1 to make error in quotient positive. We want "slightly too much" LUSD loss,
+            * which ensures the error in any given compoundedLUSDDeposit favors the Stability Pool.
+            */
+            ZUSDLossPerUnitStaked = ZUSDLossNumerator / _totalZUSDDeposits + 1;
+            lastZUSDLossError_Offset = ZUSDLossPerUnitStaked * _totalZUSDDeposits - ZUSDLossNumerator;
+        }
+
+        ETHGainPerUnitStaked = ETHNumerator / _totalZUSDDeposits;
+        lastETHError_Offset = ETHNumerator - (ETHGainPerUnitStaked * _totalZUSDDeposits);
+
+        return (ETHGainPerUnitStaked, ZUSDLossPerUnitStaked);
+    }
+
+    // Update the Stability Pool reward sum S and product P
+    function _updateRewardSumAndProduct(uint _ETHGainPerUnitStaked, uint _ZUSDLossPerUnitStaked) internal {
+        uint currentP = P;
+        uint newP;
+
+        assert(_ZUSDLossPerUnitStaked <= DECIMAL_PRECISION);
+        /*
+        * The newProductFactor is the factor by which to change all deposits, due to the depletion of Stability Pool LUSD in the liquidation.
+        * We make the product factor 0 if there was a pool-emptying. Otherwise, it is (1 - LUSDLossPerUnitStaked)
+        */
+        uint newProductFactor = uint(DECIMAL_PRECISION) - _ZUSDLossPerUnitStaked;
+
+        uint128 currentScaleCached = currentScale;
+        uint128 currentEpochCached = currentEpoch;
+        uint currentS = epochToScaleToSum[currentEpochCached][currentScaleCached];
+
+        /*
+        * Calculate the new S first, before we update P.
+        * The ETH gain for any given depositor from a liquidation depends on the value of their deposit
+        * (and the value of totalDeposits) prior to the Stability being depleted by the debt in the liquidation.
+        *
+        * Since S corresponds to ETH gain, and P to deposit loss, we update S first.
+        */
+        uint marginalETHGain = _ETHGainPerUnitStaked * currentP;
+        uint newS = currentS + marginalETHGain;
+        epochToScaleToSum[currentEpochCached][currentScaleCached] = newS;
+
+        // If the Stability Pool was emptied, increment the epoch, and reset the scale and product P
+        if (newProductFactor == 0) {
+            currentEpoch = currentEpochCached + 1;
+            currentScale = 0;
+            newP = DECIMAL_PRECISION;
+
+        // If multiplying P by a non-zero product factor would reduce P below the scale boundary, increment the scale
+        } else if (currentP * newProductFactor / DECIMAL_PRECISION < SCALE_FACTOR) {
+            newP = currentP * newProductFactor * SCALE_FACTOR / DECIMAL_PRECISION; 
+            currentScale = currentScaleCached + 1;
+        } else {
+            newP = currentP * newProductFactor / DECIMAL_PRECISION;
+        }
+
+        assert(newP > 0);
+        P = newP;
+    }
+
+    function _moveOffsetCollAndDebt(uint _collToAdd, uint _debtToOffset) internal {
+        // Burn the debt that was successfully offset
+        zusd.burn(address(this), _debtToOffset);
+
+        // send ETH from trove manager to liquidity pool
+        troveManager.sendETH(address(this), _collToAdd);
     }
 
     receive() external payable {}

@@ -7,17 +7,25 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract ZUSD is ShieldedPool, ERC20 {
 
     address public immutable troveManagerAddress;
+    address public immutable stabilityPoolAddress;
 
     constructor(
         address _hasherAddress,
-        address _troveManagerAddress
+        address _troveManagerAddress,
+        address _stabilityPoolAddress
     ) ShieldedPool(5, _hasherAddress) ERC20("ZUSD", "ZUSD") {
         troveManagerAddress = _troveManagerAddress;
+        stabilityPoolAddress = _stabilityPoolAddress;
     }
 
     function mint(address _account, uint256 _amount) external {
         _requireCallerIsTroveManager();
         _mint(_account, _amount);
+    }
+
+    function burn(address _account, uint256 _amount) external {
+        _requireCallerIsStabilityPool();
+        _burn(_account, _amount);
     }
 
     /**
@@ -60,5 +68,9 @@ contract ZUSD is ShieldedPool, ERC20 {
 
     function _requireCallerIsTroveManager() internal view {
         require(msg.sender == troveManagerAddress, "LUSDToken: Caller is not TroveManager");
+    }
+
+    function _requireCallerIsStabilityPool() internal view {
+        require(msg.sender == stabilityPoolAddress, "LUSDToken: Caller is not StabilityPool");
     }
 }

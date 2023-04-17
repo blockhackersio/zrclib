@@ -48,7 +48,7 @@ describe("ZUSD", function () {
 
     // deploy ZUSD
     const ZUSD = await ethers.getContractFactory("ZUSD");
-    zusd = await ZUSD.deploy(hasher.address, troveManager.address);
+    zusd = await ZUSD.deploy(hasher.address, troveManager.address, stabilityPool.address);
     await zusd.deployed();
     zusdDecimals = await zusd.decimals();
 
