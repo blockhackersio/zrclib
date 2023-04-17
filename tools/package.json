@@ -18,8 +18,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ethersproject/bytes": "^5.0.0",
+    "@ethersproject/bytes": "^5.7.0",
     "@rollup/plugin-json": "^6.0.0",
+    "@types/text-encoding-utf-8": "^1.0.2",
     "assert": "^2.0.0",
     "circomlibjs": "^0.1.7",
     "crypto": "^1.0.1",
@@ -27,7 +28,9 @@
     "ethers": "^5.7.2",
     "ffjavascript": "^0.2.57",
     "fixed-merkle-tree": "^0.7.3",
-    "snarkjs": "^0.6.10"
+    "localforage": "^1.10.0",
+    "snarkjs": "^0.6.10",
+    "text-encoding-utf-8": "^1.0.2"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.1.0",
@@ -36,7 +39,7 @@
     "@types/jest": "^29.5.0",
     "circomlib": "^2.0.5",
     "jest": "^29.5.0",
-    "rollup": "^3.20.2",
+    "rollup": "^3.20.4",
     "ts-jest": "^29.1.0",
     "tslib": "^2.5.0",
     "typescript": "5.1.0-dev.20230413"
