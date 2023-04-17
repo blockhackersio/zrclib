@@ -222,6 +222,9 @@ importers:
       localforage:
         specifier: ^1.10.0
         version: 1.10.0
+      rxjs:
+        specifier: ^7.8.0
+        version: 7.8.0
       snarkjs:
         specifier: ^0.6.10
         version: 0.6.10

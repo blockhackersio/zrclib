@@ -11,6 +11,20 @@ export type Store<T> = {
   removeAll(): Promise<boolean>;
 };
 
+export type NewCommitment = {
+  type: "NewCommitment";
+  commitment: string;
+  index: number;
+  encryptedOutput: string;
+};
+
+export type NewNullifier = {
+  type: "NewNullifier";
+  nullifier: string;
+};
+
+export type ContractEvent = NewCommitment | NewNullifier;
+
 export type ProofArguments = {
   proof: string;
   pubSignals: string[];
