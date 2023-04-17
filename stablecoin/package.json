@@ -1,10 +1,9 @@
 {
   "name": "hardhat-project",
   "devDependencies": {
-    "hardhat": "^2.13.1",
     "@ethersproject/abi": "^5.4.7",
-    "@ethersproject/providers": "^5.4.7",
     "@ethersproject/bytes": "^5.0.0",
+    "@ethersproject/providers": "^5.4.7",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
@@ -17,6 +16,7 @@
     "@types/node": ">=12.0.0",
     "chai": "^4.2.0",
     "ethers": "^5.7.2",
+    "hardhat": "^2.13.1",
     "hardhat-gas-reporter": "^1.0.8",
     "solidity-coverage": "^0.8.2",
     "ts-node": ">=8.0.0",
@@ -25,6 +25,9 @@
   },
   "dependencies": {
     "@chainlink/contracts": "^0.6.1",
+    "@defi-wonderland/smock": "^2.3.4",
+    "@ethersproject/abstract-provider": "^5.7.0",
+    "@ethersproject/abstract-signer": "^5.7.0",
     "@openzeppelin/contracts": "^4.8.2",
     "@zrclib/tools": "workspace:^1.0.0",
     "dotenv": "^16.0.3",

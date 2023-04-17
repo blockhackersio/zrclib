@@ -15,7 +15,7 @@ contract StabilityPool {
     mapping (address => uint256) public deposits;
     mapping (address => Snapshots) public depositSnapshots;  // depositor address -> snapshots struct
 
-    constructor(address _troveManagerAddress) {
+    constructor(address payable _troveManagerAddress) {
         troveManager = TroveManager(_troveManagerAddress);
     }
 
@@ -38,5 +38,7 @@ contract StabilityPool {
         // TODO: make sure it's only callable by Trove manager
         // TODO: Update the value of P and S
     }
+
+    receive() external payable {}
 
 }

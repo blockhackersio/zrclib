@@ -34,7 +34,7 @@ contract TroveManager is Ownable {
 
     function setAddresses(
         address _zusdAddress, 
-        address _stabilityPoolAddress, 
+        address payable _stabilityPoolAddress, 
         address _priceFeedAddress
     ) external onlyOwner {
         zusd = ZUSD(_zusdAddress);
@@ -48,11 +48,11 @@ contract TroveManager is Ownable {
      */
     function openTrove(uint zusdAmount) external payable  {
         // check that collateral provided is sufficient
-        uint256 minETHAmount = zusdAmount * uint256(getLatestPrice()) * minCollaterizationRatio / collateraizationScaleFactor / (10**priceFeed.decimals());
-        require(msg.value >= minETHAmount, "TroveManager: Insufficient ETH provided");
+        uint256 maxZUSDAmount = msg.value * uint256(getLatestPrice()) * minCollaterizationRatio / collateraizationScaleFactor / (10**priceFeed.decimals());
+        require(zusdAmount < maxZUSDAmount, "TroveManager: Insufficient ETH provided");
 
         // send ETH to trove manager
-        (bool success, ) = address(this).call{value: zusdAmount}("");
+        (bool success, ) = address(this).call{value: msg.value}("");
         require(success, "TroveManager: Sending ETH to TroveManager failed");
         
         // mint zusd and transfer to user
@@ -89,4 +89,6 @@ contract TroveManager is Ownable {
         (,int price,,,) = priceFeed.latestRoundData();
         return price;
     }
+
+    receive() external payable {}
 }
