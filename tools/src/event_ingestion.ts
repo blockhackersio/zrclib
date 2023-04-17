@@ -24,12 +24,12 @@ export class EventIngestor {
     const nullifier$ = stream.pipe(filterNullifiers());
     const utxoStore = this._utxoStore;
     const nullifierStore = this._nullifierStore;
-    utxo$.subscribe((data) => {
-      utxoStore.add(`${data.getCommitment()}`, data);
+    utxo$.subscribe(async (data) => {
+      await utxoStore.add(`${data.getCommitment()}`, data);
     });
     // TODO: Use a set instead of a Store
-    nullifier$.subscribe((data) => {
-      nullifierStore.add(data.nullifier, "1");
+    nullifier$.subscribe(async (data) => {
+      await nullifierStore.add(data.nullifier, "1");
     });
   }
 
