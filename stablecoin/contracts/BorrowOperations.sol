@@ -12,6 +12,9 @@ contract BorrowOperations is Ownable {
     ZUSD public zusd;
     AggregatorV3Interface internal priceFeed;
 
+    uint256 public minCollaterizationRatio = 120; // 120%
+    uint256 public collateraizationScaleFactor = 100;
+
     constructor(address _troveManagerAddress) {
         troveManager = TroveManager(_troveManagerAddress);
     }
@@ -27,7 +30,7 @@ contract BorrowOperations is Ownable {
      */
     function openTrove(uint zusdAmount) external payable  {
         // check that collateral provided is sufficient
-        uint256 minETHAmount = zusdAmount * uint256(getLatestPrice()) / (10**priceFeed.decimals());
+        uint256 minETHAmount = zusdAmount * uint256(getLatestPrice()) * minCollaterizationRatio / collateraizationScaleFactor / (10**priceFeed.decimals());
         require(msg.value >= minETHAmount, "BorrowerOps: Insufficient ETH provided");
 
         // send ETH to trove manager
