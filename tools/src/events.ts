@@ -1,7 +1,6 @@
 import { BigNumber, ethers } from "ethers";
-import { Observable, from } from "rxjs";
 import { EMPTY } from "rxjs";
-import { filter, switchMap, catchError } from "rxjs/operators";
+import { Observable, from, filter, tap, switchMap, catchError } from "rxjs";
 import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
 import { ContractEvent, NewCommitment, NewNullifier } from "./types";
@@ -66,7 +65,10 @@ async function decryptCommitment(
   event: NewCommitment,
   keypair: Keypair
 ): Promise<Utxo> {
-  return Utxo.decrypt(keypair, event.encryptedOutput, event.index);
+  console.log("decryptCommitment");
+  const decrypted = Utxo.decrypt(keypair, event.encryptedOutput, event.index);
+  console.log("decryptCommitment:" + decrypted);
+  return decrypted;
 }
 
 function eventIsNewCommitment(event: ContractEvent): event is NewCommitment {
@@ -80,6 +82,7 @@ export function filterValidEncryptedUtxosAndDecrypt(
 ): (a: Observable<ContractEvent>) => Observable<Utxo> {
   return (eventSource) =>
     eventSource.pipe(
+      tap((item) => console.log(item)),
       filter(eventIsNewCommitment),
       switchMap((event: NewCommitment) =>
         from(decryptCommitment(event, keypair)).pipe(catchError(() => EMPTY))

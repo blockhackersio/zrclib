@@ -14,6 +14,7 @@ class Utxo {
   public nullifier?: Uint8Array;
 
   public static decrypt(keypair: Keypair, data: string, index: number): Utxo {
+    console.log("attempting decryption....");
     const buf = keypair.decrypt(data);
 
     return new Utxo({
