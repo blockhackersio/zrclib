@@ -192,6 +192,9 @@ importers:
       '@ethersproject/bytes':
         specifier: ^5.7.0
         version: 5.7.0
+      '@metamask/eth-sig-util':
+        specifier: ^5.0.2
+        version: 5.0.2
       '@rollup/plugin-json':
         specifier: ^6.0.0
         version: 6.0.0(rollup@3.20.4)
@@ -222,6 +225,9 @@ importers:
       localforage:
         specifier: ^1.10.0
         version: 1.10.0
+      rxjs:
+        specifier: ^7.8.0
+        version: 7.8.0
       snarkjs:
         specifier: ^0.6.10
         version: 0.6.10
@@ -712,6 +718,21 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+    dev: false
+
+  /@ethereumjs/rlp@4.0.1:
+    resolution: {integrity: sha512-tqsQiBQDQdmPWE1xkkBq4rlSW5QZpLOUJ5RJh2/9fug+q9tnUhuZoVLk7s0scUIKTOzEtR72DFBXI4WiZcMpvw==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: false
+
+  /@ethereumjs/util@8.0.5:
+    resolution: {integrity: sha512-259rXKK3b3D8HRVdRmlOEi6QFvwxdt304hhrEAmpZhsj7ufXEOTIc9JRZPMnXatKjECokdLNBcDOFBeBSzAIaw==}
+    engines: {node: '>=14'}
+    dependencies:
+      '@chainsafe/ssz': 0.9.4
+      '@ethereumjs/rlp': 4.0.1
+      ethereum-cryptography: 1.2.0
     dev: false
 
   /@ethersproject/abi@5.7.0:
@@ -1286,6 +1307,18 @@ packages:
       ethjs-util: 0.1.6
       tweetnacl: 1.0.3
       tweetnacl-util: 0.15.1
+
+  /@metamask/eth-sig-util@5.0.2:
+    resolution: {integrity: sha512-RU6fG/H6/UlBol221uBkq5C7w3TwLK611nEZliO2u+kO0vHKGBXnIPlhI0tzKUigjhUeOd9mhCNbNvhh0LKt9Q==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@ethereumjs/util': 8.0.5
+      bn.js: 4.12.0
+      ethereum-cryptography: 1.2.0
+      ethjs-util: 0.1.6
+      tweetnacl: 1.0.3
+      tweetnacl-util: 0.15.1
+    dev: false
 
   /@morgan-stanley/ts-mocking-bird@0.6.4(typescript@4.5.2):
     resolution: {integrity: sha512-57VJIflP8eR2xXa9cD1LUawh+Gh+BVQfVu0n6GALyg/AqV/Nz25kDRvws3i9kIe1PTrbsZZOYpsYp6bXPd6nVA==}
