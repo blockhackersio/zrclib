@@ -6,17 +6,17 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract ZUSD is ShieldedPool, ERC20 {
 
-    address public immutable borrowerOperationsAddress;
+    address public immutable troveManagerAddress;
 
     constructor(
         address _hasherAddress,
-        address _borrowerOperationAddress
+        address _troveManagerAddress
     ) ShieldedPool(5, _hasherAddress) ERC20("ZUSD", "ZUSD") {
-        borrowerOperationsAddress = _borrowerOperationAddress;
+        troveManagerAddress = _troveManagerAddress;
     }
 
     function mint(address _account, uint256 _amount) external {
-        _requireCallerIsBorrowerOperations();
+        _requireCallerIsTroveManager();
         _mint(_account, _amount);
     }
 
@@ -61,7 +61,7 @@ contract ZUSD is ShieldedPool, ERC20 {
         _transact(_proof);
     }
 
-    function _requireCallerIsBorrowerOperations() internal view {
-        require(msg.sender == borrowerOperationsAddress, "LUSDToken: Caller is not BorrowerOperations");
+    function _requireCallerIsTroveManager() internal view {
+        require(msg.sender == troveManagerAddress, "LUSDToken: Caller is not TroveManager");
     }
 }

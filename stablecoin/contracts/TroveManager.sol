@@ -4,11 +4,13 @@ pragma solidity ^0.8.9;
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./StabilityPool.sol";
+import "./ZUSD.sol";
 
 contract TroveManager is Ownable {
 
     AggregatorV3Interface internal priceFeed;
     StabilityPool public stabilityPool;
+    ZUSD public zusd;
 
     uint256 public minCollaterizationRatio = 120; // 120%
     uint256 public collateraizationScaleFactor = 100;
@@ -30,9 +32,31 @@ contract TroveManager is Ownable {
 
     mapping (address => Trove) public troves;
 
-    function setAddresses(address _stabilityPoolAddress, address _priceFeedAddress) external onlyOwner {
+    function setAddresses(
+        address _zusdAddress, 
+        address _stabilityPoolAddress, 
+        address _priceFeedAddress
+    ) external onlyOwner {
+        zusd = ZUSD(_zusdAddress);
         stabilityPool = StabilityPool(_stabilityPoolAddress);
         priceFeed = AggregatorV3Interface(_priceFeedAddress); // price feed for USD/ETH
+    }
+
+    /**
+     * @notice Specify the amount of ZUSD to borrow (ZUSD has 18 decimals)
+     * @notice The amount of ETH attached is the collateral provided
+     */
+    function openTrove(uint zusdAmount) external payable  {
+        // check that collateral provided is sufficient
+        uint256 minETHAmount = zusdAmount * uint256(getLatestPrice()) * minCollaterizationRatio / collateraizationScaleFactor / (10**priceFeed.decimals());
+        require(msg.value >= minETHAmount, "TroveManager: Insufficient ETH provided");
+
+        // send ETH to trove manager
+        (bool success, ) = address(this).call{value: zusdAmount}("");
+        require(success, "TroveManager: Sending ETH to TroveManager failed");
+        
+        // mint zusd and transfer to user
+        zusd.mint(msg.sender, zusdAmount);
     }
 
     function liquidate(address _borrower) external {

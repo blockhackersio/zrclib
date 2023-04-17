@@ -17,14 +17,6 @@ async function main() {
     `TroveManager deployed to ${troveManager.address}`
   );
 
-  // deploy borrower operations contract
-  const BorrowerOperations = await ethers.getContractFactory("BorrowOperations");
-  const borrowerOperations = await BorrowerOperations.deploy(troveManager.address);
-  await borrowerOperations.deployed();
-  console.log(
-    `BorrowerOperations deployed to ${borrowerOperations.address}`
-  );
-
   // deploy stability pool contract
   const StabilityPool = await ethers.getContractFactory("StabilityPool");
   const stabilityPool = await StabilityPool.deploy(troveManager.address);
