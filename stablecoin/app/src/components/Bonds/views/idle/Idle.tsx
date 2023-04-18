@@ -5,7 +5,7 @@ import { BondList } from "./BondList";
 import { useBondView } from "../../context/BondViewContext";
 import { BONDS } from "../../lexicon";
 import { InfoIcon } from "../../../InfoIcon";
-import { BLusdAmmTokenIndex, SwapPressedPayload, ShieldPressedPayload, ShieldAction } from "../../context/transitions";
+import { ShieldPressedPayload, ShieldAction } from "../../context/transitions";
 import { useLiquity } from "../../../../hooks/LiquityContext";
 import { useBondAddresses } from "../../context/BondAddressesContext";
 
@@ -33,11 +33,11 @@ export const Idle: React.FC = () => {
   const handleShieldZusdPressed = () => 
     dispatchEvent("SHIELD_PRESSED", { shieldAction: ShieldAction.SHIELD } as ShieldPressedPayload);
 
-  const handleBuyBLusdPressed = () =>
-    dispatchEvent("SWAP_PRESSED", { inputToken: BLusdAmmTokenIndex.ZUSD } as SwapPressedPayload);
-
-  const handleSellBLusdPressed = () =>
-    dispatchEvent("SWAP_PRESSED", { inputToken: BLusdAmmTokenIndex.BLUSD } as SwapPressedPayload);
+    const handleTransferZusdPressed = () => 
+    dispatchEvent("SHIELD_PRESSED", { shieldAction: ShieldAction.TRANSFER } as ShieldPressedPayload);
+  
+  const handleUnshieldZusdPressed = () => 
+    dispatchEvent("SHIELD_PRESSED", { shieldAction: ShieldAction.UNSHIELD } as ShieldPressedPayload);
 
   return (
     <>
@@ -46,11 +46,11 @@ export const Idle: React.FC = () => {
           Shield ZUSD
         </Button>
 
-        <Button variant="outline" onClick={handleBuyBLusdPressed}>
+        <Button variant="outline" onClick={handleTransferZusdPressed}>
           Transfer ZUSD
         </Button>
 
-        <Button variant="outline" onClick={handleSellBLusdPressed}>
+        <Button variant="outline" onClick={handleUnshieldZusdPressed}>
           Unshield ZUSD
         </Button>
 
