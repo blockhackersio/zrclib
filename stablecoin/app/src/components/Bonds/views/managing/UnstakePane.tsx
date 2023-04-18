@@ -5,7 +5,6 @@ import { Amount } from "../../../ActionDescription";
 import { ErrorDescription } from "../../../ErrorDescription";
 import { EditableRow, StaticAmounts, StaticRow } from "../../../Trove/Editor";
 import { useBondView } from "../../context/BondViewContext";
-import { PendingRewards } from "./PendingRewards";
 import { PoolBalance } from "./PoolBalance";
 
 export const UnstakePane: React.FC = () => {
@@ -41,8 +40,6 @@ export const UnstakePane: React.FC = () => {
         maxAmount={coalescedStakedLpTokenBalance.toString()}
         maxedOut={unstakeAmount.eq(coalescedStakedLpTokenBalance)}
       />
-
-      <PendingRewards />
 
       <StaticRow label="bLUSD LP APR">
         <StaticAmounts sx={{ alignItems: "center", justifyContent: "flex-start" }}>

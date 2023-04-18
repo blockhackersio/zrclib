@@ -5,9 +5,8 @@ type Creating = "CREATING";
 type Cancelling = "CANCELLING";
 type Claiming = "CLAIMING";
 type Swapping = "SWAPPING";
-type ManagingLiquidity = "MANAGING_LIQUIDITY";
 
-export type BondView = Idle | Creating | Cancelling | Claiming | Swapping | ManagingLiquidity;
+export type BondView = Idle | Creating | Cancelling | Claiming | Swapping;
 
 /* UI events */
 type CreateBondPressed = "CREATE_BOND_PRESSED";
@@ -56,7 +55,6 @@ export const transitions: BondEventTransitions = {
     CLAIM_BOND_PRESSED: "CLAIMING",
     SWAP_PRESSED: "SWAPPING",
     SHIELD_PRESSED: "SWAPPING",
-    MANAGE_LIQUIDITY_PRESSED: "MANAGING_LIQUIDITY"
   },
   CREATING: {
     ABORT_PRESSED: "IDLE",
@@ -82,13 +80,6 @@ export const transitions: BondEventTransitions = {
     APPROVE_PRESSED: "SWAPPING",
     CONFIRM_PRESSED: "SWAPPING",
     SWAP_CONFIRMED: "IDLE"
-  },
-  MANAGING_LIQUIDITY: {
-    ABORT_PRESSED: "IDLE",
-    BACK_PRESSED: "IDLE",
-    APPROVE_PRESSED: "MANAGING_LIQUIDITY",
-    CONFIRM_PRESSED: "MANAGING_LIQUIDITY",
-    MANAGE_LIQUIDITY_CONFIRMED: "IDLE"
   }
 };
 

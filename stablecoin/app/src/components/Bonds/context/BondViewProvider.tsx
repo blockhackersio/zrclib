@@ -575,11 +575,6 @@ export const BondViewProvider: React.FC = props => {
           const { inputAmount, minOutputAmount } = payload as SwapPayload;
           await swapTokens(inputToken, inputAmount, minOutputAmount);
           await dispatchEvent("SWAP_CONFIRMED");
-        } else if (isCurrentViewEvent("MANAGING_LIQUIDITY", "APPROVE_PRESSED")) {
-          await approveTokens(payload as ApprovePressedPayload);
-        } else if (isCurrentViewEvent("MANAGING_LIQUIDITY", "CONFIRM_PRESSED")) {
-          await manageLiquidity(payload as ManageLiquidityPayload);
-          await dispatchEvent("MANAGE_LIQUIDITY_CONFIRMED");
         }
       } catch (error: unknown) {
         console.error("dispatchEvent(), event handler failed\n\n", error);
