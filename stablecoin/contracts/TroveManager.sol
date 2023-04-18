@@ -51,6 +51,8 @@ contract TroveManager is Ownable {
         uint256 maxZUSDAmount = msg.value * uint256(getLatestPrice()) * minCollaterizationRatio / collateraizationScaleFactor / (10**priceFeed.decimals());
         require(zusdAmount < maxZUSDAmount, "TroveManager: Insufficient ETH provided");
 
+        // TODO: record trove and its status
+
         // send ETH to trove manager
         (bool success, ) = address(this).call{value: msg.value}("");
         require(success, "TroveManager: Sending ETH to TroveManager failed");
@@ -70,6 +72,7 @@ contract TroveManager is Ownable {
         // call offset function in stability pool
         stabilityPool.offset(trove.debt, trove.coll); // TODO: check whether parameters passed are correct
 
+        // TODO: update trove and its status
         // TODO: transfer a liquidation premium to liquidator
     }
 
@@ -79,6 +82,7 @@ contract TroveManager is Ownable {
     function redeemCollateral(uint256 zusdAmount) external {
         // TODO: make sure that collaterization ratio is always above the minimum
         // TODO: maintain the minimum collaterization ratio specified by users
+        // TODO: update trove struct
     }
 
     function _requireTroveIsActive(address _borrower) internal view {
