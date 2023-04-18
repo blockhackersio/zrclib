@@ -18,7 +18,7 @@ export const Nav: React.FC = () => {
         <Link to="/">Dashboard</Link>
         <Link to="/bonds">
           <Flex sx={{ alignItems: "center" }}>
-            <Text>Bonds</Text>
+            <Text>Shielded Pool</Text>
             <TemporaryNewBadge />
           </Flex>
         </Link>
