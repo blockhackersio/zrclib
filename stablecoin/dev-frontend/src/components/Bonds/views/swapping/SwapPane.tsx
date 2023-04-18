@@ -204,112 +204,6 @@ export const SwapPane: React.FC = () => {
         )}
       </DisabledEditableRow>
 
-      <StaticRow label="Exchange rate">
-        {exchangeRate ? (
-          <StaticAmounts
-            inputId="swap-exchange-rate"
-            amount={exchangeRate.prettify(4)}
-            unit={`${tokenSymbol[inputToken]}:${tokenSymbol[outputToken[inputToken]]}`}
-          />
-        ) : (
-          <StaticAmounts inputId="swap-exchange-rate">
-            <Box sx={{ width: "180px", height: "16px", mt: "9px", mb: "5px" }}>
-              <Placeholder />
-            </Box>
-          </StaticAmounts>
-        )}
-      </StaticRow>
-
-      <StaticRow label="Price impact">
-        {priceImpact && priceImpactPct ? (
-          <StaticAmounts
-            inputId="swap-price-impact"
-            amount={priceImpactPct.toString(4)}
-            color={priceImpact.gte(0.005) ? "danger" : undefined}
-          />
-        ) : (
-          <StaticAmounts inputId="swap-price-impact">
-            <Box sx={{ width: "80px", height: "16px", mt: "9px", mb: "5px" }}>
-              <Placeholder />
-            </Box>
-          </StaticAmounts>
-        )}
-      </StaticRow>
-
-      <details>
-        <summary sx={{ cursor: "pointer", mx: 2, mb: 2 }}>Slippage tolerance</summary>
-
-        <Flex sx={{ alignItems: "center", mx: 4, mb: 3 }}>
-          <Label variant="radioLabel">
-            <Radio
-              name="swap-slippage-tolerance"
-              value="half"
-              checked={slippageToleranceChoice === "half"}
-              onChange={handleSlippageToleranceChange}
-            />
-            0.5%
-          </Label>
-
-          <Label variant="radioLabel">
-            <Radio
-              name="swap-slippage-tolerance"
-              value="one"
-              checked={slippageToleranceChoice === "one"}
-              onChange={handleSlippageToleranceChange}
-            />
-            1%
-          </Label>
-
-          <Label variant="radioLabel" sx={{ alignItems: "center" }}>
-            <Radio
-              name="swap-slippage-tolerance"
-              value="custom"
-              checked={slippageToleranceChoice === "custom"}
-              onChange={handleSlippageToleranceChange}
-            />
-            <Input
-              ref={customSlippageToleranceRef}
-              sx={{
-                py: "6px",
-                px: "10px",
-                width: "110px",
-                fontSize: 2,
-                ...(!customSlippageToleranceFocus
-                  ? isSlippageToleranceInvalid
-                    ? { bg: "invalid", borderColor: "danger" }
-                    : isSlippageToleranceHigh
-                    ? { borderColor: "warning" }
-                    : {}
-                  : {})
-              }}
-              type="number"
-              min={0}
-              max={100}
-              step={0.1}
-              placeholder="Custom"
-              onFocus={() => {
-                setSlippageToleranceChoice("custom");
-                setCustomSlippageToleranceFocus(true);
-              }}
-              onKeyDown={e => {
-                if (e.key === "Enter") {
-                  customSlippageToleranceRef.current?.blur();
-                }
-              }}
-              onBlur={() => setCustomSlippageToleranceFocus(false)}
-              onChange={e => {
-                try {
-                  setCustomSlippageTolerance(Decimal.from(e.target.value).div(100));
-                } catch {
-                  setCustomSlippageTolerance(undefined);
-                }
-              }}
-            />
-            &nbsp;%
-          </Label>
-        </Flex>
-      </details>
-
       {isBalanceInsufficient && (
         <ErrorDescription>
           Amount exceeds your balance by{" "}
@@ -322,14 +216,6 @@ export const SwapPane: React.FC = () => {
       {(bLusdAmmBLusdBalance?.isZero || bLusdAmmLusdBalance?.isZero) && (
         <ErrorDescription>No liquidity in pool yet. Swap unavailable.</ErrorDescription>
       )}
-
-      <Flex pb={2} sx={{ fontSize: "15.5px", justifyContent: "center", fontStyle: "italic" }}>
-        Your swap is performed directly in&nbsp;
-        <Link href="https://curve.fi/factory-crypto/134" target="_blank">
-          Curve
-        </Link>
-        &nbsp;protocol.
-      </Flex>
 
       <Flex variant="layout.actions">
         <Button
