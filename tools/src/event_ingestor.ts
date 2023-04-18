@@ -1,44 +1,71 @@
-import {
-  createEventStream,
-  filterNullifiers,
-  filterValidEncryptedUtxosAndDecrypt,
-} from "./events";
-import { Keypair } from "./keypair";
-import { ContractEvent, Store } from "./types";
-import { Observable, share } from "rxjs";
+import { ethers, providers } from "ethers";
+import { NewCommitment, NewNullifier, Store } from "./types";
 import { Utxo } from "./utxo";
+import { Keypair } from "./keypair";
+
+function formNewCommitment(args: ethers.utils.Result): NewCommitment {
+  return {
+    type: "NewCommitment",
+    commitment: args.commitment,
+    index: args.index,
+    encryptedOutput: args.encryptedOutput,
+  };
+}
+
+function formNewNullifier(args: ethers.utils.Result): NewNullifier {
+  return {
+    type: "NewNullifier",
+    nullifier: args.nullifier,
+  };
+}
 
 export class EventIngestor {
   constructor(
-    private _utxoStore: Store<Utxo>,
-    private _nullifierStore: Store<string>,
-    private _contractEventStream: Observable<ContractEvent>,
-    private _keypair: Keypair
+    private contract: ethers.Contract,
+    private keypair: Keypair,
+    private nullifierStore: Store<string>,
+    private utxoStore: Store<Utxo>
   ) {}
 
-  async connect() {
-    const event$ = this._contractEventStream.pipe(share());
-    const utxo$ = event$.pipe(
-      filterValidEncryptedUtxosAndDecrypt(this._keypair)
-    );
-    const nullifier$ = event$.pipe(filterNullifiers());
-    const utxoStore = this._utxoStore;
-    const nullifierStore = this._nullifierStore;
-    utxo$.subscribe(async (data) => {
-      console.log({ utxo$: data });
-      await utxoStore.add(`${data.getCommitment()}`, data);
+  public start() {
+    const newCommitmentFilter = this.contract.filters.NewCommitment();
+    const newNullifierFilter = this.contract.filters.NewNullifier();
+
+    this.contract.provider.on(newCommitmentFilter, async (log) => {
+      const event = this.contract.interface.parseLog(log);
+      const newCommitment = formNewCommitment(event.args);
+      await this.handleNewCommitmentEvent(newCommitment);
     });
-    // TODO: Use a set instead of a Store
-    nullifier$.subscribe(async (data) => {
-      await nullifierStore.add(data.nullifier, "1");
+
+    this.contract.provider.on(newNullifierFilter, async (log) => {
+      const event = this.contract.interface.parseLog(log);
+      const newNullifier = formNewNullifier(event.args);
+      await this.handleNewNullifierEvent(newNullifier);
     });
   }
 
-  utxoStore() {
-    return this._utxoStore;
+  public stop() {
+    this.contract.provider.removeAllListeners();
   }
 
-  nullifierStore() {
-    return this._nullifierStore;
+  private async handleNewCommitmentEvent(
+    event: Omit<NewCommitment, "type">
+  ): Promise<void> {
+    try {
+      const decryptedUtxo = Utxo.decrypt(
+        this.keypair,
+        event.encryptedOutput,
+        event.index
+      );
+      await this.utxoStore.add(event.commitment, decryptedUtxo);
+    } catch (error) {
+      console.log("Failed to decrypt encryptedOutput:", error);
+    }
+  }
+
+  private async handleNewNullifierEvent({
+    nullifier,
+  }: NewNullifier): Promise<void> {
+    await this.nullifierStore.add(nullifier, nullifier);
   }
 }

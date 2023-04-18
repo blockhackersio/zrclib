@@ -131,20 +131,6 @@ export type ArgsProof = {
   extDataHash: string;
 };
 
-// export type InputByType = {
-//   base64: string;
-//   string: string;
-//   text: string;
-//   binarystring: string;
-//   array: number[];
-//   uint8array: Uint8Array;
-//   arraybuffer: ArrayBuffer;
-//   blob: Blob;
-//   stream: NodeJS.ReadableStream;
-// };
-
-// export type InputFileFormat = InputByType[keyof InputByType];
-
 export type DownloadParams = {
   prefix: string;
   name: string;

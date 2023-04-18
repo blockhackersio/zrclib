@@ -1,8 +1,5 @@
 import { BigNumber, Wallet, ethers } from "ethers";
-import { encrypt, decrypt, getEncryptionPublicKey } from "eth-sig-util";
-
 import { packEncryptedMessage, unpackEncryptedMessage } from "./utils";
-
 import { toFixedHex } from "./utils";
 import { ensurePoseidon, poseidonHash } from "./poseidon";
 import {
@@ -12,6 +9,11 @@ import {
   recoverAddress,
 } from "ethers/lib/utils";
 import { SignatureLike, hexDataSlice } from "@ethersproject/bytes";
+import {
+  decrypt,
+  encrypt,
+  getEncryptionPublicKey,
+} from "@metamask/eth-sig-util";
 
 class Keypair {
   public privkey: string;
@@ -19,7 +21,7 @@ class Keypair {
   public encryptionKey: string;
 
   public constructor(privkey = Wallet.createRandom().privateKey) {
-    this.privkey = BigInt(privkey).toString();
+    this.privkey = toFixedHex(privkey);
     this.pubkey = poseidonHash([privkey]);
     this.encryptionKey = getEncryptionPublicKey(privkey.slice(2));
   }
@@ -36,18 +38,20 @@ class Keypair {
   }
 
   public encrypt(bytes: Buffer) {
-    return packEncryptedMessage(
-      encrypt(
-        this.encryptionKey,
-        { data: bytes.toString("base64") },
-        "x25519-xsalsa20-poly1305"
-      )
-    );
+    const d = encrypt({
+      publicKey: this.encryptionKey,
+      data: bytes.toString("base64"),
+      version: "x25519-xsalsa20-poly1305",
+    });
+    return packEncryptedMessage(d);
   }
 
   public decrypt(data: string) {
     return Buffer.from(
-      decrypt(unpackEncryptedMessage(data), this.privkey.slice(2)),
+      decrypt({
+        encryptedData: unpackEncryptedMessage(data),
+        privateKey: this.privkey.slice(2),
+      }),
       "base64"
     );
   }
@@ -72,7 +76,7 @@ class Keypair {
       privkey: null,
       pubkey: new Uint8Array(Buffer.from(str.slice(0, 64), "hex")),
       encryptionKey: Buffer.from(str.slice(64, 128), "hex").toString("base64"),
-    });
+    }) as Keypair;
   }
 
   public static async generate() {
