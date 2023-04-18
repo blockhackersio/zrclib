@@ -5,7 +5,7 @@ import { BondList } from "./BondList";
 import { useBondView } from "../../context/BondViewContext";
 import { BONDS } from "../../lexicon";
 import { InfoIcon } from "../../../InfoIcon";
-import { BLusdAmmTokenIndex, SwapPressedPayload } from "../../context/transitions";
+import { BLusdAmmTokenIndex, SwapPressedPayload, ShieldPressedPayload, ShieldAction } from "../../context/transitions";
 import { useLiquity } from "../../../../hooks/LiquityContext";
 import { useBondAddresses } from "../../context/BondAddressesContext";
 
@@ -30,6 +30,9 @@ export const Idle: React.FC = () => {
 
   const showLusdFaucet = LUSD_OVERRIDE_ADDRESS !== null && lusdBalance?.eq(0);
 
+  const handleShieldZusdPressed = () => 
+    dispatchEvent("SHIELD_PRESSED", { shieldAction: ShieldAction.SHIELD } as ShieldPressedPayload);
+
   const handleBuyBLusdPressed = () =>
     dispatchEvent("SWAP_PRESSED", { inputToken: BLusdAmmTokenIndex.ZUSD } as SwapPressedPayload);
 
@@ -39,7 +42,7 @@ export const Idle: React.FC = () => {
   return (
     <>
       <Flex variant="layout.actions" sx={{ mt: 4, mb: 3 }}>
-        <Button variant="outline" onClick={handleBuyBLusdPressed}>
+        <Button variant="outline" onClick={handleShieldZusdPressed}>
           Shield ZUSD
         </Button>
 

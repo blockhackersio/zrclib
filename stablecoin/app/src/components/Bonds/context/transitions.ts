@@ -17,6 +17,7 @@ type ApprovePressed = "APPROVE_PRESSED";
 type ConfirmPressed = "CONFIRM_PRESSED";
 type CancelBondPressed = "CANCEL_BOND_PRESSED";
 type ClaimBondPressed = "CLAIM_BOND_PRESSED";
+type ShieldActionPressed = "SHIELD_PRESSED";
 type SwapPressed = "SWAP_PRESSED";
 type AddLiquidityPressed = "ADD_LIQUIDITY_PRESSED";
 type ManageLiquidityPressed = "MANAGE_LIQUIDITY_PRESSED";
@@ -32,6 +33,7 @@ export type BondEvent =
   | CreateBondPressed
   | CancelBondPressed
   | ClaimBondPressed
+  | ShieldActionPressed
   | SwapPressed
   | AddLiquidityPressed
   | ManageLiquidityPressed
@@ -53,6 +55,7 @@ export const transitions: BondEventTransitions = {
     CANCEL_BOND_PRESSED: "CANCELLING",
     CLAIM_BOND_PRESSED: "CLAIMING",
     SWAP_PRESSED: "SWAPPING",
+    SHIELD_PRESSED: "SWAPPING",
     MANAGE_LIQUIDITY_PRESSED: "MANAGING_LIQUIDITY"
   },
   CREATING: {
@@ -89,6 +92,12 @@ export const transitions: BondEventTransitions = {
   }
 };
 
+export enum ShieldAction {
+  SHIELD,
+  UNSHIELD,
+  TRANSFER
+}
+
 export enum BLusdAmmTokenIndex {
   BLUSD,
   ZUSD,
@@ -98,6 +107,10 @@ export enum BLusdAmmTokenIndex {
 export type CreateBondPayload = { deposit: Decimal };
 
 export type SelectBondPayload = { bondId: string };
+
+export type ShieldPressedPayload = {
+  shieldAction: ShieldAction.SHIELD | ShieldAction.UNSHIELD | ShieldAction.TRANSFER;
+}
 
 export type SwapPressedPayload = {
   inputToken: BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD;
@@ -172,6 +185,7 @@ export type ManageLiquidityPayload =
 export type Payload =
   | CreateBondPayload
   | SelectBondPayload
+  | ShieldPressedPayload
   | SwapPressedPayload
   | SwapPayload
   | ApprovePressedPayload

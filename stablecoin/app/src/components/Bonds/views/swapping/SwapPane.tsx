@@ -13,7 +13,7 @@ import {
   EditableRow
 } from "../../../Trove/Editor";
 import { useBondView } from "../../context/BondViewContext";
-import { BLusdAmmTokenIndex } from "../../context/transitions";
+import { BLusdAmmTokenIndex, ShieldAction } from "../../context/transitions";
 
 const tokenSymbol: Record<BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD, string> = {
   [BLusdAmmTokenIndex.BLUSD]: "bLUSD",
@@ -50,7 +50,8 @@ export const SwapPane: React.FC = () => {
     isInputTokenApprovedWithBLusdAmm,
     bLusdAmmBLusdBalance,
     bLusdAmmLusdBalance,
-    getExpectedSwapOutput
+    getExpectedSwapOutput,
+    shieldAction
   } = useBondView();
   const editingState = useState<string>();
   const inputTokenBalance =
@@ -154,7 +155,7 @@ export const SwapPane: React.FC = () => {
     <>
       <Heading as="h2" sx={{ pt: 2, pb: 3, px: 2 }}>
         <Flex sx={{ justifyContent: "center" }}>
-          {inputToken === BLusdAmmTokenIndex.BLUSD ? <>Deposit</> : <>Withdraw</>} ZUSD
+          {shieldAction === ShieldAction.SHIELD ? <>Deposit</> : shieldAction === ShieldAction.TRANSFER ? <>Transfer</> : <>Withdraw</>} ZUSD;
         </Flex>
         <Close
           onClick={handleDismiss}

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { BondViewContext, BondViewContextType } from "./BondViewContext";
-import type {
+import {
   Stats,
   BondView,
   BondEvent,
@@ -13,7 +13,8 @@ import type {
   SwapPayload,
   ApprovePressedPayload,
   ManageLiquidityPayload,
-  BLusdLpRewards
+  BLusdLpRewards,
+  ShieldAction
 } from "./transitions";
 import { BLusdAmmTokenIndex } from "./transitions";
 import { transitions } from "./transitions";
@@ -62,6 +63,7 @@ export const BondViewProvider: React.FC = props => {
   const [inputToken, setInputToken] = useState<BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD>(
     BLusdAmmTokenIndex.BLUSD
   );
+  const [shieldAction, setShieldAction] = useState<ShieldAction>(ShieldAction.SHIELD);
   const [statuses, setStatuses] = useState<BondTransactionStatuses>({
     CREATE: "IDLE",
     CANCEL: "IDLE",
@@ -686,7 +688,8 @@ export const BondViewProvider: React.FC = props => {
     isBootstrapPeriodActive,
     hasLoaded: protocolInfo !== undefined && bonds !== undefined,
     addresses: contracts.addresses,
-    lpRewards
+    lpRewards,
+    shieldAction
   };
 
   // @ts-ignore
