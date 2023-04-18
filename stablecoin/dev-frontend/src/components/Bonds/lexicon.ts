@@ -6,14 +6,14 @@ export const PENDING_BONDS: Lexicon = {
 };
 
 export const BONDS: Lexicon = {
-  term: "Bonds",
-  description: "List of your pending bonds and bonds you have claimed or cancelled in the past."
+  term: "Shielded Funds",
+  description: "List of available UTXOs."
 };
 
 export const NOT_BONDED_YET: Lexicon = {
-  term: "You don't have any pending bonds.",
+  term: "You don't have any shielded ZUSD.",
   description:
-    "You can bond ZUSD to obtain Boosted ZUSD (bLUSD) - a yield-amplified version of ZUSD."
+    "You can shield ZUSD for private transactions."
 };
 
 export const BONDS_NAVIGATION: Lexicon = {

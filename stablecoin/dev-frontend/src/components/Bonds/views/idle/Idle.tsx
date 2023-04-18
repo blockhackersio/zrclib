@@ -42,15 +42,15 @@ export const Idle: React.FC = () => {
     <>
       <Flex variant="layout.actions" sx={{ mt: 4, mb: 3 }}>
         <Button variant="outline" onClick={handleManageLiquidityPressed}>
-          Manage liquidity
+          Shield ZUSD
         </Button>
 
         <Button variant="outline" onClick={handleBuyBLusdPressed}>
-          Buy bLUSD
+          Transfer ZUSD
         </Button>
 
         <Button variant="outline" onClick={handleSellBLusdPressed}>
-          Sell bLUSD
+          Unshield ZUSD
         </Button>
 
         {showLusdFaucet && (
@@ -80,12 +80,6 @@ export const Idle: React.FC = () => {
           </Heading>
           <Box sx={{ p: [2, 3] }}>
             <Empty />
-
-            <Flex variant="layout.actions" mt={4}>
-              <Button variant="primary" onClick={() => dispatchEvent("CREATE_BOND_PRESSED")}>
-                Create bond
-              </Button>
-            </Flex>
           </Box>
         </Card>
       )}
