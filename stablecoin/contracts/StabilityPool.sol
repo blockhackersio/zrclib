@@ -68,11 +68,23 @@ contract StabilityPool is Ownable {
     }
 
     function withdrawLiquidity(uint256 amount) external {
-        // TODO: update accounting
-        // transfer ZUSD from StabilityPool to user
-        require(deposits[msg.sender] >= amount, "StabilityPool: Withdraw amount larger than deposit");
-        deposits[msg.sender] -= amount;
-        zusd.transfer(msg.sender, amount);
+        uint initialDeposit = deposits[msg.sender];
+        require(initialDeposit > 0, 'StabilityPool: User must have a non-zero deposit');
+
+        uint depositorETHGain = getDepositorETHGain(msg.sender);
+        uint compoundedZUSDDeposit = getCompoundedZUSDDeposit(msg.sender);
+        uint ZUSDtoWithdraw = (amount < compoundedZUSDDeposit) ? amount : compoundedZUSDDeposit;
+
+        totalLiquidity -= ZUSDtoWithdraw;
+        zusd.transfer(msg.sender, ZUSDtoWithdraw);
+
+        // Update deposit
+        uint newDeposit = compoundedZUSDDeposit - ZUSDtoWithdraw;
+        _updateDepositAndSnapshots(msg.sender, newDeposit);
+
+        // transfer ETH gain to depositors (if any)
+        (bool success, ) = (msg.sender).call{value: depositorETHGain}("");
+        require(success, "StabilityPool: Sending ETH to liquidity provider failed");
     }
 
     /*
