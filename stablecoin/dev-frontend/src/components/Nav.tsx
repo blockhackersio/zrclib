@@ -23,11 +23,6 @@ export const Nav: React.FC = () => {
           </Flex>
         </Link>
       </Flex>
-      <Flex sx={{ justifyContent: "flex-end", mr: 3, flex: 1 }}>
-        <Link sx={{ fontSize: 1 }} to="/risky-troves">
-          Risky Troves
-        </Link>
-      </Flex>
     </Box>
   );
 };
