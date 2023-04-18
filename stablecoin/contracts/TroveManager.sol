@@ -15,19 +15,10 @@ contract TroveManager is Ownable {
     uint256 public minCollaterizationRatio = 120; // 120%
     uint256 public collateraizationScaleFactor = 100;
 
-    enum Status {
-        nonExistent,
-        active,
-        closedByOwner,
-        closedByLiquidation,
-        closedByRedemption
-    }
-
     // Store the necessary data for a trove
     struct Trove {
         uint256 debt; // debt denominated in ZUSD
         uint256 coll; // collateral denominated in ETH
-        Status status;
     }
 
     mapping (address => Trove) public troves;
@@ -51,7 +42,10 @@ contract TroveManager is Ownable {
         uint256 maxZUSDAmount = msg.value * uint256(getLatestPrice()) * minCollaterizationRatio / collateraizationScaleFactor / (10**priceFeed.decimals());
         require(zusdAmount < maxZUSDAmount, "TroveManager: Insufficient ETH provided");
 
-        // TODO: record trove and its status
+        // record trove and its collateral and debt
+        Trove storage trove = troves[msg.sender];
+        trove.debt += zusdAmount;
+        trove.coll += msg.value;
 
         // send ETH to trove manager
         (bool success, ) = address(this).call{value: msg.value}("");
@@ -62,31 +56,34 @@ contract TroveManager is Ownable {
     }
 
     function liquidate(address _borrower) external {
-        _requireTroveIsActive(_borrower);
-
         // check if the trove is undercollateralized
-        Trove memory trove = troves[_borrower];
+        Trove storage trove = troves[_borrower];
         uint256 minETHAmount = trove.debt * uint256(getLatestPrice()) * minCollaterizationRatio / collateraizationScaleFactor / (10**priceFeed.decimals());
         require(trove.coll < minETHAmount, "TroveManager: Trove is not undercollateralized");
+
+        // update trove and its collateral and debt
+        trove.debt = 0;
+        trove.coll = 0;
 
         // call offset function in stability pool
         stabilityPool.offset(trove.debt, trove.coll); // TODO: check whether parameters passed are correct
 
-        // TODO: update trove and its status
         // TODO: transfer a liquidation premium to liquidator
     }
 
     /**
      * @notice Send ZUSD to the trove manager to redeem ETH
      */
-    function redeemCollateral(uint256 zusdAmount) external {
-        // TODO: make sure that collaterization ratio is always above the minimum
-        // TODO: maintain the minimum collaterization ratio specified by users
-        // TODO: update trove struct
-    }
-
-    function _requireTroveIsActive(address _borrower) internal view {
-        require(troves[_borrower].status == Status.active, "TroveManager: Trove does not exist or is closed");
+    function redeemCollateral(uint256 zusdAmount, uint256 ethAmount, uint256 collaterizationRatio) external {
+        // make sure that collaterization ratio is always above the minimum
+        require(collaterizationRatio >= minCollaterizationRatio, "TroveManager: Collaterization ratio is below the minimum");
+        // maintain the minimum collaterization ratio specified by users
+        Trove storage trove = troves[msg.sender];
+        uint256 maxZUSDAmount = (trove.coll - ethAmount) * uint256(getLatestPrice()) * collaterizationRatio / collateraizationScaleFactor / (10**priceFeed.decimals());
+        require(trove.debt - zusdAmount < maxZUSDAmount, "TroveManager: Insufficient ZUSD provided");
+        trove.debt -= zusdAmount;
+        trove.coll -= ethAmount;
+        // TODO: figure out what to do with the returned ZUSD
     }
 
     function _requireCallerIsStabilityPool() internal view {
