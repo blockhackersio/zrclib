@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Heading, Link, Box, Text } from "theme-ui";
+import { Card, Heading, Box, Text } from "theme-ui";
 import { AddressZero } from "@ethersproject/constants";
 import { Decimal, Percent, LiquityStoreState } from "@liquity/lib-base";
 import { useLiquitySelector } from "@liquity/lib-react";
@@ -73,7 +73,6 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
     total.debt.nonZero && new Percent(lusdInStabilityPool.div(total.debt));
   const totalCollateralRatioPct = new Percent(total.collateralRatio(price));
   const borrowingFeePct = new Percent(borrowingRate);
-  const kickbackRatePct = frontendTag === AddressZero ? "100" : kickbackRate?.mul(100).prettify();
 
   return (
     <Card {...{ variant }}>

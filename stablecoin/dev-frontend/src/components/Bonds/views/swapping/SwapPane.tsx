@@ -1,8 +1,8 @@
 /** @jsxImportSource theme-ui */
 
-import { Decimal, Percent } from "@liquity/lib-base";
-import React, { useEffect, useRef, useState } from "react";
-import { Flex, Button, Spinner, Heading, Close, Box, Label, Radio, Input, Link } from "theme-ui";
+import { Decimal } from "@liquity/lib-base";
+import React, { useEffect, useState } from "react";
+import { Flex, Button, Spinner, Heading, Close, Box } from "theme-ui";
 import { Amount } from "../../../ActionDescription";
 import { ErrorDescription } from "../../../ErrorDescription";
 import { Icon } from "../../../Icon";
@@ -10,9 +10,7 @@ import { Placeholder } from "../../../Placeholder";
 import {
   DisabledEditableAmounts,
   DisabledEditableRow,
-  EditableRow,
-  StaticAmounts,
-  StaticRow
+  EditableRow
 } from "../../../Trove/Editor";
 import { useBondView } from "../../context/BondViewContext";
 import { BLusdAmmTokenIndex } from "../../context/transitions";
@@ -63,10 +61,7 @@ export const SwapPane: React.FC = () => {
   const [priceImpact, setPriceImpact] = useState<Decimal>();
   const [slippageToleranceChoice, setSlippageToleranceChoice] = useState<SlippageTolerance>("half");
   const [customSlippageTolerance, setCustomSlippageTolerance] = useState<Decimal>();
-  const [customSlippageToleranceFocus, setCustomSlippageToleranceFocus] = useState(false);
-  const customSlippageToleranceRef = useRef<HTMLInputElement>(null);
 
-  const priceImpactPct = priceImpact && new Percent(priceImpact);
   const isApprovePending = statuses.APPROVE_AMM === "PENDING";
   const isSwapPending = statuses.SWAP === "PENDING";
   const isBalanceInsufficient = inputAmount.gt(inputTokenBalance);
@@ -75,7 +70,6 @@ export const SwapPane: React.FC = () => {
     (!customSlippageTolerance ||
       customSlippageTolerance.lt(0.001) ||
       customSlippageTolerance.gt(Decimal.ONE));
-  const isSlippageToleranceHigh = customSlippageTolerance?.gt(0.05);
 
   // Used in dependency list of effect to recalculate output amount in case of pool changes
   const poolState = `${bLusdAmmBLusdBalance},${bLusdAmmLusdBalance}`;
