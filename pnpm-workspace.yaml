@@ -2,3 +2,4 @@ packages:
   - "integration"
   - "tools"
   - "stablecoin"
+  - "stablecoin/dev-frontend"
