@@ -22,13 +22,13 @@ export const TCR: Lexicon = {
     "The ratio of the Dollar value of the entire system collateral at the current ETH:USD price, to the entire system debt."
 };
 
-export const RECOVERY_MODE: Lexicon = {
-  term: "Recovery Mode",
+export const SHIELDED_AMOUNT: Lexicon = {
+  term: "Total Shielded Funds",
   description:
-    "Recovery Mode is activated when the Total Collateral Ratio (TCR) falls below 150%. When active, your Trove can be liquidated if its collateral ratio is below the TCR. The maximum collateral you can lose from liquidation is capped at 110% of your Trove's debt. Operations are also restricted that would negatively impact the TCR."
+    "Shielded ZUSD circulating in the pool"
 };
 
-export const STABILITY_POOL_LUSD: Lexicon = {
+export const STABILITY_POOL_ZUSD: Lexicon = {
   term: "ZUSD in Stability Pool",
   description:
     "The total ZUSD currently held in the Stability Pool, expressed as an amount and a fraction of the ZUSD supply."
@@ -51,7 +51,7 @@ export const TROVES: Lexicon = {
   description: "The total number of active Troves in the system."
 };
 
-export const LUSD_SUPPLY: Lexicon = {
+export const ZUSD_SUPPLY: Lexicon = {
   term: "ZUSD supply",
   description: "The total ZUSD minted by the Liquity Protocol."
 };

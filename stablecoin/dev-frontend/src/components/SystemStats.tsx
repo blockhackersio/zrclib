@@ -101,15 +101,15 @@ export const SystemStats: React.FC<SystemStatsProps> = ({ variant = "info", show
         </Text>
       </Statistic>
       <Statistic lexicon={l.TROVES}>{Decimal.from(numberOfTroves).prettify(0)}</Statistic>
-      <Statistic lexicon={l.LUSD_SUPPLY}>{total.debt.shorten()}</Statistic>
+      <Statistic lexicon={l.ZUSD_SUPPLY}>{total.debt.shorten()}</Statistic>
       {lusdInStabilityPoolPct && (
-        <Statistic lexicon={l.STABILITY_POOL_LUSD}>
+        <Statistic lexicon={l.STABILITY_POOL_ZUSD}>
           {lusdInStabilityPool.shorten()}
           <Text sx={{ fontSize: 1 }}>&nbsp;({lusdInStabilityPoolPct.toString(1)})</Text>
         </Statistic>
       )}
       <Statistic lexicon={l.TCR}>{totalCollateralRatioPct.prettify()}</Statistic>
-      <Statistic lexicon={l.RECOVERY_MODE}>
+      <Statistic lexicon={l.SHIELDED_AMOUNT}>
         {total.collateralRatioIsBelowCritical(price) ? <Box color="danger">Yes</Box> : "No"}
       </Statistic>
       {}
