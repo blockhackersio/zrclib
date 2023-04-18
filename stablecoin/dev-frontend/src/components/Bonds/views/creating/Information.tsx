@@ -23,7 +23,7 @@ const InformationContainer: React.FC = ({ children }) => {
   return (
     <>
       <Heading as="h2" sx={{ pt: 2, pb: 3, px: 2 }}>
-        <Flex sx={{ justifyContent: "center" }}>Bond LUSD</Flex>
+        <Flex sx={{ justifyContent: "center" }}>Bond ZUSD</Flex>
         <Close
           onClick={handleDismiss}
           sx={{
@@ -59,9 +59,9 @@ export const Information: React.FC = () => {
     <InformationContainer>
       <Box sx={{ p: [2, 3] }}>
         <Paragraph sx={{ mt: 2 }}>
-          Bonds accrue a virtual balance of boosted LUSD tokens (bLUSD) over time. At any time, the
-          bonder may choose to claim their bLUSD in exchange for their LUSD, or cancel their bond to
-          recover their deposited LUSD.
+          Bonds accrue a virtual balance of boosted ZUSD tokens (bLUSD) over time. At any time, the
+          bonder may choose to claim their bLUSD in exchange for their ZUSD, or cancel their bond to
+          recover their deposited ZUSD.
         </Paragraph>
         <Paragraph sx={{ mt: 3 }}>
           Please visit the&nbsp;

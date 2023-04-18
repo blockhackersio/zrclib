@@ -213,7 +213,7 @@ contract StabilityPool is Ownable {
         uint _totalZUSDDeposits
     ) internal returns (uint ETHGainPerUnitStaked, uint ZUSDLossPerUnitStaked) {
         /*
-        * Compute the LUSD and ETH rewards. Uses a "feedback" error correction, to keep
+        * Compute the ZUSD and ETH rewards. Uses a "feedback" error correction, to keep
         * the cumulative error in the P and S state variables low:
         *
         * 1) Form numerators which compensate for the floor division errors that occurred the last time this 
@@ -232,7 +232,7 @@ contract StabilityPool is Ownable {
         } else {
             uint ZUSDLossNumerator = _debtToOffset * DECIMAL_PRECISION - lastZUSDLossError_Offset;
             /*
-            * Add 1 to make error in quotient positive. We want "slightly too much" LUSD loss,
+            * Add 1 to make error in quotient positive. We want "slightly too much" ZUSD loss,
             * which ensures the error in any given compoundedLUSDDeposit favors the Stability Pool.
             */
             ZUSDLossPerUnitStaked = ZUSDLossNumerator / _totalZUSDDeposits + 1;
@@ -252,7 +252,7 @@ contract StabilityPool is Ownable {
 
         assert(_ZUSDLossPerUnitStaked <= DECIMAL_PRECISION);
         /*
-        * The newProductFactor is the factor by which to change all deposits, due to the depletion of Stability Pool LUSD in the liquidation.
+        * The newProductFactor is the factor by which to change all deposits, due to the depletion of Stability Pool ZUSD in the liquidation.
         * We make the product factor 0 if there was a pool-emptying. Otherwise, it is (1 - LUSDLossPerUnitStaked)
         */
         uint newProductFactor = uint(DECIMAL_PRECISION) - _ZUSDLossPerUnitStaked;

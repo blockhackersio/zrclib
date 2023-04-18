@@ -12,7 +12,7 @@ import { PoolDetails } from "./PoolDetails";
 
 const tokenSymbol = new Map([
   [BLusdAmmTokenIndex.BLUSD, "bLUSD"],
-  [BLusdAmmTokenIndex.LUSD, "LUSD"]
+  [BLusdAmmTokenIndex.ZUSD, "ZUSD"]
 ]);
 
 const WithdrawnAmount: React.FC<{ symbol: string }> = ({ symbol, children }) => (
@@ -29,7 +29,7 @@ const checkOutput = (value: string): BLusdAmmTokenIndex | "both" => {
   }
 
   const i = parseInt(value);
-  if (i === BLusdAmmTokenIndex.BLUSD || i === BLusdAmmTokenIndex.LUSD) {
+  if (i === BLusdAmmTokenIndex.BLUSD || i === BLusdAmmTokenIndex.ZUSD) {
     return i;
   }
 
@@ -38,7 +38,7 @@ const checkOutput = (value: string): BLusdAmmTokenIndex | "both" => {
 
 const zeros = new Map<BLusdAmmTokenIndex, Decimal>([
   [BLusdAmmTokenIndex.BLUSD, Decimal.ZERO],
-  [BLusdAmmTokenIndex.LUSD, Decimal.ZERO]
+  [BLusdAmmTokenIndex.ZUSD, Decimal.ZERO]
 ]);
 
 export const WithdrawPane: React.FC = () => {
@@ -79,7 +79,7 @@ export const WithdrawPane: React.FC = () => {
     const curveSlippage = 0.001; // Allow mininum of %0.1% slippage due to Curve rounding issues
     if (output === "both") {
       const minBLusdAmount = withdrawal.get(BLusdAmmTokenIndex.BLUSD)?.mul(1 - curveSlippage);
-      const minLusdAmount = withdrawal.get(BLusdAmmTokenIndex.LUSD)?.mul(1 - curveSlippage);
+      const minLusdAmount = withdrawal.get(BLusdAmmTokenIndex.ZUSD)?.mul(1 - curveSlippage);
 
       if (minBLusdAmount === undefined || minBLusdAmount === Decimal.ZERO) return;
       if (minLusdAmount === undefined || minLusdAmount === Decimal.ZERO) return;

@@ -17,17 +17,17 @@ import {
 import { useBondView } from "../../context/BondViewContext";
 import { BLusdAmmTokenIndex } from "../../context/transitions";
 
-const tokenSymbol: Record<BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.LUSD, string> = {
+const tokenSymbol: Record<BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD, string> = {
   [BLusdAmmTokenIndex.BLUSD]: "bLUSD",
-  [BLusdAmmTokenIndex.LUSD]: "LUSD"
+  [BLusdAmmTokenIndex.ZUSD]: "ZUSD"
 };
 
 const outputToken: Record<
-  BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.LUSD,
-  BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.LUSD
+  BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD,
+  BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD
 > = {
-  [BLusdAmmTokenIndex.BLUSD]: BLusdAmmTokenIndex.LUSD,
-  [BLusdAmmTokenIndex.LUSD]: BLusdAmmTokenIndex.BLUSD
+  [BLusdAmmTokenIndex.BLUSD]: BLusdAmmTokenIndex.ZUSD,
+  [BLusdAmmTokenIndex.ZUSD]: BLusdAmmTokenIndex.BLUSD
 };
 
 const marginalAmount = Decimal.ONE.div(1000);

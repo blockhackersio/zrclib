@@ -27,7 +27,7 @@ export const PoolDetails: React.FC = () => {
               {(bLusdAmmBLusdBalance ?? Decimal.ZERO).prettify(2)}
             </PoolBalance>
             <Text sx={{ fontWeight: "light", mx: "12px" }}>+</Text>
-            <PoolBalance symbol="LUSD-3CRV">
+            <PoolBalance symbol="ZUSD-3CRV">
               {(bLusdAmmLusdBalance ?? Decimal.ZERO).prettify(2)}
             </PoolBalance>
           </StaticAmounts>
@@ -40,7 +40,7 @@ export const PoolDetails: React.FC = () => {
           >
             <PoolBalance symbol="bLUSD">1</PoolBalance>
             <Text sx={{ fontWeight: "thin", mx: "6px" }}>:</Text>
-            <PoolBalance symbol="LUSD-3CRV">{poolBalanceRatio.prettify(2)}</PoolBalance>
+            <PoolBalance symbol="ZUSD-3CRV">{poolBalanceRatio.prettify(2)}</PoolBalance>
           </StaticAmounts>
         </StaticRow>
 
@@ -53,7 +53,7 @@ export const PoolDetails: React.FC = () => {
 
           <StaticRow label="bLUSD price">
             <StaticAmounts sx={{ alignItems: "center", justifyContent: "flex-start" }}>
-              <PoolBalance symbol="LUSD">
+              <PoolBalance symbol="ZUSD">
                 {(protocolInfo?.marketPrice ?? Decimal.INFINITY).prettify(2)}
               </PoolBalance>{" "}
             </StaticAmounts>

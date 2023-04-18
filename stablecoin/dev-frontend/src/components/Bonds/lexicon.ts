@@ -13,7 +13,7 @@ export const BONDS: Lexicon = {
 export const NOT_BONDED_YET: Lexicon = {
   term: "You don't have any pending bonds.",
   description:
-    "You can bond LUSD to obtain Boosted LUSD (bLUSD) - a yield-amplified version of LUSD."
+    "You can bond ZUSD to obtain Boosted ZUSD (bLUSD) - a yield-amplified version of ZUSD."
 };
 
 export const BONDS_NAVIGATION: Lexicon = {
@@ -45,23 +45,23 @@ export const BOND_NFT: Lexicon = {
 export const BREAK_EVEN_TIME: Lexicon = {
   term: "Break-even time",
   description:
-    "Estimated time at which the bond will have accrued enough bLUSD to offset the LUSD cost of the bond, under current market prices."
+    "Estimated time at which the bond will have accrued enough bLUSD to offset the ZUSD cost of the bond, under current market prices."
 };
 
 export const OPTIMUM_REBOND_TIME: Lexicon = {
   term: "Rebond time",
   description:
-    "Estimated optimum time to claim the bond, sell the bLUSD for LUSD, and then bond again, to maximize your return under current market prices."
+    "Estimated optimum time to claim the bond, sell the bLUSD for ZUSD, and then bond again, to maximize your return under current market prices."
 };
 
 export const REBOND_RETURN: Lexicon = {
   term: `${OPTIMUM_REBOND_TIME.term} return`,
-  description: `Estimated return from selling your accrued bLUSD to LUSD at the ${OPTIMUM_REBOND_TIME.term}, minus the initial LUSD cost of the bond, under current market prices.`
+  description: `Estimated return from selling your accrued bLUSD to ZUSD at the ${OPTIMUM_REBOND_TIME.term}, minus the initial ZUSD cost of the bond, under current market prices.`
 };
 
 export const REBOND_TIME_ROI: Lexicon = {
   term: `${OPTIMUM_REBOND_TIME.term} ROI`,
-  description: `Estimated ROI of selling your accrued bLUSD to LUSD at the ${OPTIMUM_REBOND_TIME.term}, minus the initial LUSD cost of the bond, under current market prices.`
+  description: `Estimated ROI of selling your accrued bLUSD to ZUSD at the ${OPTIMUM_REBOND_TIME.term}, minus the initial ZUSD cost of the bond, under current market prices.`
 };
 
 export const OPTIMUM_APY: Lexicon = {
@@ -100,7 +100,7 @@ export const BOND_AGE: Lexicon = {
 export const BOND_RETURN: Lexicon = {
   term: "Claim-now return",
   description:
-    "Expected LUSD gained from claiming the bond now and selling the bLUSD for LUSD and deducting the initial cost of the bond, under current market prices.",
+    "Expected ZUSD gained from claiming the bond now and selling the bLUSD for ZUSD and deducting the initial cost of the bond, under current market prices.",
   link: "https://docs.chickenbonds.org/faq/economic-design#_44lrt4qpho3a"
 };
 
@@ -127,14 +127,14 @@ export const CLAIMED_STATUS: Lexicon = {
 export const CANCEL_BOND: Lexicon = {
   term: "Cancel bond",
   description:
-    "A bond can be cancelled at any time to recover the initially deposited LUSD amount while forgoing the accrued bLUSD.",
+    "A bond can be cancelled at any time to recover the initially deposited ZUSD amount while forgoing the accrued bLUSD.",
   link: "https://docs.chickenbonds.org/faq/basic-usage#_rwpo6dhx26fq"
 };
 
 export const CLAIM_BOND: Lexicon = {
   term: "Claim bond",
   description:
-    "A bond can be claimed at any time to forgo the initially deposited LUSD amount and gain the accrued bLUSD.",
+    "A bond can be claimed at any time to forgo the initially deposited ZUSD amount and gain the accrued bLUSD.",
   link: "https://docs.chickenbonds.org/faq/basic-usage#_2c022erjceom"
 };
 
@@ -179,14 +179,14 @@ export const BLUSD_SUPPLY: Lexicon = {
 export const BLUSD_FLOOR_PRICE: Lexicon = {
   term: "Floor price",
   description:
-    "The amount of LUSD that an arbitrageur could redeem bLUSD for thus creating a lower bound bLUSD market price.",
+    "The amount of ZUSD that an arbitrageur could redeem bLUSD for thus creating a lower bound bLUSD market price.",
   link: "https://docs.chickenbonds.org/faq/economic-design#_c2c3valbf2bj-1"
 };
 
 export const BLUSD_WIND_DOWN_PRICE: Lexicon = {
   term: "Net asset value",
   description:
-    "The protocol supports a graceful wind down mechanism for migration purposes, whereby Yearn Finance governance can trigger a special function which moves the Permanent bucket LUSD into the Reserve, thus enabling all bLUSD to be redeemed for a higher floor price.",
+    "The protocol supports a graceful wind down mechanism for migration purposes, whereby Yearn Finance governance can trigger a special function which moves the Permanent bucket ZUSD into the Reserve, thus enabling all bLUSD to be redeemed for a higher floor price.",
   link:
     "https://docs.chickenbonds.org/faq/potential-future-system-migration#what-is-the-wind-down-functionality"
 };
@@ -200,7 +200,7 @@ export const BLUSD_APR: Lexicon = {
 export const BLUSD_LP_APR: Lexicon = {
   term: "LP APR",
   description:
-    "The APR from providing liquidity to the bLUSD/LUSD-3CRV pool. A combination of LUSD rewards from Chicken-in fees and Curve rewards.",
+    "The APR from providing liquidity to the bLUSD/ZUSD-3CRV pool. A combination of ZUSD rewards from Chicken-in fees and Curve rewards.",
   link: "https://docs.chickenbonds.org/faq/economic-design#_1qcmo1v5zahs"
 };
 
@@ -214,28 +214,28 @@ export const BLUSD_YIELD_AMPLIFICATION: Lexicon = {
 export const TREASURY_TOTAL: Lexicon = {
   term: "Total",
   description:
-    "The total amount of LUSD held by the protocol within the three buckets (Pending, Reserve, Permanent).",
+    "The total amount of ZUSD held by the protocol within the three buckets (Pending, Reserve, Permanent).",
   link: "https://docs.chickenbonds.org/faq/technical-design#_ydtvzh456fiz"
 };
 
 export const TREASURY_PENDING: Lexicon = {
   term: "Pending",
   description:
-    "Contains the deposited LUSD of the users while they bond. Pending bonds can be claimed or cancelled any time, moving the LUSD into the Reserve and Permanent buckets, or back to the bonder, respectively.",
+    "Contains the deposited ZUSD of the users while they bond. Pending bonds can be claimed or cancelled any time, moving the ZUSD into the Reserve and Permanent buckets, or back to the bonder, respectively.",
   link: "https://docs.chickenbonds.org/faq/technical-design#_ydtvzh456fiz"
 };
 
 export const TREASURY_ACQUIRED: Lexicon = {
   term: "Reserve",
   description:
-    "Contains a portion of the LUSD obtained from claimed bonds and captures the yield from the entire Treasury. It acts as a reserve backing the bLUSD supply. bLUSD can be redeemed for a pro-rata share of the LUSD held in the Reserve bucket.",
+    "Contains a portion of the ZUSD obtained from claimed bonds and captures the yield from the entire Treasury. It acts as a reserve backing the bLUSD supply. bLUSD can be redeemed for a pro-rata share of the ZUSD held in the Reserve bucket.",
   link: "https://docs.chickenbonds.org/faq/technical-design#_ydtvzh456fiz"
 };
 
 export const TREASURY_PERMANENT: Lexicon = {
   term: "Permanent",
   description:
-    "Contains a portion of the LUSD obtained from claimed bonds which contributes a permanent price premium over LUSD. The LUSD in this bucket is not redeemable.",
+    "Contains a portion of the ZUSD obtained from claimed bonds which contributes a permanent price premium over ZUSD. The ZUSD in this bucket is not redeemable.",
   link: "https://docs.chickenbonds.org/faq/technical-design#_ydtvzh456fiz"
 };
 

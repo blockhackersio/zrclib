@@ -48,7 +48,7 @@ export const Yield: React.FC = () => {
         tooltip={
           <Card variant="tooltip" sx={{ width: ["220px", "518px"] }}>
             <Paragraph>
-              An <Text sx={{ fontWeight: "bold" }}>estimate</Text> of the LQTY return on the LUSD
+              An <Text sx={{ fontWeight: "bold" }}>estimate</Text> of the LQTY return on the ZUSD
               deposited to the Stability Pool over the next year, not including your ETH gains from
               liquidations.
             </Paragraph>

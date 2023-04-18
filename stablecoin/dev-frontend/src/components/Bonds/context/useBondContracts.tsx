@@ -192,7 +192,7 @@ export const useBondContracts = (): BondContracts => {
         stakedLpTokenBalance,
         lpTokenSupply,
         bLusdAmmBLusdBalance: bLusdAmmCoinBalances[BLusdAmmTokenIndex.BLUSD],
-        bLusdAmmLusdBalance: bLusdAmmCoinBalances[BLusdAmmTokenIndex.LUSD],
+        bLusdAmmLusdBalance: bLusdAmmCoinBalances[BLusdAmmTokenIndex.ZUSD],
         lpRewards
       };
     },

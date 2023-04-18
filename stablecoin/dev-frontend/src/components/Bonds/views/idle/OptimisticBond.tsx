@@ -48,7 +48,7 @@ const getBondEvents = (bond: OptimisticBondType): EventType[] => {
       date: UNKNOWN_DATE,
       label: (
         <>
-          <Label description="How many bLUSD are recommended before claiming the bond, selling the bLUSD for LUSD, and then opening another bond.">
+          <Label description="How many bLUSD are recommended before claiming the bond, selling the bLUSD for ZUSD, and then opening another bond.">
             {l.OPTIMUM_REBOND_TIME.term}
           </Label>
           <SubLabel style={{ fontWeight: 400 }}></SubLabel>
@@ -94,9 +94,9 @@ export const OptimisticBond: React.FC<BondProps> = ({ bond, style }) => {
                 fontSize: "14.5px"
               }}
             >
-              <Record lexicon={l.BOND_DEPOSIT} value={bond.deposit.prettify(2)} type="LUSD" />
+              <Record lexicon={l.BOND_DEPOSIT} value={bond.deposit.prettify(2)} type="ZUSD" />
 
-              <Record lexicon={l.MARKET_VALUE} type="LUSD" />
+              <Record lexicon={l.MARKET_VALUE} type="ZUSD" />
             </Flex>
             <Actions bondId={bond.id} disabled />
           </Flex>

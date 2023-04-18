@@ -71,7 +71,7 @@ const BLUSD_LUSD_3CRV_POOL_ADDRESS = "0x74ED5d42203806c8CDCf2F04Ca5F60DC777b901c
 const CRV_TOKEN_ADDRESS = "0xD533a949740bb3306d119CC777fa900bA034cd52";
 
 const TOKEN_ADDRESS_NAME_MAP: Record<string, string> = {
-  [LUSD_TOKEN_ADDRESS]: "LUSD",
+  [LUSD_TOKEN_ADDRESS]: "ZUSD",
   [CRV_TOKEN_ADDRESS]: "CRV"
 };
 
@@ -89,7 +89,7 @@ const LQTY_ISSUANCE_GAS_HEADROOM = BigNumber.from(50000);
 const bLusdToLusdRoute: [string, string, string, string, string] = [
   mainnet.BLUSD_TOKEN_ADDRESS ?? "",
   mainnet.BLUSD_AMM_ADDRESS ?? "",
-  LUSD_3CRV_POOL_ADDRESS, // LP token of LUSD-3Crv-f has same address as pool
+  LUSD_3CRV_POOL_ADDRESS, // LP token of ZUSD-3Crv-f has same address as pool
   LUSD_3CRV_POOL_ADDRESS,
   LUSD_TOKEN_ADDRESS
 ];
@@ -120,13 +120,13 @@ const getRoute = (inputToken: BLusdAmmTokenIndex): [RouteAddresses, RouteSwaps] 
     // 9 = remove_liquidity_one_coin()
     //
     // Indices:
-    // - bLUSD pool: { 0: bLUSD, 1: LUSD-3Crv-f }
-    // - LUSD-3Crv-f pool: { 0: LUSD, 1: 3Crv }
+    // - bLUSD pool: { 0: bLUSD, 1: ZUSD-3Crv-f }
+    // - ZUSD-3Crv-f pool: { 0: ZUSD, 1: 3Crv }
 
-    //                                          bLUSD        LUSD
+    //                                          bLUSD        ZUSD
     inputToken === BLusdAmmTokenIndex.BLUSD ? [0, 1, 3] : [0, 0, 6], // step 1
     inputToken === BLusdAmmTokenIndex.BLUSD ? [0, 0, 9] : [1, 0, 3], // step 2
-    [0, 0, 0], //                                LUSD       bLUSD
+    [0, 0, 0], //                                ZUSD       bLUSD
     [0, 0, 0]
   ]
 ];
@@ -462,7 +462,7 @@ const getBlusdAmmPriceMainnet = async (bLusdAmm: CurveCryptoSwap2ETH): Promise<D
 
   const [oraclePrice, marginalOutputAmount] = await Promise.all([
     bLusdAmm.price_oracle().then(decimalify),
-    lusd3CrvPool.calc_withdraw_one_coin(marginalInputAmount.hex, 0 /* LUSD */).then(decimalify)
+    lusd3CrvPool.calc_withdraw_one_coin(marginalInputAmount.hex, 0 /* ZUSD */).then(decimalify)
   ]);
 
   return marginalOutputAmount.div(marginalInputAmount).div(oraclePrice);
@@ -803,7 +803,7 @@ const isTokenApprovedWithBLusdAmm = async (
 
   const allowance = await token.allowance(account, bLusdAmmAddress);
 
-  // Unlike bLUSD, LUSD doesn't explicitly handle infinite approvals, therefore the allowance will
+  // Unlike bLUSD, ZUSD doesn't explicitly handle infinite approvals, therefore the allowance will
   // start to decrease from 2**64.
   // However, it is practically impossible that it would decrease below 2**63.
   return allowance.gt(constants.MaxInt256);
@@ -815,7 +815,7 @@ const isTokenApprovedWithBLusdAmmMainnet = async (
 ): Promise<boolean> => {
   const allowance = await token.allowance(account, CURVE_REGISTRY_SWAPS_ADDRESS);
 
-  // Unlike bLUSD, LUSD doesn't explicitly handle infinite approvals, therefore the allowance will
+  // Unlike bLUSD, ZUSD doesn't explicitly handle infinite approvals, therefore the allowance will
   // start to decrease from 2**64.
   // However, it is practically impossible that it would decrease below 2**63.
   return allowance.gt(constants.MaxInt256);
@@ -867,7 +867,7 @@ const approveTokenWithBLusdAmmMainnet = async (token: LUSDToken | BLUSDToken | u
 };
 
 const getOtherToken = (thisToken: BLusdAmmTokenIndex) =>
-  thisToken === BLusdAmmTokenIndex.BLUSD ? BLusdAmmTokenIndex.LUSD : BLusdAmmTokenIndex.BLUSD;
+  thisToken === BLusdAmmTokenIndex.BLUSD ? BLusdAmmTokenIndex.ZUSD : BLusdAmmTokenIndex.BLUSD;
 
 const getExpectedSwapOutput = async (
   inputToken: BLusdAmmTokenIndex,
@@ -1041,11 +1041,11 @@ const getExpectedWithdrawal = async (
 
     return new Map([
       [BLusdAmmTokenIndex.BLUSD, decimalify(bLusdAmount)],
-      [BLusdAmmTokenIndex.LUSD, decimalify(lusdAmount)]
+      [BLusdAmmTokenIndex.ZUSD, decimalify(lusdAmount)]
     ]);
   } else {
     const withdrawEstimatorFunction =
-      output === BLusdAmmTokenIndex.LUSD
+      output === BLusdAmmTokenIndex.ZUSD
         ? () => bLusdZapper.getMinWithdrawLUSD(burnLp.hex)
         : () => bLusdAmm.calc_withdraw_one_coin(burnLp.hex, 0);
     return new Map([[output, await withdrawEstimatorFunction().then(decimalify)]]);
@@ -1145,7 +1145,7 @@ const removeLiquidityOneCoin = async (
   bLusdZapper: BLUSDLPZap | undefined,
   bLusdAmm: CurveCryptoSwap2ETH | undefined
 ): Promise<void> => {
-  if (output === BLusdAmmTokenIndex.LUSD) {
+  if (output === BLusdAmmTokenIndex.ZUSD) {
     return removeLiquidityLUSD(burnLpTokens, minAmount, bLusdZapper);
   } else {
     return removeLiquidityBLUSD(burnLpTokens, minAmount, bLusdAmm);

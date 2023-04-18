@@ -15,7 +15,7 @@ export const Bonds: React.FC = () => {
     return (
       <Container sx={{ position: "absolute", left: "30%", top: "40%" }}>
         <InfoMessage title="Unsupported network">
-          LUSD Bonds don't seem to be deployed to this network.
+          ZUSD Bonds don't seem to be deployed to this network.
         </InfoMessage>
       </Container>
     );
