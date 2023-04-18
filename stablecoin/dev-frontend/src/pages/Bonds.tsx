@@ -1,5 +1,4 @@
 import { Container } from "theme-ui";
-import { BondStats } from "../components/BondStats";
 import { Bonds as BondPanel } from "../components/Bonds/Bonds";
 import { useBondView } from "../components/Bonds/context/BondViewContext";
 import type {
@@ -32,10 +31,6 @@ export const Bonds: React.FC = () => {
       <Container variant="columns" sx={{ justifyContent: "flex-start" }}>
         <Container variant="left" sx={{ width: ["100%", "70%"] }}>
           <BondPanel />
-        </Container>
-
-        <Container variant="right" sx={{ width: ["100%", "30%"] }}>
-          <BondStats />
         </Container>
       </Container>
       {status && <TransactionStatus state={status} style={{ zIndex: 9999999999 }} />}
