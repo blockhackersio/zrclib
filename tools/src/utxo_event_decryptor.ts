@@ -17,7 +17,6 @@ function attemptUtxoDecryption(
   try {
     return Utxo.decrypt(keypair, event.encryptedOutput, event.index);
   } catch (_err) {
-    console.log(_err);
     return null;
   }
 }

@@ -60,7 +60,7 @@ it("Test transfer", async function () {
   await t("Approving ERC20 payment", mockErc20.approve(zrc20.address, deposit));
   const tx = await t("Submitting transaction", zrc20.transact(shieldProof));
   await tx.wait();
-  await sleep(10000); // Must wait for events to fire after pool (cannot seem to speed up polling)
+  await sleep(10_000); // Must wait for events to fire after pool (cannot seem to speed up polling)
   const publicBalance = await t(
     "Getting ERC20 balance",
     mockErc20.balanceOf(source.address)
@@ -71,12 +71,15 @@ it("Test transfer", async function () {
     "Getting private balance",
     account.getBalance()
   );
-  expect(privateBalance).to.eq(deposit);
+  expect(privateBalance).to.eq(deposit); // Transfer to the darkside worked! :)
 
-  // // transfer
+  // transfer
+  // XXXXXXXX: Next we need to get the merkletree updating based on the commitment events added
+  // See prepare_transaction.ts
+
   // const transferAmount = 5 * 1_000_000;
 
-  // // receiver has to send sender a public keypair
+  // // // receiver has to send sender a public keypair
   // const receiverKeypair = await Keypair.fromSigner(reciever);
   // const receiverAddress = receiverKeypair.address(); // contains only the public key
   // const zrcTransferProof = await t(

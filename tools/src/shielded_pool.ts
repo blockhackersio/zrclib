@@ -46,9 +46,10 @@ export class ShieldedPoolProver {
     });
 
     const change = new Utxo({
-      amount: BigNumber.from(amount).sub(inputsTotal),
+      amount: inputsTotal.sub(amount),
       keypair: this.account.getKeypair(),
     });
+    console.log({ inputs, inputsTotal, toSend, change });
 
     const proof = await prepareTransaction({
       inputs,

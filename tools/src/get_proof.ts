@@ -72,7 +72,7 @@ export async function getProof({
 
       if (input.index < 0) {
         throw new Error(
-          `Input commitment ${toFixedHex(input.getCommitment())} was not found`
+          `Input commitment ${input.getCommitment()} was not found`
         );
       }
       inputMerklePathIndices.push(input.index);

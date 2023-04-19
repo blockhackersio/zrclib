@@ -9,6 +9,7 @@ import { FormattedProof } from "./types";
 const MERKLE_TREE_HEIGHT = 5;
 
 async function buildMerkleTree() {
+  // XXX: get merkletree UPDATING!!!
   // TODO: get the leaves, if any
   const t = new MerkleTree(MERKLE_TREE_HEIGHT, [], {
     hashFunction: poseidonHash2 as any as HashFunction<Element>,
