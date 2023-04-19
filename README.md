@@ -92,7 +92,7 @@ classDiagram
     UtxoStore: -keypair
     UtxoStore: start()
     UtxoStore: stop()
-    UtxoStore: status()
+    UtxoStore: isStarted()
     UtxoStore: getNotesUpTo(amount) Note[]
     UtxoStore: get(id)
     UtxoStore: getAll()
@@ -105,8 +105,9 @@ classDiagram
     UtxoEventDecryptor: -lastEvent
     UtxoEventDecryptor: start()
     UtxoEventDecryptor: stop()
-    UtxoEventDecryptor: status()
-    UtxoEventDecryptor: onDecryptedEvent(handler)
+    UtxoEventDecryptor: isStarted()
+    UtxoEventDecryptor: onDecryptedUtxo(handler)
+    UtxoEventDecryptor: onNullifier(handler)
 
     note for PasswordEncryptor "PasswordEncryptor enables user to e2e encrypt their utxo store and keypair"
 
@@ -146,5 +147,6 @@ classDiagram
     UtxoStore ..> EncryptedStore
     EncryptedStore ..> IndexDBStore
     UtxoStore ..> UtxoEventDecryptor
+
 
 ```
