@@ -14,9 +14,12 @@ const isBrowser =
   typeof window !== "undefined" && typeof window.crypto !== "undefined";
 const crypto: Crypto = isBrowser ? window.crypto : require("crypto").webcrypto;
 
-export async function encrypt(data: object, key: CryptoKey): Promise<string> {
+export async function encrypt(
+  data: object | string | number,
+  key: CryptoKey
+): Promise<string> {
   try {
-    const dataString = JSON.stringify(data);
+    const dataString = typeof data === "string" ? data : JSON.stringify(data);
     const dataBuffer = isBrowser
       ? new TextEncoder().encode(dataString)
       : Buffer.from(dataString, "utf-8");
@@ -80,7 +83,7 @@ export async function decrypt(
 
 export async function generateKeyFromPassword(
   password: string,
-  iterations: number = 10000
+  iterations: number = 100000
 ): Promise<CryptoKey> {
   const passwordBuffer = isBrowser
     ? new TextEncoder().encode(password)
@@ -114,12 +117,12 @@ export async function generateKeyFromPassword(
   );
 }
 
-export class Encryptor {
+export class PasswordEncryptor {
   private _keyProm: Promise<CryptoKey>;
-  constructor(_password: string) {
-    this._keyProm = generateKeyFromPassword(_password);
+  constructor(password: string) {
+    this._keyProm = generateKeyFromPassword(password);
   }
-  async encrypt(data: object): Promise<string> {
+  async encrypt(data: object | string | number): Promise<string> {
     const key = await this._keyProm;
     return encrypt(data, key);
   }
@@ -131,6 +134,6 @@ export class Encryptor {
   }
 
   public static fromPassword(password: string) {
-    return new Encryptor(password);
+    return new PasswordEncryptor(password);
   }
 }

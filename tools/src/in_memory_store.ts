@@ -1,7 +1,9 @@
 import { Store } from "./types";
 
 // Wrap a Map in the Store interface
-export class InMemoryStore<T> implements Store<T> {
+export class InMemoryStore<T extends object | string | number>
+  implements Store<T>
+{
   constructor(private _data: Map<string, T> = new Map()) {}
 
   async add(id: string, data: T): Promise<boolean> {

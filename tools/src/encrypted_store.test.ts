@@ -1,12 +1,16 @@
 import { EncryptedStore } from "./encrypted_store";
 import { InMemoryStore } from "./in_memory_store";
+import { PasswordEncryptor } from "./password_encryptor";
 
 describe("EncryptedStore", () => {
   let encryptedStore: EncryptedStore<{ name: string }>;
   let memory: InMemoryStore<string> = new InMemoryStore();
 
   beforeEach(() => {
-    encryptedStore = new EncryptedStore("password", memory);
+    encryptedStore = new EncryptedStore(
+      PasswordEncryptor.fromPassword("password"),
+      memory
+    );
   });
 
   afterEach(async () => {
@@ -69,13 +73,17 @@ describe("EncryptedStore", () => {
   });
 
   it("should not be able to be accessed by using the wrong password", async () => {
-    const storeAccess = new EncryptedStore("password", memory);
-    const storeNoAccess = new EncryptedStore("some other password", memory);
+    const password = PasswordEncryptor.fromPassword("password");
+    const someOtherPassword = PasswordEncryptor.fromPassword(
+      "some other password"
+    );
+    const storeAccess = new EncryptedStore(password, memory);
+    const storeNoAccess = new EncryptedStore(someOtherPassword, memory);
 
     const msg = { message: "I am a piece of text" };
     await storeAccess.add("mything", msg);
     expect(memory.getAll()).resolves.toEqual([
-      "0102030405060708090a0b0c0d0e0f10d33b9e353f10bc2cf24cf4ce4cf538539899dd1d766140a0d0ff0c2fbeacf897c5d9",
+      "0102030405060708090a0b0c0d0e0f1059285726936b7efb2a0f135e94db2f8986a00edc7e8b56fd4df76845a1f8f41be1d7",
     ]);
     expect(storeAccess.get("mything")).resolves.toEqual(msg);
     expect(storeNoAccess.get("mything")).rejects.toThrow("DECRYPTION_FAILURE");

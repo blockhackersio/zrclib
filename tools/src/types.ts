@@ -3,7 +3,7 @@ import { BigNumber, BigNumberish } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
 import { Keypair } from "./keypair";
 
-export type Store<T> = {
+export type Store<T extends object | string | number> = {
   add(id: string, data: T): Promise<boolean>;
   get(id: string): Promise<T | undefined>;
   getAll(): Promise<T[]>;

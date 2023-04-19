@@ -31,16 +31,18 @@ function subscribeToContractEvents<T>(
   fromBlock: number,
   eventFilter: EventFilter,
   eventParser: (event: { args?: any }) => T,
-  callback: (event: T, blockheight: number) => void
+  callback: (event: T, blockheight: number) => void | Promise<void>
 ): UnsubscribeFn {
   const provider = ethers.getDefaultProvider();
   const contract = new Contract(contractAddress, [], provider);
 
-  contract.queryFilter(eventFilter, fromBlock).then((historicalEvents) => {
-    historicalEvents.forEach((event: any) => {
-      callback(eventParser(event.args), event.blockNumber);
+  contract
+    .queryFilter(eventFilter, fromBlock)
+    .then(async (historicalEvents) => {
+      for (const event of historicalEvents) {
+        await callback(eventParser((event as any).args), event.blockNumber);
+      }
     });
-  });
 
   const handler = (event: any) => {
     callback(eventParser(event.args), event.blockNumber);
@@ -64,36 +66,43 @@ function attemptUtxoDecryption(
   }
 }
 
-type UtxoHandler = (utxo: Utxo, blockheight: number) => void;
-type NullifierHandler = (nullifier: string, blockheight: number) => void;
+type UtxoHandler = (utxo: Utxo, blockheight: number) => void | Promise<void>;
+type NullifierHandler = (
+  nullifier: string,
+  blockheight: number
+) => void | Promise<void>;
 
 export class UtxoEventDecryptor {
   private _isStarted: boolean = false;
   private unsubscribe: UnsubscribeFn = () => {};
   private handleUtxo: UtxoHandler = () => {};
   private handleNullifier: NullifierHandler = () => {};
+
   constructor(private address: string, private keypair: Keypair) {}
 
-  public start(lastBlock = 0) {
+  public start(
+    lastBlock = 0,
+    _subscribeToContractEvents = subscribeToContractEvents
+  ) {
     this._isStarted = true;
     const self = this;
-    function handleEvent(
+    async function handleEvent(
       event: NewCommitment | NewNullifier,
       blockheight: number
     ) {
       if (event.type === "NewNullifier") {
-        self.handleNullifier(event.nullifier, blockheight);
+        await self.handleNullifier(event.nullifier, blockheight);
         return;
       }
       if (event.type === "NewCommitment") {
         const utxo = attemptUtxoDecryption(self.keypair, event);
-        if (utxo) self.handleUtxo(utxo, blockheight);
+        if (utxo) await self.handleUtxo(utxo, blockheight);
         return;
       }
       throw new Error("Unknown event");
     }
 
-    this.unsubscribe = subscribeToContractEvents(
+    this.unsubscribe = _subscribeToContractEvents(
       this.address,
       lastBlock,
       {

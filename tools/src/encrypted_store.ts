@@ -1,25 +1,24 @@
 import { InMemoryStore } from "./in_memory_store";
-import { Encryptor } from "./isomorphic_encrypt";
+import { PasswordEncryptor } from "./password_encryptor";
 import { Store } from "./types";
 
-export class EncryptedStore<T extends object> implements Store<T> {
-  private _encryptor: Encryptor;
+export class EncryptedStore<T extends object | string | number>
+  implements Store<T>
+{
   constructor(
-    _pass: string,
+    private encryptor: PasswordEncryptor,
     private _store: Store<string> = new InMemoryStore()
-  ) {
-    this._encryptor = Encryptor.fromPassword(_pass);
-  }
+  ) {}
 
   async add(id: string, data: T): Promise<boolean> {
-    const encrypted = await this._encryptor.encrypt(data);
+    const encrypted = await this.encryptor.encrypt(data);
     this._store.add(id, encrypted);
     return true;
   }
 
   async getAll(): Promise<T[]> {
     const encryptedItems = await this._store.getAll();
-    const encryptor = this._encryptor;
+    const encryptor = this.encryptor;
     const items: T[] = await Promise.all(
       encryptedItems.map((item) => {
         return encryptor.decrypt<T>(item);
@@ -31,7 +30,7 @@ export class EncryptedStore<T extends object> implements Store<T> {
   async get(id: string): Promise<T | undefined> {
     const encryptedItem = await this._store.get(id);
     if (!encryptedItem) return;
-    const encryptor = this._encryptor;
+    const encryptor = this.encryptor;
     return await encryptor.decrypt<T>(encryptedItem);
   }
 
