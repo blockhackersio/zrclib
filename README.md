@@ -112,14 +112,18 @@ classDiagram
     Encryptor: -hash
     Encryptor: +fromPassword(password)$
 
+    class Store
+    Store: getAll()
+    Store: get(id)
+    Store: add(id, item)
+    Store: remove(id)
+    Store: removeAll()
+
     class EncryptedStore
     EncryptedStore: Encryptor encryptor
     EncryptedStore: Store backend
-    EncryptedStore: getAll()
-    EncryptedStore: get(id)
-    EncryptedStore: add(id, item)
-    EncryptedStore: remove(id)
-    EncryptedStore: removeAll()
+
+    Store <|-- EncryptedStore
 
     class Keypair
     Keypair: privateKey
