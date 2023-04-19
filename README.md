@@ -81,6 +81,7 @@ await token.withdraw(unshieldProof);
 ### UtxoStore
 
 ```mermaid
+
 classDiagram
     note for UtxoStore "- Facade / Coordinator for Utxo storage"
 
@@ -105,9 +106,12 @@ classDiagram
     UtxoEventDecryptor: status()
     UtxoEventDecryptor: onDecryptedEvent(handler)
 
+    class Encryptor
+    Encryptor: -hash
+    Encryptor: +fromPassword(password)$
 
     class EncryptedStore
-    EncryptedStore: encryptor
+    EncryptedStore: Encryptor encryptor
     EncryptedStore: getAll()
     EncryptedStore: get(id)
     EncryptedStore: add(id, item)
@@ -116,4 +120,5 @@ classDiagram
 
     UtxoStore --> EncryptedStore
     UtxoStore --> UtxoEventDecryptor
+
 ```
