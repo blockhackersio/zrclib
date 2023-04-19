@@ -123,7 +123,10 @@ classDiagram
     EncryptedStore: Encryptor encryptor
     EncryptedStore: Store backend
 
+    class IndexDBStore
+
     Store <|-- EncryptedStore
+    Store <|-- IndexDBStore
 
     class Keypair
     Keypair: privateKey
