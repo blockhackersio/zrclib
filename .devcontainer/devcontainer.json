@@ -25,8 +25,7 @@
         "tomoyukim.vscode-mermaid-editor",
         "unifiedjs.vscode-mdx",
         "vstirbu.vscode-mermaid-preview",
-        "Vue.volar",
-        "Github.copilot"
+        "Vue.volar"
       ]
     }
   },

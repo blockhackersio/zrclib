@@ -26,7 +26,7 @@ const artifactPath = path.join(
 const artifact = require(artifactPath);
 
 it("Test transfer", async function () {
-  const Hasher = await ethers.getContractFactory(
+  const Hasher: any = await ethers.getContractFactory(
     artifact.abi,
     artifact.bytecode
   );
