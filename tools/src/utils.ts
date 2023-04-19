@@ -2,7 +2,7 @@ import * as crypto from "crypto";
 import * as ff from "ffjavascript";
 import { BigNumber, utils } from "ethers";
 import { FIELD_SIZE } from "./constants";
-import { EthEncryptedData } from "eth-sig-util";
+import { EthEncryptedData } from "@metamask/eth-sig-util";
 import { Utxo } from "./utxo";
 
 function randomBN(nbytes = 31) {

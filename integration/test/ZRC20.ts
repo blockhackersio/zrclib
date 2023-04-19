@@ -6,7 +6,7 @@ import { ShieldedAccount, Keypair, ShieldedPool } from "@zrclib/tools";
 import path from "path";
 import { MockToken__factory, ZRC20__factory } from "../typechain-types";
 import { expect } from "chai";
-
+const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 async function t<T>(
   log: string,
   promiseOrFn: Promise<T> | (() => Promise<T>)
@@ -49,36 +49,42 @@ it("Test transfer", async function () {
   expect(await mockErc20.balanceOf(source.address)).to.eq(deposit);
 
   // Create approver
-  const account = await ShieldedAccount.create(zrc20.address, "password123");
+  const account = await ShieldedAccount.create(zrc20, "password123");
   await account.loginWithEthersSigner(source);
-  return; // XXX: Fixing issues below
-  const prover = ShieldedPool.getProver(account);
+  const prover = account.getProver();
 
   // Create proof
   const shieldProof = await t("Creating shield proof", prover.shield(deposit));
 
   // call verify proof
   await t("Approving ERC20 payment", mockErc20.approve(zrc20.address, deposit));
-  await t("Submitting transaction", zrc20.transact(shieldProof));
-
-  const bal = await t(
+  const tx = await t("Submitting transaction", zrc20.transact(shieldProof));
+  await tx.wait();
+  await sleep(10000); // Must wait for events to fire after pool (cannot seem to speed up polling)
+  const publicBalance = await t(
     "Getting ERC20 balance",
     mockErc20.balanceOf(source.address)
   );
 
-  expect(bal).to.eq(0);
-
-  // transfer
-  const transferAmount = 5 * 1_000_000;
-
-  // receiver has to send sender a public keypair
-  const receiverKeypair = await Keypair.fromSigner(reciever);
-  const receiverAddress = receiverKeypair.address(); // contains only the public key
-  const zrcTransferProof = await t(
-    "Creating transfer proof",
-    prover.transfer(transferAmount, receiverAddress)
+  expect(publicBalance).to.eq(0);
+  const privateBalance = await t(
+    "Getting private balance",
+    account.getBalance()
   );
+  expect(privateBalance).to.eq(deposit);
 
-  await t("Submitting transaction", zrc20.transfer(zrcTransferProof));
-  console.log("Ok");
+  // // transfer
+  // const transferAmount = 5 * 1_000_000;
+
+  // // receiver has to send sender a public keypair
+  // const receiverKeypair = await Keypair.fromSigner(reciever);
+  // const receiverAddress = receiverKeypair.address(); // contains only the public key
+  // const zrcTransferProof = await t(
+  //   "Creating transfer proof",
+  //   prover.transfer(transferAmount, receiverAddress)
+  // );
+
+  // await t("Submitting transaction", zrc20.transact(zrcTransferProof));
+  // expect(privateBalance).to.eq(transferAmount);
+  // console.log("Ok");
 });

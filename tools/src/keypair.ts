@@ -95,7 +95,6 @@ export class Keypair {
     }
     const privKey = generatePrivateKeyFromEntropy(signedMessage);
     const keypair = new Keypair(privKey);
-    console.log(`keypair: ${keypair.address()}`);
     return keypair;
   }
 }

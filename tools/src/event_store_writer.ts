@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers";
+import { BigNumber, ethers, providers } from "ethers";
 import { Utxo } from "./utxo";
 import { UtxoEventDecryptor } from "./utxo_event_decryptor";
 import { Keypair } from "./keypair";
@@ -7,12 +7,12 @@ import { AccountStore } from "./account_store";
 
 export class EventStoreWriter {
   constructor(
-    address: string,
+    contract: ethers.Contract,
     keypair: Keypair,
     storeKey: PasswordEncryptor,
     private _store: AccountStore = new AccountStore(storeKey),
     private utxoEventDecryptor: UtxoEventDecryptor = new UtxoEventDecryptor(
-      address,
+      contract,
       keypair
     )
   ) {

@@ -35,7 +35,7 @@ contract ShieldedPool is TransactionVerifier, MerkleTreeWithHistory {
     event NewCommitment(
         bytes32 indexed commitment,
         uint256 indexed index,
-        bytes indexed encryptedOutput
+        bytes encryptedOutput
     );
 
     event NewNullifier(bytes32 indexed nullifier);

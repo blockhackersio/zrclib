@@ -1,14 +1,18 @@
 import { EventStoreWriter } from "./event_store_writer";
 import { Keypair } from "./keypair";
-import { BigNumberish, ethers } from "ethers";
+import { BigNumberish, ethers, providers } from "ethers";
 import { PasswordEncryptor } from "./password_encryptor";
 import { AccountStore } from "./account_store";
 import { Utxo } from "./utxo";
+import { ShieldedPoolProver } from "./shielded_pool";
 
 export class ShieldedAccount {
   private keypair?: Keypair;
   private eventStoreWriter?: EventStoreWriter;
-  constructor(private address: string, private encryptor: PasswordEncryptor) {}
+  constructor(
+    private contract: ethers.Contract,
+    private encryptor: PasswordEncryptor
+  ) {}
 
   isLoggedIn() {
     !!this.keypair && !!this.encryptor && !!this.eventStoreWriter;
@@ -18,7 +22,7 @@ export class ShieldedAccount {
     const keypair = await Keypair.fromSigner(signer);
     this.keypair = keypair;
     this.eventStoreWriter = new EventStoreWriter(
-      this.address,
+      this.contract,
       keypair,
       this.encryptor
     );
@@ -33,7 +37,7 @@ export class ShieldedAccount {
       throw new Error("NO_CREDENTIALS_FOUND");
     }
     this.eventStoreWriter = new EventStoreWriter(
-      this.address,
+      this.contract,
       keypair,
       this.encryptor
     );
@@ -60,17 +64,25 @@ export class ShieldedAccount {
     return await this.getStore().getUtxosUpTo(amount);
   }
 
+  async getBalance() {
+    return await this.getStore().getBalance();
+  }
+
   createUtxo(amount: BigNumberish) {
     return new Utxo({ amount, keypair: this.getKeypair() });
   }
 
+  getProver() {
+    return new ShieldedPoolProver(this);
+  }
+
   static async create(
-    address: string,
+    contract: ethers.Contract,
     password: string
   ): Promise<ShieldedAccount> {
     // Ensure password length > 16
     const encryptor = PasswordEncryptor.fromPassword(password);
-    return new ShieldedAccount(address, encryptor);
+    return new ShieldedAccount(contract, encryptor);
   }
 }
 

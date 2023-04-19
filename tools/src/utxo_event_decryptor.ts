@@ -1,59 +1,14 @@
-import { Contract, EventFilter, ethers, providers } from "ethers";
-import { NewCommitment, NewNullifier, Store } from "./types";
+import { ethers } from "ethers";
+import { NewCommitment } from "./types";
 import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
 
-function toNewCommitment(args: any): NewCommitment {
-  return {
-    type: "NewCommitment",
-    commitment: args.commitment,
-    index: args.index,
-    encryptedOutput: args.encryptedOutput,
-  };
-}
+[
+  "event NewCommitment(bytes32 indexed commitment, uint256 indexed index, bytes indexed encryptedOutput)",
+  "event NewNullifier(bytes32 indexed nullifier)",
+];
 
-function toNullifierOrCommitment(args: any): NewCommitment | NewNullifier {
-  if (args.commitment) {
-    return toNewCommitment(args);
-  }
-  return toNewNullifier(args);
-}
-
-function toNewNullifier(args: any): NewNullifier {
-  return {
-    type: "NewNullifier",
-    nullifier: args.nullifier,
-  };
-}
 type UnsubscribeFn = () => void;
-function subscribeToContractEvents<T>(
-  contractAddress: string,
-  fromBlock: number,
-  eventFilter: EventFilter,
-  eventParser: (event: { args?: any }) => T,
-  callback: (event: T, blockheight: number) => void | Promise<void>
-): UnsubscribeFn {
-  const provider = ethers.getDefaultProvider();
-  const contract = new Contract(contractAddress, [], provider);
-
-  contract
-    .queryFilter(eventFilter, fromBlock)
-    .then(async (historicalEvents) => {
-      for (const event of historicalEvents) {
-        await callback(eventParser((event as any).args), event.blockNumber);
-      }
-    });
-
-  const handler = (event: any) => {
-    callback(eventParser(event.args), event.blockNumber);
-  };
-
-  const eventEmitter = contract.on(eventFilter, handler);
-
-  return () => {
-    eventEmitter.off(eventFilter, handler);
-  };
-}
 
 function attemptUtxoDecryption(
   keypair: Keypair,
@@ -62,6 +17,7 @@ function attemptUtxoDecryption(
   try {
     return Utxo.decrypt(keypair, event.encryptedOutput, event.index);
   } catch (_err) {
+    console.log(_err);
     return null;
   }
 }
@@ -78,42 +34,35 @@ export class UtxoEventDecryptor {
   private handleUtxo: UtxoHandler = () => {};
   private handleNullifier: NullifierHandler = () => {};
 
-  constructor(private address: string, private keypair: Keypair) {}
+  constructor(private contract: ethers.Contract, private keypair: Keypair) {}
 
-  public start(
-    lastBlock = 0,
-    _subscribeToContractEvents = subscribeToContractEvents
-  ) {
+  public start(lastBlock = 0 /* will use this later */) {
     this._isStarted = true;
-    const self = this;
-    async function handleEvent(
-      event: NewCommitment | NewNullifier,
-      blockheight: number
-    ) {
-      if (event.type === "NewNullifier") {
-        await self.handleNullifier(event.nullifier, blockheight);
-        return;
-      }
-      if (event.type === "NewCommitment") {
-        const utxo = attemptUtxoDecryption(self.keypair, event);
-        if (utxo) await self.handleUtxo(utxo, blockheight);
-        return;
-      }
-      throw new Error("Unknown event");
-    }
 
-    this.unsubscribe = _subscribeToContractEvents(
-      this.address,
-      lastBlock,
-      {
-        topics: [
-          ethers.utils.id("NewCommitment(bytes32,uint256,bytes)"),
-          ethers.utils.id("NewNullifier(bytes32)"),
-        ],
-      },
-      toNullifierOrCommitment,
-      handleEvent
-    );
+    const commitmentHandler = (
+      commitment: string,
+      index: ethers.BigNumber,
+      encryptedOutput: string,
+      event: ethers.Event
+    ) => {
+      const utxo = attemptUtxoDecryption(this.keypair, {
+        type: "NewCommitment",
+        commitment,
+        index: index.toNumber(),
+        encryptedOutput,
+      });
+      if (utxo) this.handleUtxo(utxo, event.blockNumber);
+    };
+    const nullifierHandler = async (nullifier: string, event: ethers.Event) => {
+      await this.handleNullifier(nullifier, event.blockNumber);
+    };
+    this.contract.on("NewCommitment", commitmentHandler);
+    this.contract.on("NewNullifier", nullifierHandler);
+
+    this.unsubscribe = () => {
+      this.contract.off("NewCommitment", commitmentHandler);
+      this.contract.off("NewNullifier", nullifierHandler);
+    };
   }
 
   public onUtxo(handler: UtxoHandler) {
