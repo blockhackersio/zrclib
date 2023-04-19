@@ -75,3 +75,45 @@ const unshieldProof = await prover.proveUnshield(5e17, receiver);
 // call `transferFrom` to return 0.5 of your ERC-20 tokens to your public account
 await token.withdraw(unshieldProof);
 ```
+
+## Architecture
+
+### UtxoStore
+
+```mermaid
+classDiagram
+    note for UtxoStore "- Facade / Coordinator for Utxo storage"
+
+    class UtxoStore
+    UtxoStore: -encryptor
+    UtxoStore: -keypair
+    UtxoStore: start()
+    UtxoStore: stop()
+    UtxoStore: status()
+    UtxoStore: getNotesUpTo(amount) Note[]
+    UtxoStore: get(id)
+    UtxoStore: getAll()
+
+    note for UtxoEventDecryptor "- Listens for historical and current contract events\n- Manages event cursor storing events in the store\n- Filters events decryptable by keypair\n"
+
+    class UtxoEventDecryptor
+    UtxoEventDecryptor: -contract
+    UtxoEventDecryptor: -keypair
+    UtxoEventDecryptor: -lastEvent
+    UtxoEventDecryptor: start()
+    UtxoEventDecryptor: stop()
+    UtxoEventDecryptor: status()
+    UtxoEventDecryptor: onDecryptedEvent(handler)
+
+
+    class EncryptedStore
+    EncryptedStore: encryptor
+    EncryptedStore: getAll()
+    EncryptedStore: get(id)
+    EncryptedStore: add(id, item)
+    EncryptedStore: remove(id)
+    EncryptedStore: removeAll()
+
+    UtxoStore --> EncryptedStore
+    UtxoStore --> UtxoEventDecryptor
+```
