@@ -108,9 +108,11 @@ classDiagram
     UtxoEventDecryptor: status()
     UtxoEventDecryptor: onDecryptedEvent(handler)
 
-    class Encryptor
-    Encryptor: -hash
-    Encryptor: +fromPassword(password)$
+    note for PasswordEncryptor "PasswordEncryptor enables user to e2e encrypt their utxo store and keypair"
+
+    class PasswordEncryptor
+    PasswordEncryptor: -hash
+    PasswordEncryptor: +fromPassword(password)$
 
     class Store
     Store: getAll()
@@ -128,7 +130,7 @@ classDiagram
     Store <|-- EncryptedStore
     Store <|-- IndexDBStore
 
-    EncryptedStore --> IndexDBStore
+    note for Keypair "- Acts as identity keys for asset storage\n- Derived from a message signed with their wallet"
 
     class Keypair
     Keypair: privateKey
@@ -141,10 +143,8 @@ classDiagram
     Keypair: +fromSigner(signer)$
     Keypair: +fromString(string)$
 
-
-    UtxoStore --> EncryptedStore
-    UtxoStore --> UtxoEventDecryptor
-
-
+    UtxoStore ..> EncryptedStore
+    EncryptedStore ..> IndexDBStore
+    UtxoStore ..> UtxoEventDecryptor
 
 ```
