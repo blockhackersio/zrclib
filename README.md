@@ -121,7 +121,21 @@ classDiagram
     EncryptedStore: remove(id)
     EncryptedStore: removeAll()
 
+    class Keypair
+    Keypair: privateKey
+    Keypair: publicKey
+    Keypair: encryptionKey
+    Keypair: encrypt(data)
+    Keypair: decrypt(data)
+    Keypair: sign(commitment,merklepath)
+    Keypair: +generate()$
+    Keypair: +fromSigner(signer)$
+    Keypair: +fromString(string)$
+
+
     UtxoStore --> EncryptedStore
     UtxoStore --> UtxoEventDecryptor
+
+
 
 ```
