@@ -16,7 +16,7 @@ export const Nav: React.FC = () => {
     <Box as="nav" sx={{ display: ["none", "flex"], alignItems: "center", flex: 1 }}>
       <Flex>
         <Link to="/">Dashboard</Link>
-        <Link to="/bonds">
+        <Link to="/shield">
           <Flex sx={{ alignItems: "center" }}>
             <Text>Shielded Pool</Text>
             <TemporaryNewBadge />
