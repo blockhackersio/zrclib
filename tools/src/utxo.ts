@@ -1,10 +1,11 @@
-import { BigNumber } from "ethers";
+import { BigNumber, BigNumberish } from "ethers";
 import { UtxoOptions } from "./types";
 import { Keypair } from "./keypair";
 import { randomBN, toBuffer } from "./utils";
 import { poseidonHash } from "./poseidon";
+import { Serializer } from "./serializer";
 
-class Utxo {
+export class Utxo {
   public keypair: Keypair;
   public amount: BigNumber;
   public transactionHash?: string;
@@ -79,5 +80,25 @@ class Utxo {
     return this.keypair.encrypt(bytes);
   }
 }
+export class UtxoSerializer implements Serializer<Utxo> {
+  serialize(o: Utxo): string {
+    const { amount, blinding, keypair, index } = o;
 
-export { Utxo };
+    return JSON.stringify({
+      amount,
+      blinding,
+      keypair: keypair.privkey,
+      index,
+    });
+  }
+
+  deserialize(o: string): Utxo {
+    const { amount, blinding, keypair, index } = JSON.parse(o);
+    return new Utxo({
+      amount: BigNumber.from(amount),
+      blinding: BigNumber.from(blinding),
+      keypair: new Keypair(keypair),
+      index,
+    });
+  }
+}

@@ -3,37 +3,43 @@ import { Utxo } from "./utxo";
 import { UtxoEventDecryptor } from "./utxo_event_decryptor";
 import { Keypair } from "./keypair";
 import { PasswordEncryptor } from "./password_encryptor";
-import { EncryptedStore } from "./encrypted_store";
-import { Store } from "./types";
+import { AccountStore } from "./account_store";
 
-export class UtxoStore {
+export class EventStoreWriter {
   constructor(
     address: string,
     keypair: Keypair,
     storeKey: PasswordEncryptor,
+    private _store: AccountStore = new AccountStore(storeKey),
     private utxoEventDecryptor: UtxoEventDecryptor = new UtxoEventDecryptor(
       address,
       keypair
-    ),
-    private store: Store<Utxo | string | number> = new EncryptedStore(storeKey)
+    )
   ) {
     this.utxoEventDecryptor.onUtxo(async (utxo, blockheight) => {
-      await this.store.add("latestBlock", blockheight);
-      await this.store.add(`${utxo.getCommitment()}`, utxo);
+      await this._store.setLatestBlock(blockheight);
+      await this._store.addUtxo(utxo);
     });
 
     this.utxoEventDecryptor.onNullifier(async (nullifier, blockheight) => {
-      await this.store.add("latestBlock", blockheight);
-      await this.store.add(`${nullifier}`, 1);
+      await this._store.setLatestBlock(blockheight);
+      await this._store.addNullifier(nullifier);
     });
   }
 
   async start() {
-    // get lastBlock from encrypted store
     this.utxoEventDecryptor.start();
   }
 
-  async getUtxosUpTo(_amount: number | BigNumber): Promise<Utxo[]> {
-    return [];
+  store() {
+    return this._store;
+  }
+
+  async getUnspentUtxos() {
+    return this._store.getUnspentUtxos();
+  }
+
+  async getUtxosUpTo(amount: number | BigNumber): Promise<Utxo[]> {
+    return this._store.getUtxosUpTo(amount);
   }
 }

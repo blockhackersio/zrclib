@@ -14,8 +14,9 @@ import {
   encrypt,
   getEncryptionPublicKey,
 } from "@metamask/eth-sig-util";
+import { Serializer } from "./serializer";
 
-class Keypair {
+export class Keypair {
   public privkey: string;
   public pubkey: Uint8Array;
   public encryptionKey: string;
@@ -99,7 +100,15 @@ class Keypair {
   }
 }
 
-export { Keypair };
+export class KeypairSerializer implements Serializer<Keypair> {
+  deserialize(o: string): Keypair {
+    const parsed = JSON.parse(o);
+    return new Keypair(parsed);
+  }
+  serialize(o: Keypair): string {
+    return JSON.stringify(o.privkey);
+  }
+}
 
 function verifyMessage(message: string, signature: SignatureLike): string {
   return recoverAddress(hashMessage(message), signature);

@@ -58,7 +58,7 @@ export type CommitmentEvent = {
 export type CommitmentEvents = CommitmentEvent[];
 
 export interface UtxoOptions {
-  amount?: BigNumber | number | string;
+  amount?: BigNumberish;
   blinding?: BigNumber;
   index?: number | null;
   keypair?: Keypair;

@@ -1,14 +1,19 @@
+import { BigNumber } from "ethers";
 import { EncryptedStore } from "./encrypted_store";
 import { InMemoryStore } from "./in_memory_store";
 import { PasswordEncryptor } from "./password_encryptor";
+import { Utxo, UtxoSerializer } from "./utxo";
+import { JSONSerializer } from "./serializer";
+import { Keypair } from "./keypair";
 
 describe("EncryptedStore", () => {
-  let encryptedStore: EncryptedStore<{ name: string }>;
+  let encryptedStore: EncryptedStore<object>;
   let memory: InMemoryStore<string> = new InMemoryStore();
-
+  let jsonSerializer = new JSONSerializer<object>();
   beforeEach(() => {
     encryptedStore = new EncryptedStore(
       PasswordEncryptor.fromPassword("password"),
+      jsonSerializer,
       memory
     );
   });
@@ -77,15 +82,42 @@ describe("EncryptedStore", () => {
     const someOtherPassword = PasswordEncryptor.fromPassword(
       "some other password"
     );
-    const storeAccess = new EncryptedStore(password, memory);
-    const storeNoAccess = new EncryptedStore(someOtherPassword, memory);
+    const storeAccess = new EncryptedStore(password, jsonSerializer, memory);
+    const storeNoAccess = new EncryptedStore(
+      someOtherPassword,
+      jsonSerializer,
+      memory
+    );
 
     const msg = { message: "I am a piece of text" };
     await storeAccess.add("mything", msg);
     expect(memory.getAll()).resolves.toEqual([
-      "0102030405060708090a0b0c0d0e0f1059285726936b7efb2a0f135e94db2f8986a00edc7e8b56fd4df76845a1f8f41be1d7",
+      "0102030405060708090a0b0c0d0e0f10d33b9e353f10bc2cf24cf4ce4cf538539899dd1d766140a0d0ff0c2fbeacf897c5d9",
     ]);
     expect(storeAccess.get("mything")).resolves.toEqual(msg);
     expect(storeNoAccess.get("mything")).rejects.toThrow("DECRYPTION_FAILURE");
+  });
+
+  it("should be able to reconstitute a complex object", async () => {
+    const store = new EncryptedStore(
+      PasswordEncryptor.fromPassword("password"),
+      new UtxoSerializer(),
+      memory
+    );
+    const utxoIn = new Utxo({
+      amount: BigNumber.from(100),
+      index: 12,
+    });
+
+    expect(await store.add("1", utxoIn)).toBe(true);
+
+    const utxoOut = await store.get("1");
+    expect(!!utxoOut).toBe(true);
+    expect(utxoOut!.amount).toEqual(utxoIn.amount);
+    expect(utxoOut!.blinding).toEqual(utxoIn.blinding);
+    expect(utxoOut!.index).toEqual(utxoIn.index);
+    expect(utxoOut!.keypair.privkey).toEqual(utxoIn.keypair.privkey);
+    expect(utxoOut!.getCommitment()).toEqual(utxoIn.getCommitment());
+    expect(utxoOut!.getNullifier()).toEqual(utxoIn.getNullifier());
   });
 });

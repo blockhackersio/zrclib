@@ -1,4 +1,4 @@
-import { Keypair } from "./keypair";
+import { Keypair, KeypairSerializer } from "./keypair";
 
 test("keypair", async () => {
   const keypair = await Keypair.generate();
@@ -12,4 +12,12 @@ test("keypair.encrypt()", async () => {
   const encrypted = keypair.encrypt(Buffer.from("hello world"));
   const decrypted = keypair.decrypt(encrypted);
   expect(decrypted.toString()).toEqual("hello world");
+});
+
+test("serializer", async () => {
+  const keypair = await Keypair.generate();
+  const serializer = new KeypairSerializer();
+  const serialized = serializer.serialize(keypair);
+  const newKeypair = serializer.deserialize(serialized);
+  expect(newKeypair.privkey).toBe(keypair.privkey);
 });

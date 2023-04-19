@@ -12,13 +12,13 @@ test("hello", async () => {
   expect(key).toEqual(key2);
   const data = { message: "Hello, world!" };
   let start = Date.now();
-  const encrypted = await encrypt(data, key);
+  const encrypted = await encrypt(JSON.stringify(data), key);
   expect(encrypted).toBe(
-    "0102030405060708090a0b0c0d0e0f10428d717d15f5110e173f605f182d0e24cca8a9bccd7d7897d6135f"
+    "0102030405060708090a0b0c0d0e0f10e48edc68e20d35ea05c045d31819af45c85b4bb1472852127d9947"
   );
   start = Date.now();
   const decrypted = await decrypt(encrypted, key);
-  expect(decrypted).toEqual({ message: "Hello, world!" });
+  expect(JSON.parse(decrypted)).toEqual({ message: "Hello, world!" });
 });
 
 test("PasswordEncryptor", async () => {
@@ -27,11 +27,11 @@ test("PasswordEncryptor", async () => {
   const encryptor = PasswordEncryptor.fromPassword(password);
   const data = { message: "Hello, world!" };
   let start = Date.now();
-  const encrypted = await encryptor.encrypt(data);
+  const encrypted = await encryptor.encrypt(JSON.stringify(data));
   expect(encrypted).toBe(
-    "0102030405060708090a0b0c0d0e0f10428d717d15f5110e173f605f182d0e24cca8a9bccd7d7897d6135f"
+    "0102030405060708090a0b0c0d0e0f10e48edc68e20d35ea05c045d31819af45c85b4bb1472852127d9947"
   );
   start = Date.now();
   const decrypted = await encryptor.decrypt(encrypted);
-  expect(decrypted).toEqual({ message: "Hello, world!" });
+  expect(JSON.parse(decrypted)).toEqual({ message: "Hello, world!" });
 });

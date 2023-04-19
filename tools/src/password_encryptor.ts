@@ -14,12 +14,9 @@ const isBrowser =
   typeof window !== "undefined" && typeof window.crypto !== "undefined";
 const crypto: Crypto = isBrowser ? window.crypto : require("crypto").webcrypto;
 
-export async function encrypt(
-  data: object | string | number,
-  key: CryptoKey
-): Promise<string> {
+export async function encrypt(data: string, key: CryptoKey): Promise<string> {
   try {
-    const dataString = typeof data === "string" ? data : JSON.stringify(data);
+    const dataString = data;
     const dataBuffer = isBrowser
       ? new TextEncoder().encode(dataString)
       : Buffer.from(dataString, "utf-8");
@@ -55,7 +52,7 @@ export async function encrypt(
 export async function decrypt(
   hexString: string,
   key: CryptoKey
-): Promise<object> {
+): Promise<string> {
   try {
     const encryptedBuffer = Buffer.from(hexString, "hex");
     const iv = encryptedBuffer.slice(0, 16);
@@ -75,7 +72,7 @@ export async function decrypt(
       ? new TextDecoder().decode(new Uint8Array(decryptedBuffer))
       : Buffer.from(decryptedBuffer).toString("utf-8");
 
-    return JSON.parse(decryptedString);
+    return decryptedString;
   } catch (err) {
     throw new Error("DECRYPTION_FAILURE");
   }
@@ -83,7 +80,7 @@ export async function decrypt(
 
 export async function generateKeyFromPassword(
   password: string,
-  iterations: number = 100000
+  iterations: number = 10000
 ): Promise<CryptoKey> {
   const passwordBuffer = isBrowser
     ? new TextEncoder().encode(password)
@@ -122,15 +119,14 @@ export class PasswordEncryptor {
   constructor(password: string) {
     this._keyProm = generateKeyFromPassword(password);
   }
-  async encrypt(data: object | string | number): Promise<string> {
+  async encrypt(data: string): Promise<string> {
     const key = await this._keyProm;
     return encrypt(data, key);
   }
 
-  async decrypt<T>(data: string): Promise<T> {
+  async decrypt(data: string): Promise<string> {
     const key = await this._keyProm;
-
-    return decrypt(data, key) as Promise<T>;
+    return decrypt(data, key) as Promise<string>;
   }
 
   public static fromPassword(password: string) {

@@ -17,7 +17,8 @@ export class ShieldedPoolProver {
    */
   async shield(amount: number | BigNumber): Promise<FormattedProof> {
     await ensurePoseidon();
-    const deposit = new Utxo({ amount, keypair: this.account.getKeypair() });
+
+    const deposit = this.account.createUtxo(amount);
     const proof = await prepareTransaction({
       outputs: [deposit],
     });

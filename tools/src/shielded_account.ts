@@ -1,26 +1,80 @@
-import { UtxoStore } from "./utxo_store";
+import { EventStoreWriter } from "./event_store_writer";
 import { Keypair } from "./keypair";
-import { BigNumber, ethers } from "ethers";
+import { BigNumberish, ethers } from "ethers";
+import { PasswordEncryptor } from "./password_encryptor";
+import { AccountStore } from "./account_store";
+import { Utxo } from "./utxo";
 
 export class ShieldedAccount {
-  constructor(
-    private keypair: Keypair,
-    private utxoStore: UtxoStore = UtxoStore.create()
-  ) {}
+  private keypair?: Keypair;
+  private eventStoreWriter?: EventStoreWriter;
+  constructor(private address: string, private encryptor: PasswordEncryptor) {}
+
+  isLoggedIn() {
+    !!this.keypair && !!this.encryptor && !!this.eventStoreWriter;
+  }
+
+  async loginWithEthersSigner(signer: ethers.Signer) {
+    const keypair = await Keypair.fromSigner(signer);
+    this.keypair = keypair;
+    this.eventStoreWriter = new EventStoreWriter(
+      this.address,
+      keypair,
+      this.encryptor
+    );
+    await this.eventStoreWriter.start();
+  }
+
+  async loginFromLocalCache() {
+    // load keypair with encryptor
+    const state = new AccountStore(this.encryptor);
+    const keypair = await state.getKeypair();
+    if (!keypair) {
+      throw new Error("NO_CREDENTIALS_FOUND");
+    }
+    this.eventStoreWriter = new EventStoreWriter(
+      this.address,
+      keypair,
+      this.encryptor
+    );
+    await this.eventStoreWriter.start();
+  }
+
+  private getEventStoreWriter() {
+    if (this.eventStoreWriter) return this.eventStoreWriter;
+    throw new Error("USER_NOT_LOGGED_IN");
+  }
+
+  private getStore() {
+    return this.getEventStoreWriter().store();
+  }
 
   getKeypair() {
-    return this.keypair;
+    if (this.keypair) {
+      return this.keypair;
+    }
+    throw new Error("USER_NOT_LOGGED_IN");
   }
 
-  async getUtxosUpTo(amount: number | BigNumber) {
-    return await this.utxoStore.getUtxosUpTo(amount);
+  async getUtxosUpTo(amount: BigNumberish) {
+    return await this.getStore().getUtxosUpTo(amount);
   }
 
-  async fromKeypair(keypair: Keypair) {
-    return new ShieldedAccount(keypair);
+  createUtxo(amount: BigNumberish) {
+    return new Utxo({ amount, keypair: this.getKeypair() });
   }
 
-  static async fromSigner(signer: ethers.Signer): Promise<ShieldedAccount> {
-    return new ShieldedAccount(await Keypair.fromSigner(signer));
+  static async create(
+    address: string,
+    password: string
+  ): Promise<ShieldedAccount> {
+    // Ensure password length > 16
+    const encryptor = PasswordEncryptor.fromPassword(password);
+    return new ShieldedAccount(address, encryptor);
   }
+}
+
+type WithStateManager = { eventStoreWriter: EventStoreWriter };
+function ensureStatemanager(value: any): value is WithStateManager {
+  return !!value.eventStoreWriter;
 }

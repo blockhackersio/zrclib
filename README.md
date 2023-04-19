@@ -45,14 +45,20 @@ pnpm build
 // Get the standard ethers contract
 const token = await ethers.Contract(address, abi, signer);
 
-const account = ShieldedAccount.from(signer);
-
-if (!account.loggedIn()) {
-  await account.login(); // Request Wallet to sign message
+const account = ShieldedAccount.create(
+  "0x123456781234567812345678123456871324",
+  "password123"
+);
+try {
+  await account.loginFromLocalCache();
+} catch (err) {
+  console.error("Login was unsuccessful");
 }
+expect(account.isLoggedIn()).toBe(false);
 
-// create shieldedPool object
-const prover = ShieldedPool.getProver(account);
+await account.loginWithEthersSigner(signer);
+
+expect(account.isLoggedIn()).toBe(true);
 
 // Generate proof that shields 1 token
 // Call the deposit method on the contract which will
@@ -78,24 +84,24 @@ await token.withdraw(unshieldProof);
 
 ## Architecture
 
-### UtxoStore
+### EventStoreWriter
 
-The UtxoStore is an encrypted store for your private note information as well as your keypair. This data is encrypted with AES-256 and stored in indexDB in the browser and [keyv](keyvhq.js.org) storage strategies are possible serverside (ie. MySQL, PostgreSQL, SQLite, Redis, Mongo, DynamoDB, Firestore, Memcached, and more).
+The EventStoreWriter is an encrypted store for your private note information as well as your keypair. This data is encrypted with AES-256 and stored in indexDB in the browser and [keyv](keyvhq.js.org) storage strategies are possible serverside (ie. MySQL, PostgreSQL, SQLite, Redis, Mongo, DynamoDB, Firestore, Memcached, and more).
 
 ```mermaid
 
 classDiagram
-    note for UtxoStore "- Facade / Coordinator for Utxo storage"
+    note for EventStoreWriter "- Facade / Coordinator for Utxo storage"
 
-    class UtxoStore
-    UtxoStore: -encryptor
-    UtxoStore: -keypair
-    UtxoStore: start()
-    UtxoStore: stop()
-    UtxoStore: isStarted()
-    UtxoStore: getNotesUpTo(amount) Note[]
-    UtxoStore: get(id)
-    UtxoStore: getAll()
+    class EventStoreWriter
+    EventStoreWriter: -encryptor
+    EventStoreWriter: -keypair
+    EventStoreWriter: start()
+    EventStoreWriter: stop()
+    EventStoreWriter: isStarted()
+    EventStoreWriter: getNotesUpTo(amount) Note[]
+    EventStoreWriter: get(id)
+    EventStoreWriter: getAll()
 
     note for UtxoEventDecryptor "- Listens for historical and current contract events\n- Manages event cursor storing events in the store\n- Filters events decryptable by keypair\n"
 
@@ -144,9 +150,9 @@ classDiagram
     Keypair: +fromSigner(signer)$
     Keypair: +fromString(string)$
 
-    UtxoStore ..> EncryptedStore
+    EventStoreWriter ..> EncryptedStore
     EncryptedStore ..> IndexDBStore
-    UtxoStore ..> UtxoEventDecryptor
+    EventStoreWriter ..> UtxoEventDecryptor
 
 
 ```
