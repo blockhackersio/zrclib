@@ -11,7 +11,7 @@ import { getConfig } from "./config";
 import theme from "./theme";
 
 import { DisposableWalletProvider } from "./testUtils/DisposableWalletProvider";
-import { LiquityFrontend } from "./LiquityFrontend";
+import { ZusdFrontend } from "./ZusdFrontend";
 import { AppLoader } from "./components/AppLoader";
 
 if (window.ethereum) {
@@ -100,7 +100,7 @@ const App = () => {
             unsupportedMainnetFallback={<UnsupportedMainnetFallback />}
           >
             <TransactionProvider>
-              <LiquityFrontend loader={<AppLoader />} />
+              <ZusdFrontend loader={<AppLoader />} />
             </TransactionProvider>
           </LiquityProvider>
         </WalletConnector>

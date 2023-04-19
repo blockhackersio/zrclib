@@ -20,10 +20,10 @@ import { StabilityViewProvider } from "./components/Stability/context/StabilityV
 import "tippy.js/dist/tippy.css"; // Tooltip default style
 import { BondsProvider } from "./components/Bonds/context/BondsProvider";
 
-type LiquityFrontendProps = {
+type ZusdFrontendProps = {
   loader?: React.ReactNode;
 };
-export const LiquityFrontend: React.FC<LiquityFrontendProps> = ({ loader }) => {
+export const ZusdFrontend: React.FC<ZusdFrontendProps> = ({ loader }) => {
   const { account, provider, liquity } = useLiquity();
 
   // For console tinkering ;-)

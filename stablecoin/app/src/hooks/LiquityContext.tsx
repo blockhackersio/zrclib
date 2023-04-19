@@ -13,10 +13,10 @@ import {
   _connectByChainId
 } from "@liquity/lib-ethers";
 
-import { LiquityFrontendConfig, getConfig } from "../config";
+import { ZusdFrontendConfig, getConfig } from "../config";
 
 type LiquityContextValue = {
-  config: LiquityFrontendConfig;
+  config: ZusdFrontendConfig;
   account: string;
   provider: Provider;
   liquity: EthersLiquityWithStore<BlockPolledLiquityStore>;
@@ -44,7 +44,7 @@ export const LiquityProvider: React.FC<LiquityProviderProps> = ({
   unsupportedMainnetFallback
 }) => {
   const { library: provider, account, chainId } = useWeb3React<Web3Provider>();
-  const [config, setConfig] = useState<LiquityFrontendConfig>();
+  const [config, setConfig] = useState<ZusdFrontendConfig>();
 
   const connection = useMemo(() => {
     if (config && provider && account && chainId) {
