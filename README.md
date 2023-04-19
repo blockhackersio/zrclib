@@ -128,6 +128,8 @@ classDiagram
     Store <|-- EncryptedStore
     Store <|-- IndexDBStore
 
+    EncryptedStore --> IndexDBStore
+
     class Keypair
     Keypair: privateKey
     Keypair: publicKey
