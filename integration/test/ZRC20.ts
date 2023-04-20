@@ -25,26 +25,31 @@ const artifactPath = path.join(
 );
 const artifact = require(artifactPath);
 
-it("Test transfer", async function () {
+async function deploy({ mintAmount }: { mintAmount: number }) {
   const Hasher: any = await ethers.getContractFactory(
     artifact.abi,
     artifact.bytecode
   );
   const [source, reciever] = await ethers.getSigners();
+  const hasher = await Hasher.deploy();
+  const tokenFactory = new MockToken__factory(source);
 
-  // Deploy contracts
+  const mockErc20 = await tokenFactory.deploy(mintAmount);
+  await mockErc20.deployed();
+
+  const zrc20Factory = new ZRC20__factory(source);
+  const zrc20 = await zrc20Factory.deploy(hasher.address, mockErc20.address);
+  return { zrc20, mockErc20, signers: [source, reciever] };
+}
+
+it("Test transfer", async function () {
   const deposit = 10 * 1_000_000;
-  const { zrc20, mockErc20 } = await t("Deploying contracts", async () => {
-    const hasher = await Hasher.deploy();
-    const tokenFactory = new MockToken__factory(source);
 
-    const mockErc20 = await tokenFactory.deploy(deposit);
-    await mockErc20.deployed();
-
-    const zrc20Factory = new ZRC20__factory(source);
-    const zrc20 = await zrc20Factory.deploy(hasher.address, mockErc20.address);
-    return { zrc20, mockErc20 };
-  });
+  const {
+    zrc20,
+    mockErc20,
+    signers: [source],
+  } = await deploy({ mintAmount: deposit });
 
   expect(await mockErc20.balanceOf(source.address)).to.eq(deposit);
 
