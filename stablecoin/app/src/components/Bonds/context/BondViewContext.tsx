@@ -19,7 +19,7 @@ import { Decimal } from "@liquity/lib-base";
 export type BondViewContextType = {
   view: BondView;
   dispatchEvent: (event: BondEvent, payload?: Payload) => void;
-  lusdBalance?: Decimal;
+  zusdBalance?: Decimal;
   statuses: BondTransactionStatuses;
   isSynchronizing: boolean;
   inputToken: TokenIndex.BLUSD | TokenIndex.ZUSD;

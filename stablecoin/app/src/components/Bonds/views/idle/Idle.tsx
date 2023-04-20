@@ -12,7 +12,7 @@ export const Idle: React.FC = () => {
   const { liquity } = useLiquity();
   const { ZUSD_ADDRESS } = useBondAddresses();
 
-  const { dispatchEvent, lusdBalance } = useBondView();
+  const { dispatchEvent } = useBondView();
   const [chain, setChain] = useState<number>();
 
   useEffect(() => {

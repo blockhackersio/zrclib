@@ -23,12 +23,12 @@ export const SwapPane: React.FC = () => {
     dispatchEvent,
     statuses,
     inputToken,
-    lusdBalance,
+    zusdBalance,
     shieldAction
   } = useBondView();
   const editingState = useState<string>();
   const inputTokenBalance = 
-    lusdBalance ?? Decimal.ZERO;
+    zusdBalance ?? Decimal.ZERO;
   const [inputAmount, setInputAmount] = useState<Decimal>(Decimal.ZERO);
   const [outputAmount, setOutputAmount] = useState<Decimal>();
 

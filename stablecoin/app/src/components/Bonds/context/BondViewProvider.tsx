@@ -54,7 +54,7 @@ export const BondViewProvider: React.FC = props => {
     SWAP: "IDLE",
     MANAGE_LIQUIDITY: "IDLE"
   });
-  const [ lusdBalance, setZusdBalance] = useState<Decimal>();
+  const [ zusdBalance, setZusdBalance] = useState<Decimal>();
 
   // const [lusdBalance, setLusdBalance] = useState<Decimal>();
   const { account } = useLiquity();
@@ -155,7 +155,7 @@ export const BondViewProvider: React.FC = props => {
     view,
     dispatchEvent,
     statuses,
-    lusdBalance,
+    zusdBalance,
     isSynchronizing,
     inputToken,
     addresses: contracts.addresses,
