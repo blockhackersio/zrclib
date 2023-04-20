@@ -154,6 +154,7 @@ export const SwapPane: React.FC = () => {
   return (
     <>
       <Heading as="h2" sx={{ pt: 2, pb: 3, px: 2 }}>
+        {console.log("shieldAction value:", shieldAction)}
         <Flex sx={{ justifyContent: "center" }}>
           {shieldAction === ShieldAction.SHIELD ? <>Deposit</> : shieldAction === ShieldAction.TRANSFER ? <>Transfer</> : <>Withdraw</>} ZUSD;
         </Flex>
@@ -183,22 +184,6 @@ export const SwapPane: React.FC = () => {
         <Icon name="arrow-down" size="lg" />
       </Flex>
 
-      <DisabledEditableRow label="Buy">
-        {outputAmount ? (
-          <DisabledEditableAmounts
-            inputId="swap-output-amount"
-            amount={outputAmount.prettify(2)}
-            unit={tokenSymbol[outputToken[inputToken]]}
-          />
-        ) : (
-          <DisabledEditableAmounts inputId="swap-output-amount">
-            <Box sx={{ width: "160px", height: "20px", mt: "10px", mb: "6px" }}>
-              <Placeholder />
-            </Box>
-          </DisabledEditableAmounts>
-        )}
-      </DisabledEditableRow>
-
       {isBalanceInsufficient && (
         <ErrorDescription>
           Amount exceeds your balance by{" "}
@@ -206,10 +191,6 @@ export const SwapPane: React.FC = () => {
             {inputAmount.sub(inputTokenBalance).prettify(2)} {tokenSymbol[inputToken]}
           </Amount>
         </ErrorDescription>
-      )}
-
-      {(bLusdAmmBLusdBalance?.isZero || bLusdAmmLusdBalance?.isZero) && (
-        <ErrorDescription>No liquidity in pool yet. Swap unavailable.</ErrorDescription>
       )}
 
       <Flex variant="layout.actions">
