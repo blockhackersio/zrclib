@@ -35,8 +35,7 @@ contract ZRC20 is ShieldedPool {
                 "Can't withdraw to zero address"
             );
 
-            token.transferFrom(
-                address(this),
+            token.transfer(
                 _proof.extData.recipient,
                 uint256(-_proof.extData.extAmount)
             );

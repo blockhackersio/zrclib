@@ -110,7 +110,9 @@ it("Test transfer", async function () {
     "Creating withdraw proof",
     prover.unshield(FIVE, aliceSigner.address)
   );
-
+  console.log(
+    `withdrawProof.extData.extAmount: ${withdrawProof.extData.extAmount}`
+  );
   const tx3 = await t("Submitting transaction", zrc20.transact(withdrawProof));
   await tx3.wait();
   await sleep(10_000); // Must wait for events to fire after pool (cannot seem to speed up polling)
