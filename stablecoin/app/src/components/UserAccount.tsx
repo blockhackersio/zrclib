@@ -10,7 +10,7 @@ import { shortenAddress } from "../utils/shortenAddress";
 
 import { Icon } from "./Icon";
 import { useShieldedPoolContracts } from "./Bonds/context/useBondContracts";
-import { ethers, BigNumber } from "ethers";
+import { ethers } from "ethers";
 
 const select = ({ accountBalance, lusdBalance, lqtyBalance }: LiquityStoreState) => ({
   accountBalance,

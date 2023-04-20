@@ -19,6 +19,7 @@ import type { ERC20Faucet } from "@liquity/chicken-bonds/lusd/types";
 import { useShieldedPoolContracts } from "./useBondContracts";
 import { useWeb3React } from "@web3-react/core";
 import { useBondAddresses } from "./BondAddressesContext";
+import { ethers } from "ethers";
 
 // Refresh backend values every 15 seconds
 const SYNCHRONIZE_INTERVAL_MS = 15 * 1000;
@@ -53,14 +54,29 @@ export const BondViewProvider: React.FC = props => {
     SWAP: "IDLE",
     MANAGE_LIQUIDITY: "IDLE"
   });
-  const [lusdBalance, setLusdBalance] = useState<Decimal>();
+  const [ lusdBalance, setZusdBalance] = useState<Decimal>();
+
+  // const [lusdBalance, setLusdBalance] = useState<Decimal>();
   const { account } = useLiquity();
   const {
     ZUSD_ADDRESS
   } = useBondAddresses();
   const contracts = useShieldedPoolContracts();
+  const { zusdToken } = useShieldedPoolContracts();
   const { chainId } = useWeb3React();
   const isMainnet = chainId === 1;
+
+  const getZusdBalance = async () => {
+    const balance = await zusdToken?.balanceOf(account);
+    if (balance !== undefined) {
+      const actualBalance = ethers.utils.formatUnits(balance, 18);
+      setZusdBalance(Decimal.from(actualBalance));
+    }
+  };
+
+  useEffect(() => {
+    getZusdBalance();
+  }, [account, zusdToken]);
 
   useEffect(() => {
     if (isSynchronizing) return;
