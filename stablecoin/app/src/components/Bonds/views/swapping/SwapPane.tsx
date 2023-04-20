@@ -12,8 +12,7 @@ import {
 import { useBondView } from "../../context/BondViewContext";
 import { TokenIndex, ShieldAction } from "../../context/transitions";
 
-const tokenSymbol: Record<TokenIndex.BLUSD | TokenIndex.ZUSD, string> = {
-  [TokenIndex.BLUSD]: "BLUSD",
+const tokenSymbol: Record<TokenIndex.ZUSD, string> = {
   [TokenIndex.ZUSD]: "ZUSD"
 };
 
@@ -33,7 +32,7 @@ export const SwapPane: React.FC = () => {
     shieldAction
   } = useBondView();
   const editingState = useState<string>();
-  const inputTokenBalance =
+  const inputTokenBalance = 
     (inputToken === TokenIndex.BLUSD ? bLusdBalance : lusdBalance) ?? Decimal.ZERO;
   const [inputAmount, setInputAmount] = useState<Decimal>(Decimal.ZERO);
   const [outputAmount, setOutputAmount] = useState<Decimal>();
@@ -121,7 +120,7 @@ export const SwapPane: React.FC = () => {
         label=""
         inputId="swap-input-amount"
         amount={inputAmount.prettify(2)}
-        unit={tokenSymbol[inputToken]}
+        unit="ZUSD"
         editingState={editingState}
         editedAmount={inputAmount.toString()}
         setEditedAmount={amount => setInputAmount(Decimal.from(amount))}
@@ -137,7 +136,7 @@ export const SwapPane: React.FC = () => {
         <ErrorDescription>
           Amount exceeds your balance by{" "}
           <Amount>
-            {inputAmount.sub(inputTokenBalance).prettify(2)} {tokenSymbol[inputToken]}
+            {inputAmount.sub(inputTokenBalance).prettify(2)} {"ZUSD"}
           </Amount>
         </ErrorDescription>
       )}

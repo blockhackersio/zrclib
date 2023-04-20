@@ -88,7 +88,7 @@ export const Bond: React.FC<BondProps> = ({ bond, style }) => {
   const { BOND_NFT_ADDRESS } = useBondAddresses();
 
   const handleSellBLusdPressed = () => {
-    dispatchEvent("SWAP_PRESSED", { inputToken: TokenIndex.BLUSD } as SwapPressedPayload);
+    //dispatchEvent("SWAP_PRESSED", { inputToken: TokenIndex.ZUSD } as SwapPressedPayload);
   };
 
   return (

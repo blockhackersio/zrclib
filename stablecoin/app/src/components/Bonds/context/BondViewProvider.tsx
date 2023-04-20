@@ -60,7 +60,7 @@ export const BondViewProvider: React.FC = props => {
   const [isBLusdLpApprovedWithAmmZapper, setIsBLusdLpApprovedWithAmmZapper] = useState(false);
   const [isBLusdLpApprovedWithGauge, setIsBLusdLpApprovedWithGauge] = useState(false);
   const [isSynchronizing, setIsSynchronizing] = useState(false);
-  const [inputToken, setInputToken] = useState<TokenIndex.BLUSD | TokenIndex.ZUSD>(
+  const [inputToken, setInputToken] = useState<TokenIndex.ZUSD>(
     TokenIndex.ZUSD
   );
   const [shieldAction, setShieldAction] = useState<ShieldAction>(ShieldAction.SHIELD | ShieldAction.UNSHIELD | ShieldAction.TRANSFER);
@@ -678,7 +678,7 @@ export const BondViewProvider: React.FC = props => {
     isBLusdLpApprovedWithGauge,
     inputToken,
     isInputTokenApprovedWithBLusdAmm:
-      inputToken === TokenIndex.BLUSD
+      inputToken === TokenIndex.ZUSD
         ? isBLusdApprovedWithBlusdAmm
         : isLusdApprovedWithBlusdAmm,
     getExpectedSwapOutput,

@@ -104,7 +104,7 @@ export type ShieldPressedPayload = {
 }
 
 export type SwapPressedPayload = {
-  inputToken: TokenIndex.BLUSD | TokenIndex.ZUSD;
+  inputToken: TokenIndex.ZUSD;
 };
 
 export type SwapPayload = {
