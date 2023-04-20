@@ -85,7 +85,6 @@ type BondProps = { bond: BondType; style?: ThemeUIStyleObject };
 export const Bond: React.FC<BondProps> = ({ bond, style }) => {
   const events = getBondEvents(bond);
   const { dispatchEvent } = useBondView();
-  const { BOND_NFT_ADDRESS } = useBondAddresses();
 
   const handleSellBLusdPressed = () => {
     //dispatchEvent("SWAP_PRESSED", { inputToken: TokenIndex.ZUSD } as SwapPressedPayload);
@@ -110,17 +109,6 @@ export const Bond: React.FC<BondProps> = ({ bond, style }) => {
           bg: "background"
         }}
       >
-        <Image
-          sx={{ cursor: "pointer", minWidth: "150px" }}
-          src={bond.tokenUri}
-          alt="NFT image representation of your bond."
-          onClick={() => {
-            window.open(
-              `https://looksrare.org/collections/${BOND_NFT_ADDRESS}/${bond.id}`,
-              "_blank"
-            );
-          }}
-        />
       </Flex>
       <Card mt={[0, 0, 0, 0]} sx={{ borderRadius: 12, flexGrow: 1 }}>
         <Flex p={[2, 3]} sx={{ flexDirection: "column" }}>

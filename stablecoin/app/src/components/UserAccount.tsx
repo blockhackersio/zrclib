@@ -22,9 +22,9 @@ export const UserAccount: React.FC = () => {
   const { account } = useLiquity();
   const { accountBalance, lusdBalance: realLusdBalance, lqtyBalance } = useLiquitySelector(select);
   const { lusdBalance: customLusdBalance } = useBondView();
-  const { LUSD_OVERRIDE_ADDRESS } = useBondAddresses();
+  const { ZUSD_ADDRESS } = useBondAddresses();
 
-  const lusdBalance = LUSD_OVERRIDE_ADDRESS === null ? realLusdBalance : customLusdBalance;
+  const lusdBalance = ZUSD_ADDRESS === null ? realLusdBalance : customLusdBalance;
 
   return (
     <Box sx={{ display: ["none", "flex"] }}>

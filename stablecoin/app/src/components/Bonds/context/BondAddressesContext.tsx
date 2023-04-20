@@ -1,22 +1,17 @@
 import { useWeb3React } from "@web3-react/core";
 import React, { useContext, createContext } from "react";
-
-import mainnet from "@liquity/chicken-bonds/lusd/addresses/mainnet.json";
-import goerli from "@liquity/chicken-bonds/lusd/addresses/goerli.json";
 import { Addresses } from "./transitions";
 
+const goerli: Addresses = {
+  ZUSD_ADDRESS: "0x9cFa388a74a89b1b32Cf0185d5572159AA988811"
+}
+
 const nullAddresses: Addresses = {
-  BLUSD_AMM_ADDRESS: null,
-  BLUSD_AMM_STAKING_ADDRESS: null,
-  BLUSD_TOKEN_ADDRESS: null,
-  BOND_NFT_ADDRESS: null,
-  CHICKEN_BOND_MANAGER_ADDRESS: null,
-  LUSD_OVERRIDE_ADDRESS: null,
-  BLUSD_LP_ZAP_ADDRESS: null
+  ZUSD_ADDRESS: null
 };
 
 export const chainIdAddressesMap: Partial<Record<number, Addresses>> = {
-  1: mainnet,
+  // 1: mainnet,
   5: goerli
   // 11155111: sepolia
 };

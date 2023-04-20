@@ -6,17 +6,7 @@ import { Container } from "theme-ui";
 import { Swapping } from "./views/swapping/Swapping";
 
 export const Bonds: React.FC = () => {
-  const { view, hasFoundContracts } = useBondView();
-
-  if (!hasFoundContracts) {
-    return (
-      <Container sx={{ position: "absolute", left: "30%", top: "40%" }}>
-        <InfoMessage title="Unsupported network">
-          ZUSD Bonds don't seem to be deployed to this network.
-        </InfoMessage>
-      </Container>
-    );
-  }
+  const { view } = useBondView();
 
   let View = null;
   switch (view) {

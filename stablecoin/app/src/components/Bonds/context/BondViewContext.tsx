@@ -22,8 +22,6 @@ export type BondViewContextType = {
   lusdBalance?: Decimal;
   statuses: BondTransactionStatuses;
   isSynchronizing: boolean;
-  getLusdFromFaucet: () => Promise<void>;
-  hasFoundContracts: boolean;
   inputToken: TokenIndex.BLUSD | TokenIndex.ZUSD;
   addresses: Addresses;
   shieldAction: ShieldAction;

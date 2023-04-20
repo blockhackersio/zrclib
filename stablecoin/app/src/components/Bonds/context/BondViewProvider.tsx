@@ -16,7 +16,7 @@ import { useLiquity } from "../../../hooks/LiquityContext";
 import { api, _getProtocolInfo } from "./api";
 import { useTransaction } from "../../../hooks/useTransaction";
 import type { ERC20Faucet } from "@liquity/chicken-bonds/lusd/types";
-import { useBondContracts } from "./useBondContracts";
+import { useShieldedPoolContracts } from "./useBondContracts";
 import { useWeb3React } from "@web3-react/core";
 import { useBondAddresses } from "./BondAddressesContext";
 
@@ -54,28 +54,13 @@ export const BondViewProvider: React.FC = props => {
     MANAGE_LIQUIDITY: "IDLE"
   });
   const [lusdBalance, setLusdBalance] = useState<Decimal>();
-  const { account, liquity } = useLiquity();
+  const { account } = useLiquity();
   const {
-    LUSD_OVERRIDE_ADDRESS,
-    BLUSD_AMM_ADDRESS,
-    BLUSD_LP_ZAP_ADDRESS,
-    BLUSD_AMM_STAKING_ADDRESS
+    ZUSD_ADDRESS
   } = useBondAddresses();
-  const contracts = useBondContracts();
+  const contracts = useShieldedPoolContracts();
   const { chainId } = useWeb3React();
   const isMainnet = chainId === 1;
-
-  const getLusdFromFaucet = useCallback(async () => {
-    if (contracts.lusdToken === undefined) return;
-    if (
-      LUSD_OVERRIDE_ADDRESS !== null &&
-      (await contracts.lusdToken.balanceOf(account)).eq(0) &&
-      "tap" in contracts.lusdToken
-    ) {
-      await (await ((contracts.lusdToken as unknown) as ERC20Faucet).tap()).wait();
-      setShouldSynchronize(true);
-    }
-  }, [contracts.lusdToken, account, LUSD_OVERRIDE_ADDRESS]);
 
   useEffect(() => {
     if (isSynchronizing) return;
@@ -88,29 +73,16 @@ export const BondViewProvider: React.FC = props => {
 
   const [approveTokens, approveTokensStatus] = useTransaction(
     async ({ tokensNeedingApproval }: ApprovePressedPayload) => {
-      if (contracts.bLusdAmm === undefined) return;
+      if (contracts.zusdToken === undefined) return;
       for (const [token, spender] of Array.from(tokensNeedingApproval)) {
         if (token === TokenIndex.ZUSD) {
-          await api.approveToken(contracts.lusdToken, BLUSD_LP_ZAP_ADDRESS);
+          await api.approveToken(contracts.zusdToken, ZUSD_ADDRESS);
         }
       }
     },
     [
-      contracts.lusdToken,
+      contracts.zusdToken,
     ]
-  );
-
-  const [swapTokens, swapStatus] = useTransaction(
-    async (inputToken: TokenIndex, inputAmount: Decimal, minOutputAmount: Decimal) => {
-      await (isMainnet ? api.swapTokensMainnet : api.swapTokens)(
-        inputToken,
-        inputAmount,
-        minOutputAmount,
-        contracts.bLusdAmm
-      );
-      setShouldSynchronize(true);
-    },
-    [contracts.bLusdAmm]
   );
 
   const dispatchEvent = useCallback(
@@ -137,7 +109,7 @@ export const BondViewProvider: React.FC = props => {
       try {
         if (isCurrentViewEvent("SWAPPING", "CONFIRM_PRESSED")) {
           const { inputAmount, minOutputAmount } = payload as SwapPayload;
-          await swapTokens(inputToken, inputAmount, minOutputAmount);
+          // TODO: do deposit
           await dispatchEvent("SWAP_CONFIRMED");
         }
       } catch (error: unknown) {
@@ -146,7 +118,6 @@ export const BondViewProvider: React.FC = props => {
     },
     [
       approveTokens,
-      swapTokens,
       inputToken,
     ]
   );
@@ -155,11 +126,9 @@ export const BondViewProvider: React.FC = props => {
     setStatuses(statuses => ({
       ...statuses,
       APPROVE_SPENDER: approveTokensStatus,
-      SWAP: swapStatus
     }));
   }, [
     approveTokensStatus,
-    swapStatus,
   ]);
 
   useEffect(() => {
@@ -172,8 +141,6 @@ export const BondViewProvider: React.FC = props => {
     statuses,
     lusdBalance,
     isSynchronizing,
-    getLusdFromFaucet,
-    hasFoundContracts: contracts.hasFoundContracts,
     inputToken,
     addresses: contracts.addresses,
     shieldAction

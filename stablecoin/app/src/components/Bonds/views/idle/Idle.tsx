@@ -10,9 +10,9 @@ import { useBondAddresses } from "../../context/BondAddressesContext";
 
 export const Idle: React.FC = () => {
   const { liquity } = useLiquity();
-  const { LUSD_OVERRIDE_ADDRESS } = useBondAddresses();
+  const { ZUSD_ADDRESS } = useBondAddresses();
 
-  const { dispatchEvent, getLusdFromFaucet, lusdBalance } = useBondView();
+  const { dispatchEvent, lusdBalance } = useBondView();
   const [chain, setChain] = useState<number>();
 
   useEffect(() => {
@@ -24,8 +24,6 @@ export const Idle: React.FC = () => {
   }, [chain, liquity.connection.signer]);
 
   const hasBonds = false;
-
-  const showLusdFaucet = LUSD_OVERRIDE_ADDRESS !== null && lusdBalance?.eq(0);
 
   const handleShieldZusdPressed = () => 
     dispatchEvent("SHIELD_PRESSED", { shieldAction: ShieldAction.SHIELD } as ShieldPressedPayload);
@@ -50,12 +48,6 @@ export const Idle: React.FC = () => {
         <Button variant="outline" onClick={handleUnshieldZusdPressed}>
           Unshield ZUSD
         </Button>
-
-        {showLusdFaucet && (
-          <Button variant={hasBonds ? "outline" : "primary"} onClick={() => getLusdFromFaucet()}>
-            Get 10k ZUSD
-          </Button>
-        )}
 
         {hasBonds && (
           <Button variant="primary" onClick={() => dispatchEvent("CREATE_BOND_PRESSED")}>
