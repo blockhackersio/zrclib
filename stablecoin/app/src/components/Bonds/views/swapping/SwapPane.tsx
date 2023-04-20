@@ -104,7 +104,6 @@ export const SwapPane: React.FC = () => {
   return (
     <>
       <Heading as="h2" sx={{ pt: 2, pb: 3, px: 2 }}>
-        {console.log("shieldAction value:", shieldAction)}
         <Flex sx={{ justifyContent: "center" }}>
           {shieldAction === ShieldAction.SHIELD ? <>Deposit</> : shieldAction === ShieldAction.TRANSFER ? <>Transfer</> : <>Withdraw</>} ZUSD;
         </Flex>
@@ -119,7 +118,7 @@ export const SwapPane: React.FC = () => {
       </Heading>
 
       <EditableRow
-        label="Deposit"
+        label=""
         inputId="swap-input-amount"
         amount={inputAmount.prettify(2)}
         unit={tokenSymbol[inputToken]}

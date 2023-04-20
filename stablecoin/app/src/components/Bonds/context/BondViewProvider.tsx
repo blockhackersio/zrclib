@@ -63,7 +63,7 @@ export const BondViewProvider: React.FC = props => {
   const [inputToken, setInputToken] = useState<BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD>(
     BLusdAmmTokenIndex.BLUSD
   );
-  const [shieldAction, setShieldAction] = useState<ShieldAction>(ShieldAction.SHIELD);
+  const [shieldAction, setShieldAction] = useState<ShieldAction>(ShieldAction.SHIELD | ShieldAction.UNSHIELD | ShieldAction.TRANSFER);
   const [statuses, setStatuses] = useState<BondTransactionStatuses>({
     CREATE: "IDLE",
     CANCEL: "IDLE",
@@ -542,6 +542,10 @@ export const BondViewProvider: React.FC = props => {
 
       if (payload && "inputToken" in payload && payload.inputToken !== inputToken) {
         setInputToken(payload.inputToken);
+      }
+
+      if (payload && "shieldAction" in payload) {
+        setShieldAction(payload.shieldAction);
       }
 
       const isCurrentViewEvent = (_view: BondView, _event: BondEvent) =>
