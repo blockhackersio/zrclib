@@ -15,7 +15,6 @@ export function useContract<TContractType>(
   useEffect(() => {
     (async () => {
       try {
-        if (contract !== undefined) return;
         if (address === null) {
           setContract({ instance: undefined, status: "FAILED" });
           return;
