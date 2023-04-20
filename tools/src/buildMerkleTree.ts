@@ -12,7 +12,7 @@ export async function buildMerkleTree(contract: Contract) {
     .sort((a, b) => a.args?.index - b.args?.index)
     .map((e) => toFixedHex(e.args?.commitment));
 
-  console.log(leaves);
+  console.log({ leaves });
 
   const t = new MerkleTree(MERKLE_TREE_HEIGHT, leaves, {
     hashFunction: poseidonHash2,

@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers";
 import { getExtDataHash, shuffle, stringifyBigInts, toFixedHex } from "./utils";
 import { FIELD_SIZE } from "./constants";
-import { fieldToObject } from "./poseidon";
+import { fieldToObject, fieldToString } from "./poseidon";
 import { plonk } from "snarkjs";
 import MerkleTree from "fixed-merkle-tree";
 
@@ -68,11 +68,12 @@ export async function getProof({
 
   for (const input of inputs) {
     if (input.amount.gt(0)) {
-      input.index = tree.indexOf(toFixedHex(input.getCommitment()));
+      const commitment = toFixedHex(fieldToString(input.getCommitment()));
+      input.index = tree.indexOf(commitment);
 
       if (input.index < 0) {
         throw new Error(
-          `Input commitment ${input.getCommitment()} was not found`
+          `Input commitment ${commitment} was not found in the following tree: ${tree}`
         );
       }
       inputMerklePathIndices.push(input.index);

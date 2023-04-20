@@ -48,7 +48,7 @@ it("Test transfer", async function () {
   const {
     zrc20,
     mockErc20,
-    signers: [source],
+    signers: [source, reciever],
   } = await deploy({ mintAmount: deposit });
 
   expect(await mockErc20.balanceOf(source.address)).to.eq(deposit);
@@ -82,15 +82,15 @@ it("Test transfer", async function () {
   // XXXXXXXX: Next we need to get the merkletree updating based on the commitment events added
   // See prepare_transaction.ts
 
-  // const transferAmount = 5 * 1_000_000;
+  const transferAmount = 5 * 1_000_000;
 
-  // // // receiver has to send sender a public keypair
-  // const receiverKeypair = await Keypair.fromSigner(reciever);
-  // const receiverAddress = receiverKeypair.address(); // contains only the public key
-  // const zrcTransferProof = await t(
-  //   "Creating transfer proof",
-  //   prover.transfer(transferAmount, receiverAddress)
-  // );
+  // receiver has to send sender a public keypair
+  const receiverKeypair = await Keypair.fromSigner(reciever);
+  const receiverAddress = receiverKeypair.address(); // contains only the public key
+  const zrcTransferProof = await t(
+    "Creating transfer proof",
+    prover.transfer(transferAmount, receiverAddress)
+  );
 
   // await t("Submitting transaction", zrc20.transact(zrcTransferProof));
   // expect(privateBalance).to.eq(transferAmount);
