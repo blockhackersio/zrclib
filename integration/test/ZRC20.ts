@@ -105,5 +105,15 @@ it("Test transfer", async function () {
 
   expect(alicePrivateBal).to.eq(FIVE);
   expect(bobPrivateBal).to.eq(FIVE);
+
+  const withdrawProof = await t(
+    "Creating withdraw proof",
+    prover.unshield(FIVE, aliceSigner.address)
+  );
+
+  const tx3 = await t("Submitting transaction", zrc20.transact(withdrawProof));
+  await tx3.wait();
+  await sleep(10_000); // Must wait for events to fire after pool (cannot seem to speed up polling)
+
   console.log("Ok");
 });
