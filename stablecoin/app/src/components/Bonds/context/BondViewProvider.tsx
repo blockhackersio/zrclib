@@ -61,7 +61,7 @@ export const BondViewProvider: React.FC = props => {
   const [isBLusdLpApprovedWithGauge, setIsBLusdLpApprovedWithGauge] = useState(false);
   const [isSynchronizing, setIsSynchronizing] = useState(false);
   const [inputToken, setInputToken] = useState<TokenIndex.BLUSD | TokenIndex.ZUSD>(
-    TokenIndex.BLUSD
+    TokenIndex.ZUSD
   );
   const [shieldAction, setShieldAction] = useState<ShieldAction>(ShieldAction.SHIELD | ShieldAction.UNSHIELD | ShieldAction.TRANSFER);
   const [statuses, setStatuses] = useState<BondTransactionStatuses>({

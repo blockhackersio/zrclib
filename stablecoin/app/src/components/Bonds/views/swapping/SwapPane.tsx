@@ -13,7 +13,7 @@ import { useBondView } from "../../context/BondViewContext";
 import { TokenIndex, ShieldAction } from "../../context/transitions";
 
 const tokenSymbol: Record<TokenIndex.BLUSD | TokenIndex.ZUSD, string> = {
-  [TokenIndex.BLUSD]: "ZUSD",
+  [TokenIndex.BLUSD]: "BLUSD",
   [TokenIndex.ZUSD]: "ZUSD"
 };
 
