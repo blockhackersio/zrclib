@@ -43,50 +43,51 @@ async function deploy({ mintAmount }: { mintAmount: number }) {
 }
 
 it("Test transfer", async function () {
-  const deposit = 10 * 1_000_000;
+  const TEN = 10 * 1_000_000;
 
   const {
     zrc20,
     mockErc20,
-    signers: [source, reciever],
-  } = await deploy({ mintAmount: deposit });
+    signers: [aliceSigner, bobSigner],
+  } = await deploy({ mintAmount: TEN });
 
-  expect(await mockErc20.balanceOf(source.address)).to.eq(deposit);
+  expect(await mockErc20.balanceOf(aliceSigner.address)).to.eq(TEN);
 
   // Create approver
-  const account = await ShieldedAccount.create(zrc20, "password123");
-  await account.loginWithEthersSigner(source);
-  const prover = account.getProver();
+  const alice = await ShieldedAccount.create(zrc20, "password123");
+  await alice.loginWithEthersSigner(aliceSigner);
+
+  const bob = await ShieldedAccount.create(zrc20, "password123");
+  await bob.loginWithEthersSigner(bobSigner);
+
+  const prover = alice.getProver();
 
   // Create proof
-  const shieldProof = await t("Creating shield proof", prover.shield(deposit));
+  const shieldProof = await t("Creating shield proof", prover.shield(TEN));
 
   // call verify proof
-  await t("Approving ERC20 payment", mockErc20.approve(zrc20.address, deposit));
+  await t("Approving ERC20 payment", mockErc20.approve(zrc20.address, TEN));
   const tx = await t("Submitting transaction", zrc20.transact(shieldProof));
   await tx.wait();
   await sleep(10_000); // Must wait for events to fire after pool (cannot seem to speed up polling)
   const publicBalance = await t(
     "Getting ERC20 balance",
-    mockErc20.balanceOf(source.address)
+    mockErc20.balanceOf(aliceSigner.address)
   );
 
   expect(publicBalance).to.eq(0);
-  const privateBalance = await t(
-    "Getting private balance",
-    account.getBalance()
-  );
-  expect(privateBalance).to.eq(deposit); // Transfer to the darkside worked! :)
+  const privateBalance = await t("Getting private balance", alice.getBalance());
+  expect(privateBalance).to.eq(TEN); // Transfer to the darkside worked! :)
 
-  // transfer
-  const transferAmount = 5 * 1_000_000;
+  // transfer is half the deposit
+  const FIVE = 5_000_000;
 
   // receiver has to send sender a public keypair
-  const receiverKeypair = await Keypair.fromSigner(reciever);
-  const receiverAddress = receiverKeypair.address(); // contains only the public key
+  const bobKeypair = bob.getKeypair();
+  const bobPubkey = bobKeypair.address(); // contains only the public key
   const zrcTransferProof = await t(
     "Creating transfer proof",
-    prover.transfer(transferAmount, receiverAddress)
+    prover.transfer(FIVE, bobPubkey)
   );
   const tx2 = await t(
     "Submitting transaction",
@@ -95,11 +96,14 @@ it("Test transfer", async function () {
   await tx2.wait();
   await sleep(10_000); // Must wait for events to fire after pool (cannot seem to speed up polling)
 
-  const privateBalance2 = await t(
+  const alicePrivateBal = await t(
     "Getting private balance",
-    account.getBalance()
+    alice.getBalance()
   );
-  // XXX: Balance is including spent tokens!!
-  expect(privateBalance2).to.eq(transferAmount);
+
+  const bobPrivateBal = await t("Getting private balance", bob.getBalance());
+
+  expect(alicePrivateBal).to.eq(FIVE);
+  expect(bobPrivateBal).to.eq(FIVE);
   console.log("Ok");
 });
