@@ -13,7 +13,6 @@ import { ClaimAndMove } from "./actions/ClaimAndMove";
 import { ClaimRewards } from "./actions/ClaimRewards";
 import { useStabilityView } from "./context/StabilityViewContext";
 import { RemainingLQTY } from "./RemainingLQTY";
-import { Yield } from "./Yield";
 import { InfoIcon } from "../InfoIcon";
 
 const selector = ({ stabilityDeposit, trove, lusdInStabilityPool }: LiquityStoreState) => ({
@@ -101,9 +100,6 @@ export const ActiveDeposit: React.FC = () => {
                 />
               }
             />
-            <Flex sx={{ justifyContent: "flex-end", flex: 1 }}>
-              <Yield />
-            </Flex>
           </Flex>
         </Box>
 
