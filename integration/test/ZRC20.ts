@@ -116,6 +116,12 @@ it("Test transfer", async function () {
   const tx3 = await t("Submitting transaction", zrc20.transact(withdrawProof));
   await tx3.wait();
   await sleep(10_000); // Must wait for events to fire after pool (cannot seem to speed up polling)
+  const publicBalance2 = await t(
+    "Getting ERC20 balance",
+    mockErc20.balanceOf(aliceSigner.address)
+  );
+
+  expect(publicBalance2).to.eq(FIVE);
 
   console.log("Ok");
 });
