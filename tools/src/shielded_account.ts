@@ -5,6 +5,7 @@ import { PasswordEncryptor } from "./password_encryptor";
 import { AccountStore } from "./account_store";
 import { Utxo } from "./utxo";
 import { ShieldedPoolProver } from "./shielded_pool";
+import { buildMerkleTree } from "./buildMerkleTree";
 
 export class ShieldedAccount {
   private keypair?: Keypair;
@@ -66,6 +67,10 @@ export class ShieldedAccount {
 
   async getBalance() {
     return await this.getStore().getBalance();
+  }
+
+  async getTree() {
+    return await buildMerkleTree(this.contract);
   }
 
   createUtxo(amount: BigNumberish) {

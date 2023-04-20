@@ -2,31 +2,21 @@ import { BigNumber } from "ethers";
 import { Keypair } from "./keypair";
 import { Utxo } from "./utxo";
 import { getProof } from "./get_proof";
-import { Element, HashFunction, MerkleTree } from "fixed-merkle-tree";
-import { poseidonHash2 } from "./poseidon";
+import { MerkleTree } from "fixed-merkle-tree";
 import { FormattedProof } from "./types";
 
-const MERKLE_TREE_HEIGHT = 5;
-
-async function buildMerkleTree() {
-  // XXX: get merkletree UPDATING!!!
-  // TODO: get the leaves, if any
-  const t = new MerkleTree(MERKLE_TREE_HEIGHT, [], {
-    hashFunction: poseidonHash2 as any as HashFunction<Element>,
-    zeroElement:
-      "21663839004416932945382355908790599225266501822907911457504978515578255421292",
-  });
-  return t;
-}
+export const MERKLE_TREE_HEIGHT = 5;
 
 export async function prepareTransaction({
   inputs = [],
   outputs = [],
   recipient = 0,
+  tree,
 }: {
   inputs?: Utxo[];
   outputs?: Utxo[];
   recipient?: string | 0;
+  tree: MerkleTree;
 }): Promise<FormattedProof> {
   while (inputs.length < 2) {
     const keypair = await Keypair.generate();
@@ -44,7 +34,7 @@ export async function prepareTransaction({
   const zrcProof = await getProof({
     inputs,
     outputs,
-    tree: await buildMerkleTree(),
+    tree,
     extAmount,
     recipient,
   });

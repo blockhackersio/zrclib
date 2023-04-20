@@ -1,9 +1,9 @@
 import { buildPoseidon } from "circomlibjs";
-import { BigNumber, BigNumberish } from "ethers";
+import { BigNumberish } from "ethers";
 
 type PoseidonFn = (a: BigNumberish[]) => Uint8Array;
 
-export let poseidon: PoseidonFn = () => {
+let poseidon: PoseidonFn = () => {
   throw new Error("Poseidon not initialized!");
 };
 
@@ -11,8 +11,12 @@ export function poseidonHash(items: BigNumberish[]): Uint8Array {
   return poseidon(items);
 }
 
-export function poseidonHash2(a: BigNumberish, b: BigNumberish): Uint8Array {
-  return poseidonHash([a, b]);
+export function poseidonHash2(a: BigNumberish, b: BigNumberish): string {
+  return fieldToString(poseidonHash([a, b]));
+}
+
+export function fieldToString(input: Uint8Array): string {
+  return (poseidon as any).F.toString(input);
 }
 
 export function fieldToObject(input: BigNumberish): bigint {

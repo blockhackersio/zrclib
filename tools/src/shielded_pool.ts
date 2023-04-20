@@ -21,6 +21,7 @@ export class ShieldedPoolProver {
     const deposit = this.account.createUtxo(amount);
     const proof = await prepareTransaction({
       outputs: [deposit],
+      tree: await this.account.getTree(),
     });
     return proof;
   }
@@ -54,6 +55,7 @@ export class ShieldedPoolProver {
     const proof = await prepareTransaction({
       inputs,
       outputs: [toSend, change],
+      tree: await this.account.getTree(),
     });
 
     return proof;
@@ -88,6 +90,7 @@ export class ShieldedPoolProver {
       inputs,
       outputs,
       recipient: recipientEthAddress,
+      tree: await this.account.getTree(),
     });
 
     return proof;

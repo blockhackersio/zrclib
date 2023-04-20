@@ -103,9 +103,10 @@ export async function getProof({
   }
 
   let input = {
-    root: fieldToObject(
-      (tree as any)._layers[tree.levels][0] ?? (tree as any)._zeros[tree.levels]
-    ),
+    // root: fieldToObject(
+    //   (tree as any)._layers[tree.levels][0] ?? (tree as any)._zeros[tree.levels]
+    // ),
+    root: BigInt(`${tree.root}`),
     inputNullifier: inputNullifier,
     outputCommitment: outputCommitment,
     publicAmount: BigNumber.from(extAmount)
