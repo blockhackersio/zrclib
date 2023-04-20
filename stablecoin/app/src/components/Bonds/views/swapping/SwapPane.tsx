@@ -10,11 +10,11 @@ import {
   EditableRow
 } from "../../../Trove/Editor";
 import { useBondView } from "../../context/BondViewContext";
-import { BLusdAmmTokenIndex, ShieldAction } from "../../context/transitions";
+import { TokenIndex, ShieldAction } from "../../context/transitions";
 
-const tokenSymbol: Record<BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD, string> = {
-  [BLusdAmmTokenIndex.BLUSD]: "ZUSD",
-  [BLusdAmmTokenIndex.ZUSD]: "ZUSD"
+const tokenSymbol: Record<TokenIndex.BLUSD | TokenIndex.ZUSD, string> = {
+  [TokenIndex.BLUSD]: "ZUSD",
+  [TokenIndex.ZUSD]: "ZUSD"
 };
 
 const marginalAmount = Decimal.ONE.div(1000);
@@ -34,7 +34,7 @@ export const SwapPane: React.FC = () => {
   } = useBondView();
   const editingState = useState<string>();
   const inputTokenBalance =
-    (inputToken === BLusdAmmTokenIndex.BLUSD ? bLusdBalance : lusdBalance) ?? Decimal.ZERO;
+    (inputToken === TokenIndex.BLUSD ? bLusdBalance : lusdBalance) ?? Decimal.ZERO;
   const [inputAmount, setInputAmount] = useState<Decimal>(Decimal.ZERO);
   const [outputAmount, setOutputAmount] = useState<Decimal>();
 

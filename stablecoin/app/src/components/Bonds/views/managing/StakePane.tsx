@@ -5,7 +5,7 @@ import { Amount } from "../../../ActionDescription";
 import { ErrorDescription } from "../../../ErrorDescription";
 import { EditableRow, StaticAmounts, StaticRow } from "../../../Trove/Editor";
 import { useBondView } from "../../context/BondViewContext";
-import { ApprovePressedPayload, BLusdAmmTokenIndex } from "../../context/transitions";
+import { ApprovePressedPayload, TokenIndex } from "../../context/transitions";
 import { PoolBalance } from "./PoolBalance";
 
 export const StakePane: React.FC = () => {
@@ -30,7 +30,7 @@ export const StakePane: React.FC = () => {
     const tokensNeedingApproval = new Map();
     if (!isBLusdLpApprovedWithGauge) {
       tokensNeedingApproval.set(
-        BLusdAmmTokenIndex.BLUSD_LUSD_LP,
+        TokenIndex.BLUSD_LUSD_LP,
         addresses.BLUSD_AMM_STAKING_ADDRESS
       );
     }

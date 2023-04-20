@@ -47,7 +47,7 @@ import {
   getFloorPrice
 } from "../utils";
 import { UNKNOWN_DATE } from "../../HorizontalTimeline";
-import { BLusdAmmTokenIndex } from "./transitions";
+import { TokenIndex } from "./transitions";
 import {
   TokenExchangeEvent,
   TokenExchangeEventObject
@@ -100,9 +100,9 @@ type RouteAddresses = [string, string, string, string, string, string, string, s
 type RouteSwapParams = [BigNumberish, BigNumberish, BigNumberish];
 type RouteSwaps = [RouteSwapParams, RouteSwapParams, RouteSwapParams, RouteSwapParams];
 
-const getRoute = (inputToken: BLusdAmmTokenIndex): [RouteAddresses, RouteSwaps] => [
+const getRoute = (inputToken: TokenIndex): [RouteAddresses, RouteSwaps] => [
   [
-    ...(inputToken === BLusdAmmTokenIndex.BLUSD ? bLusdToLusdRoute : lusdToBLusdRoute),
+    ...(inputToken === TokenIndex.BLUSD ? bLusdToLusdRoute : lusdToBLusdRoute),
     constants.AddressZero,
     constants.AddressZero,
     constants.AddressZero,
@@ -124,8 +124,8 @@ const getRoute = (inputToken: BLusdAmmTokenIndex): [RouteAddresses, RouteSwaps] 
     // - ZUSD-3Crv-f pool: { 0: ZUSD, 1: 3Crv }
 
     //                                          bLUSD        ZUSD
-    inputToken === BLusdAmmTokenIndex.BLUSD ? [0, 1, 3] : [0, 0, 6], // step 1
-    inputToken === BLusdAmmTokenIndex.BLUSD ? [0, 0, 9] : [1, 0, 3], // step 2
+    inputToken === TokenIndex.BLUSD ? [0, 1, 3] : [0, 0, 6], // step 1
+    inputToken === TokenIndex.BLUSD ? [0, 0, 9] : [1, 0, 3], // step 2
     [0, 0, 0], //                                ZUSD       bLUSD
     [0, 0, 0]
   ]
@@ -426,7 +426,7 @@ const marginalInputAmount = Decimal.ONE.div(1000);
 const getBlusdAmmPrice = async (bLusdAmm: CurveCryptoSwap2ETH): Promise<Decimal> => {
   try {
     const marginalOutputAmount = await getExpectedSwapOutput(
-      BLusdAmmTokenIndex.BLUSD,
+      TokenIndex.BLUSD,
       marginalInputAmount,
       bLusdAmm
     );
@@ -442,7 +442,7 @@ const getBlusdAmmPrice = async (bLusdAmm: CurveCryptoSwap2ETH): Promise<Decimal>
 const getBlusdAmmPriceMainnet = async (bLusdAmm: CurveCryptoSwap2ETH): Promise<Decimal> => {
   try {
     const marginalOutputAmount = await getExpectedSwapOutputMainnet(
-      BLusdAmmTokenIndex.BLUSD,
+      TokenIndex.BLUSD,
       marginalInputAmount,
       bLusdAmm
     );
@@ -866,18 +866,18 @@ const approveTokenWithBLusdAmmMainnet = async (token: LUSDToken | BLUSDToken | u
   return;
 };
 
-const getOtherToken = (thisToken: BLusdAmmTokenIndex) =>
-  thisToken === BLusdAmmTokenIndex.BLUSD ? BLusdAmmTokenIndex.ZUSD : BLusdAmmTokenIndex.BLUSD;
+const getOtherToken = (thisToken: TokenIndex) =>
+  thisToken === TokenIndex.BLUSD ? TokenIndex.ZUSD : TokenIndex.BLUSD;
 
 const getExpectedSwapOutput = async (
-  inputToken: BLusdAmmTokenIndex,
+  inputToken: TokenIndex,
   inputAmount: Decimal,
   bLusdAmm: CurveCryptoSwap2ETH
 ): Promise<Decimal> =>
   decimalify(await bLusdAmm.get_dy(inputToken, getOtherToken(inputToken), inputAmount.hex));
 
 const getExpectedSwapOutputMainnet = async (
-  inputToken: BLusdAmmTokenIndex,
+  inputToken: TokenIndex,
   inputAmount: Decimal,
   bLusdAmm: CurveCryptoSwap2ETH
 ): Promise<Decimal> => {
@@ -897,7 +897,7 @@ const getExpectedSwapOutputMainnet = async (
 };
 
 const swapTokens = async (
-  inputToken: BLusdAmmTokenIndex,
+  inputToken: TokenIndex,
   inputAmount: Decimal,
   minOutputAmount: Decimal,
   bLusdAmm: CurveCryptoSwap2ETH | undefined
@@ -934,7 +934,7 @@ const swapTokens = async (
 };
 
 const swapTokensMainnet = async (
-  inputToken: BLusdAmmTokenIndex,
+  inputToken: TokenIndex,
   inputAmount: Decimal,
   minOutputAmount: Decimal,
   bLusdAmm: CurveCryptoSwap2ETH | undefined
@@ -1032,20 +1032,20 @@ const getCoinBalances = (pool: CurveCryptoSwap2ETH) =>
 
 const getExpectedWithdrawal = async (
   burnLp: Decimal,
-  output: BLusdAmmTokenIndex | "both",
+  output: TokenIndex | "both",
   bLusdZapper: BLUSDLPZap,
   bLusdAmm: CurveCryptoSwap2ETH
-): Promise<Map<BLusdAmmTokenIndex, Decimal>> => {
+): Promise<Map<TokenIndex, Decimal>> => {
   if (output === "both") {
     const [bLusdAmount, lusdAmount] = await bLusdZapper.getMinWithdrawBalanced(burnLp.hex);
 
     return new Map([
-      [BLusdAmmTokenIndex.BLUSD, decimalify(bLusdAmount)],
-      [BLusdAmmTokenIndex.ZUSD, decimalify(lusdAmount)]
+      [TokenIndex.BLUSD, decimalify(bLusdAmount)],
+      [TokenIndex.ZUSD, decimalify(lusdAmount)]
     ]);
   } else {
     const withdrawEstimatorFunction =
-      output === BLusdAmmTokenIndex.ZUSD
+      output === TokenIndex.ZUSD
         ? () => bLusdZapper.getMinWithdrawLUSD(burnLp.hex)
         : () => bLusdAmm.calc_withdraw_one_coin(burnLp.hex, 0);
     return new Map([[output, await withdrawEstimatorFunction().then(decimalify)]]);
@@ -1140,12 +1140,12 @@ const removeLiquidityBLUSD = async (
 
 const removeLiquidityOneCoin = async (
   burnLpTokens: Decimal,
-  output: BLusdAmmTokenIndex,
+  output: TokenIndex,
   minAmount: Decimal,
   bLusdZapper: BLUSDLPZap | undefined,
   bLusdAmm: CurveCryptoSwap2ETH | undefined
 ): Promise<void> => {
-  if (output === BLusdAmmTokenIndex.ZUSD) {
+  if (output === TokenIndex.ZUSD) {
     return removeLiquidityLUSD(burnLpTokens, minAmount, bLusdZapper);
   } else {
     return removeLiquidityBLUSD(burnLpTokens, minAmount, bLusdAmm);

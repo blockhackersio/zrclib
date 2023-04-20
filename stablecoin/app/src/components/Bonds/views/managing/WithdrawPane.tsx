@@ -7,12 +7,12 @@ import { Icon } from "../../../Icon";
 import { DisabledEditableAmounts, DisabledEditableRow, EditableRow } from "../../../Trove/Editor";
 import { Warning } from "../../../Warning";
 import { useBondView } from "../../context/BondViewContext";
-import { ApprovePressedPayload, BLusdAmmTokenIndex } from "../../context/transitions";
+import { ApprovePressedPayload, TokenIndex } from "../../context/transitions";
 import { PoolDetails } from "./PoolDetails";
 
 const tokenSymbol = new Map([
-  [BLusdAmmTokenIndex.BLUSD, "bLUSD"],
-  [BLusdAmmTokenIndex.ZUSD, "ZUSD"]
+  [TokenIndex.BLUSD, "bLUSD"],
+  [TokenIndex.ZUSD, "ZUSD"]
 ]);
 
 const WithdrawnAmount: React.FC<{ symbol: string }> = ({ symbol, children }) => (
@@ -23,22 +23,22 @@ const WithdrawnAmount: React.FC<{ symbol: string }> = ({ symbol, children }) => 
   </>
 );
 
-const checkOutput = (value: string): BLusdAmmTokenIndex | "both" => {
+const checkOutput = (value: string): TokenIndex | "both" => {
   if (value === "both") {
     return "both";
   }
 
   const i = parseInt(value);
-  if (i === BLusdAmmTokenIndex.BLUSD || i === BLusdAmmTokenIndex.ZUSD) {
+  if (i === TokenIndex.BLUSD || i === TokenIndex.ZUSD) {
     return i;
   }
 
   throw new Error(`invalid output choice "${value}"`);
 };
 
-const zeros = new Map<BLusdAmmTokenIndex, Decimal>([
-  [BLusdAmmTokenIndex.BLUSD, Decimal.ZERO],
-  [BLusdAmmTokenIndex.ZUSD, Decimal.ZERO]
+const zeros = new Map<TokenIndex, Decimal>([
+  [TokenIndex.BLUSD, Decimal.ZERO],
+  [TokenIndex.ZUSD, Decimal.ZERO]
 ]);
 
 export const WithdrawPane: React.FC = () => {
@@ -55,19 +55,19 @@ export const WithdrawPane: React.FC = () => {
 
   const editingState = useState<string>();
   const [burnLpTokens, setBurnLp] = useState<Decimal>(Decimal.ZERO);
-  const [output, setOutput] = useState<BLusdAmmTokenIndex | "both">("both");
-  const [withdrawal, setWithdrawal] = useState<Map<BLusdAmmTokenIndex, Decimal>>(zeros);
+  const [output, setOutput] = useState<TokenIndex | "both">("both");
+  const [withdrawal, setWithdrawal] = useState<Map<TokenIndex, Decimal>>(zeros);
 
   const isApprovePending = statuses.APPROVE_SPENDER === "PENDING";
   const coalescedLpTokenBalance = lpTokenBalance ?? Decimal.ZERO;
   const isManageLiquidityPending = statuses.MANAGE_LIQUIDITY === "PENDING";
   const isBalanceInsufficient = burnLpTokens.gt(coalescedLpTokenBalance);
-  const needsApproval = output !== BLusdAmmTokenIndex.BLUSD && !isBLusdLpApprovedWithAmmZapper;
+  const needsApproval = output !== TokenIndex.BLUSD && !isBLusdLpApprovedWithAmmZapper;
 
   const handleApprovePressed = () => {
     const tokensNeedingApproval = new Map();
     if (needsApproval) {
-      tokensNeedingApproval.set(BLusdAmmTokenIndex.BLUSD_LUSD_LP, addresses.BLUSD_LP_ZAP_ADDRESS);
+      tokensNeedingApproval.set(TokenIndex.BLUSD_LUSD_LP, addresses.BLUSD_LP_ZAP_ADDRESS);
     }
     dispatchEvent("APPROVE_PRESSED", { tokensNeedingApproval } as ApprovePressedPayload);
   };
@@ -78,8 +78,8 @@ export const WithdrawPane: React.FC = () => {
   const handleConfirmPressed = () => {
     const curveSlippage = 0.001; // Allow mininum of %0.1% slippage due to Curve rounding issues
     if (output === "both") {
-      const minBLusdAmount = withdrawal.get(BLusdAmmTokenIndex.BLUSD)?.mul(1 - curveSlippage);
-      const minLusdAmount = withdrawal.get(BLusdAmmTokenIndex.ZUSD)?.mul(1 - curveSlippage);
+      const minBLusdAmount = withdrawal.get(TokenIndex.BLUSD)?.mul(1 - curveSlippage);
+      const minLusdAmount = withdrawal.get(TokenIndex.ZUSD)?.mul(1 - curveSlippage);
 
       if (minBLusdAmount === undefined || minBLusdAmount === Decimal.ZERO) return;
       if (minLusdAmount === undefined || minLusdAmount === Decimal.ZERO) return;

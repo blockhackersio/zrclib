@@ -25,7 +25,7 @@ import { useLiquity } from "../../../hooks/LiquityContext";
 import { useCallback } from "react";
 import type { BondsApi } from "./api";
 import type { BLusdLpRewards, Bond, ProtocolInfo, Stats } from "./transitions";
-import { BLusdAmmTokenIndex } from "./transitions";
+import { TokenIndex } from "./transitions";
 import type { Addresses } from "./transitions";
 import { useWeb3React } from "@web3-react/core";
 import { useBondAddresses } from "./BondAddressesContext";
@@ -191,8 +191,8 @@ export const useBondContracts = (): BondContracts => {
         lpTokenBalance,
         stakedLpTokenBalance,
         lpTokenSupply,
-        bLusdAmmBLusdBalance: bLusdAmmCoinBalances[BLusdAmmTokenIndex.BLUSD],
-        bLusdAmmLusdBalance: bLusdAmmCoinBalances[BLusdAmmTokenIndex.ZUSD],
+        bLusdAmmBLusdBalance: bLusdAmmCoinBalances[TokenIndex.BLUSD],
+        bLusdAmmLusdBalance: bLusdAmmCoinBalances[TokenIndex.ZUSD],
         lpRewards
       };
     },

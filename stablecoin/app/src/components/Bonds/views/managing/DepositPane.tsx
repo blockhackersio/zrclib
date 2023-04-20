@@ -7,7 +7,7 @@ import { Icon } from "../../../Icon";
 import { InfoIcon } from "../../../InfoIcon";
 import { DisabledEditableRow, EditableRow } from "../../../Trove/Editor";
 import { useBondView } from "../../context/BondViewContext";
-import { BLusdAmmTokenIndex } from "../../context/transitions";
+import { TokenIndex } from "../../context/transitions";
 import { PoolDetails } from "./PoolDetails";
 import type { Address, ApprovePressedPayload } from "../../context/transitions";
 
@@ -54,12 +54,12 @@ export const DepositPane: React.FC = () => {
       : Decimal.ONE;
 
   const handleApprovePressed = () => {
-    const tokensNeedingApproval = new Map<BLusdAmmTokenIndex, Address>();
+    const tokensNeedingApproval = new Map<TokenIndex, Address>();
     if (zapperNeedsLusdApproval) {
-      tokensNeedingApproval.set(BLusdAmmTokenIndex.ZUSD, addresses.BLUSD_LP_ZAP_ADDRESS);
+      tokensNeedingApproval.set(TokenIndex.ZUSD, addresses.BLUSD_LP_ZAP_ADDRESS);
     }
     if (zapperNeedsBLusdApproval) {
-      tokensNeedingApproval.set(BLusdAmmTokenIndex.BLUSD, addresses.BLUSD_LP_ZAP_ADDRESS);
+      tokensNeedingApproval.set(TokenIndex.BLUSD, addresses.BLUSD_LP_ZAP_ADDRESS);
     }
 
     dispatchEvent("APPROVE_PRESSED", { tokensNeedingApproval } as ApprovePressedPayload);

@@ -89,7 +89,7 @@ export enum ShieldAction {
   TRANSFER
 }
 
-export enum BLusdAmmTokenIndex {
+export enum TokenIndex {
   BLUSD,
   ZUSD,
   BLUSD_LUSD_LP
@@ -104,7 +104,7 @@ export type ShieldPressedPayload = {
 }
 
 export type SwapPressedPayload = {
-  inputToken: BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD;
+  inputToken: TokenIndex.BLUSD | TokenIndex.ZUSD;
 };
 
 export type SwapPayload = {
@@ -126,7 +126,7 @@ export type Addresses = {
 
 // This payload is only dispatched by "Manage liquidity"
 export type ApprovePressedPayload = {
-  tokensNeedingApproval: Map<BLusdAmmTokenIndex, Address>;
+  tokensNeedingApproval: Map<TokenIndex, Address>;
 };
 
 export type AddLiquidityPayload = {
@@ -147,7 +147,7 @@ export type RemoveLiquidityPayload = {
 export type RemoveLiquidityOneCoinPayload = {
   action: "removeLiquidityOneCoin";
   burnLpTokens: Decimal;
-  output: BLusdAmmTokenIndex;
+  output: TokenIndex;
   minAmount: Decimal;
 };
 

@@ -2,7 +2,7 @@ import { Card, Flex, Button, Image, ThemeUIStyleObject } from "theme-ui";
 import { EventType, HorizontalTimeline } from "../../../HorizontalTimeline";
 import { Record } from "../../Record";
 import { Actions } from "./actions/Actions";
-import { BLusdAmmTokenIndex, Bond as BondType, SwapPressedPayload } from "../../context/transitions";
+import { TokenIndex, Bond as BondType, SwapPressedPayload } from "../../context/transitions";
 import { Label, SubLabel } from "../../../HorizontalTimeline";
 import * as l from "../../lexicon";
 import { statuses, useBondView } from "../../context/BondViewContext";
@@ -88,7 +88,7 @@ export const Bond: React.FC<BondProps> = ({ bond, style }) => {
   const { BOND_NFT_ADDRESS } = useBondAddresses();
 
   const handleSellBLusdPressed = () => {
-    dispatchEvent("SWAP_PRESSED", { inputToken: BLusdAmmTokenIndex.BLUSD } as SwapPressedPayload);
+    dispatchEvent("SWAP_PRESSED", { inputToken: TokenIndex.BLUSD } as SwapPressedPayload);
   };
 
   return (

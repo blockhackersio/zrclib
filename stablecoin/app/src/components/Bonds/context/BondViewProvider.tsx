@@ -16,7 +16,7 @@ import {
   BLusdLpRewards,
   ShieldAction
 } from "./transitions";
-import { BLusdAmmTokenIndex } from "./transitions";
+import { TokenIndex } from "./transitions";
 import { transitions } from "./transitions";
 import { Decimal } from "@liquity/lib-base";
 import { useLiquity } from "../../../hooks/LiquityContext";
@@ -60,8 +60,8 @@ export const BondViewProvider: React.FC = props => {
   const [isBLusdLpApprovedWithAmmZapper, setIsBLusdLpApprovedWithAmmZapper] = useState(false);
   const [isBLusdLpApprovedWithGauge, setIsBLusdLpApprovedWithGauge] = useState(false);
   const [isSynchronizing, setIsSynchronizing] = useState(false);
-  const [inputToken, setInputToken] = useState<BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD>(
-    BLusdAmmTokenIndex.BLUSD
+  const [inputToken, setInputToken] = useState<TokenIndex.BLUSD | TokenIndex.ZUSD>(
+    TokenIndex.BLUSD
   );
   const [shieldAction, setShieldAction] = useState<ShieldAction>(ShieldAction.SHIELD | ShieldAction.UNSHIELD | ShieldAction.TRANSFER);
   const [statuses, setStatuses] = useState<BondTransactionStatuses>({
@@ -327,9 +327,9 @@ export const BondViewProvider: React.FC = props => {
   }, [isSynchronizing, shouldSynchronize, account, contracts, simulatedProtocolInfo]);
 
   const [approveAmm, approveAmmStatus] = useTransaction(
-    async (tokensNeedingApproval: BLusdAmmTokenIndex[]) => {
+    async (tokensNeedingApproval: TokenIndex[]) => {
       for (const token of tokensNeedingApproval) {
-        if (token === BLusdAmmTokenIndex.BLUSD) {
+        if (token === TokenIndex.BLUSD) {
           await (isMainnet
             ? api.approveTokenWithBLusdAmmMainnet(contracts.bLusdToken)
             : api.approveTokenWithBLusdAmm(contracts.bLusdToken, BLUSD_AMM_ADDRESS));
@@ -351,21 +351,21 @@ export const BondViewProvider: React.FC = props => {
     async ({ tokensNeedingApproval }: ApprovePressedPayload) => {
       if (contracts.bLusdAmm === undefined) return;
       for (const [token, spender] of Array.from(tokensNeedingApproval)) {
-        if (token === BLusdAmmTokenIndex.BLUSD) {
+        if (token === TokenIndex.BLUSD) {
           await api.approveToken(contracts.bLusdToken, spender);
           if (spender === BLUSD_AMM_ADDRESS) {
             setIsBLusdApprovedWithBlusdAmm(true);
           } else if (spender === BLUSD_LP_ZAP_ADDRESS) {
             setIsBLusdApprovedWithAmmZapper(true);
           }
-        } else if (token === BLusdAmmTokenIndex.ZUSD) {
+        } else if (token === TokenIndex.ZUSD) {
           await api.approveToken(contracts.lusdToken, BLUSD_LP_ZAP_ADDRESS);
           setIsLusdApprovedWithAmmZapper(true);
-        } else if (token === BLusdAmmTokenIndex.BLUSD_LUSD_LP && spender === undefined) {
+        } else if (token === TokenIndex.BLUSD_LUSD_LP && spender === undefined) {
           const lpToken = await api.getLpToken(contracts.bLusdAmm);
           await api.approveToken(lpToken, BLUSD_LP_ZAP_ADDRESS);
           setIsBLusdLpApprovedWithAmmZapper(true);
-        } else if (token === BLusdAmmTokenIndex.BLUSD_LUSD_LP) {
+        } else if (token === TokenIndex.BLUSD_LUSD_LP) {
           const lpToken = await api.getLpToken(contracts.bLusdAmm);
           await api.approveToken(lpToken, spender);
           if (spender === BLUSD_LP_ZAP_ADDRESS) {
@@ -431,7 +431,7 @@ export const BondViewProvider: React.FC = props => {
   );
 
   const getExpectedSwapOutput = useCallback(
-    async (inputToken: BLusdAmmTokenIndex, inputAmount: Decimal) =>
+    async (inputToken: TokenIndex, inputAmount: Decimal) =>
       contracts.bLusdAmm
         ? (isMainnet ? api.getExpectedSwapOutputMainnet : api.getExpectedSwapOutput)(
             inputToken,
@@ -443,7 +443,7 @@ export const BondViewProvider: React.FC = props => {
   );
 
   const [swapTokens, swapStatus] = useTransaction(
-    async (inputToken: BLusdAmmTokenIndex, inputAmount: Decimal, minOutputAmount: Decimal) => {
+    async (inputToken: TokenIndex, inputAmount: Decimal, minOutputAmount: Decimal) => {
       await (isMainnet ? api.swapTokensMainnet : api.swapTokens)(
         inputToken,
         inputAmount,
@@ -506,12 +506,12 @@ export const BondViewProvider: React.FC = props => {
   const getExpectedWithdrawal = useCallback(
     async (
       burnLp: Decimal,
-      output: BLusdAmmTokenIndex | "both"
-    ): Promise<Map<BLusdAmmTokenIndex, Decimal>> => {
+      output: TokenIndex | "both"
+    ): Promise<Map<TokenIndex, Decimal>> => {
       if (contracts.bLusdAmm === undefined)
         return new Map([
-          [BLusdAmmTokenIndex.ZUSD, Decimal.ZERO],
-          [BLusdAmmTokenIndex.BLUSD, Decimal.ZERO]
+          [TokenIndex.ZUSD, Decimal.ZERO],
+          [TokenIndex.BLUSD, Decimal.ZERO]
         ]);
 
       return contracts.bLusdAmmZapper
@@ -678,7 +678,7 @@ export const BondViewProvider: React.FC = props => {
     isBLusdLpApprovedWithGauge,
     inputToken,
     isInputTokenApprovedWithBLusdAmm:
-      inputToken === BLusdAmmTokenIndex.BLUSD
+      inputToken === TokenIndex.BLUSD
         ? isBLusdApprovedWithBlusdAmm
         : isLusdApprovedWithBlusdAmm,
     getExpectedSwapOutput,

@@ -8,7 +8,7 @@ import type {
   BondTransactionStatuses,
   ProtocolInfo,
   OptimisticBond,
-  BLusdAmmTokenIndex,
+  TokenIndex,
   Addresses,
   BLusdLpRewards,
   ShieldAction
@@ -45,14 +45,14 @@ export type BondViewContextType = {
   isBLusdApprovedWithAmmZapper: boolean;
   isBLusdLpApprovedWithAmmZapper: boolean;
   isBLusdLpApprovedWithGauge: boolean;
-  inputToken: BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD;
+  inputToken: TokenIndex.BLUSD | TokenIndex.ZUSD;
   isInputTokenApprovedWithBLusdAmm: boolean;
-  getExpectedSwapOutput: (inputToken: BLusdAmmTokenIndex, inputAmount: Decimal) => Promise<Decimal>;
+  getExpectedSwapOutput: (inputToken: TokenIndex, inputAmount: Decimal) => Promise<Decimal>;
   getExpectedLpTokens: (bLusdAmount: Decimal, lusdAmount: Decimal) => Promise<Decimal>;
   getExpectedWithdrawal: (
     burnLp: Decimal,
-    output: BLusdAmmTokenIndex | "both"
-  ) => Promise<Map<BLusdAmmTokenIndex, Decimal>>;
+    output: TokenIndex | "both"
+  ) => Promise<Map<TokenIndex, Decimal>>;
   isBootstrapPeriodActive?: boolean;
   hasLoaded: boolean;
   addresses: Addresses;
