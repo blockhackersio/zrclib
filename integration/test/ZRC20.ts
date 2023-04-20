@@ -91,8 +91,17 @@ it("Test transfer", async function () {
     "Creating transfer proof",
     prover.transfer(transferAmount, receiverAddress)
   );
+  const tx2 = await t(
+    "Submitting transaction",
+    zrc20.transact(zrcTransferProof)
+  );
+  await tx2.wait();
+  await sleep(10_000); // Must wait for events to fire after pool (cannot seem to speed up polling)
 
-  // await t("Submitting transaction", zrc20.transact(zrcTransferProof));
-  // expect(privateBalance).to.eq(transferAmount);
-  // console.log("Ok");
+  const privateBalance2 = await t(
+    "Getting private balance",
+    account.getBalance()
+  );
+  expect(privateBalance2).to.eq(transferAmount);
+  console.log("Ok");
 });
