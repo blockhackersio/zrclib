@@ -87,7 +87,7 @@ contract TroveManager is Ownable {
     }
 
     function _requireCallerIsStabilityPool() internal view {
-        require(msg.sender == address(stabilityPool), "LUSDToken: Caller is not StabilityPool");
+        require(msg.sender == address(stabilityPool), "TroveManager: Caller is not StabilityPool");
     }
 
     function getLatestPrice() public view returns (int) {
