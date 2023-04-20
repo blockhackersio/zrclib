@@ -6,39 +6,18 @@ import { Flex, Button, Spinner, Heading, Close, Box } from "theme-ui";
 import { Amount } from "../../../ActionDescription";
 import { ErrorDescription } from "../../../ErrorDescription";
 import { Icon } from "../../../Icon";
-import { Placeholder } from "../../../Placeholder";
 import {
-  DisabledEditableAmounts,
-  DisabledEditableRow,
   EditableRow
 } from "../../../Trove/Editor";
 import { useBondView } from "../../context/BondViewContext";
 import { BLusdAmmTokenIndex, ShieldAction } from "../../context/transitions";
 
 const tokenSymbol: Record<BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD, string> = {
-  [BLusdAmmTokenIndex.BLUSD]: "bLUSD",
+  [BLusdAmmTokenIndex.BLUSD]: "ZUSD",
   [BLusdAmmTokenIndex.ZUSD]: "ZUSD"
 };
 
-const outputToken: Record<
-  BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD,
-  BLusdAmmTokenIndex.BLUSD | BLusdAmmTokenIndex.ZUSD
-> = {
-  [BLusdAmmTokenIndex.BLUSD]: BLusdAmmTokenIndex.ZUSD,
-  [BLusdAmmTokenIndex.ZUSD]: BLusdAmmTokenIndex.BLUSD
-};
-
 const marginalAmount = Decimal.ONE.div(1000);
-
-type SlippageTolerance = "half" | "one" | "custom";
-
-const checkSlippageTolerance = (value: string): SlippageTolerance => {
-  if (value === "half" || value === "one" || value === "custom") {
-    return value;
-  }
-
-  throw new Error(`invalid slippage tolerance choice "${value}"`);
-};
 
 export const SwapPane: React.FC = () => {
   const {
@@ -58,19 +37,10 @@ export const SwapPane: React.FC = () => {
     (inputToken === BLusdAmmTokenIndex.BLUSD ? bLusdBalance : lusdBalance) ?? Decimal.ZERO;
   const [inputAmount, setInputAmount] = useState<Decimal>(Decimal.ZERO);
   const [outputAmount, setOutputAmount] = useState<Decimal>();
-  const [exchangeRate, setExchangeRate] = useState<Decimal>();
-  const [priceImpact, setPriceImpact] = useState<Decimal>();
-  const [slippageToleranceChoice, setSlippageToleranceChoice] = useState<SlippageTolerance>("half");
-  const [customSlippageTolerance, setCustomSlippageTolerance] = useState<Decimal>();
 
   const isApprovePending = statuses.APPROVE_AMM === "PENDING";
   const isSwapPending = statuses.SWAP === "PENDING";
   const isBalanceInsufficient = inputAmount.gt(inputTokenBalance);
-  const isSlippageToleranceInvalid =
-    slippageToleranceChoice === "custom" &&
-    (!customSlippageTolerance ||
-      customSlippageTolerance.lt(0.001) ||
-      customSlippageTolerance.gt(Decimal.ONE));
 
   // Used in dependency list of effect to recalculate output amount in case of pool changes
   const poolState = `${bLusdAmmBLusdBalance},${bLusdAmmLusdBalance}`;
@@ -88,22 +58,9 @@ export const SwapPane: React.FC = () => {
       return;
     }
 
-    const slippageTolerance =
-      slippageToleranceChoice === "half"
-        ? Decimal.from(0.005)
-        : slippageToleranceChoice === "one"
-        ? Decimal.from(0.01)
-        : customSlippageTolerance;
-
-    if (!slippageTolerance || isSlippageToleranceInvalid) {
-      return;
-    }
-
-    const minOutputFactor = Decimal.ONE.sub(slippageTolerance);
-
     dispatchEvent("CONFIRM_PRESSED", {
       inputAmount,
-      minOutputAmount: outputAmount.mul(minOutputFactor)
+      minOutputAmount: outputAmount
     });
   };
 
@@ -111,16 +68,11 @@ export const SwapPane: React.FC = () => {
     dispatchEvent("BACK_PRESSED");
   };
 
-  const handleSlippageToleranceChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setSlippageToleranceChoice(checkSlippageTolerance(e.target.value));
-
   useEffect(() => {
     let cancelled = false;
 
     const timeoutId = setTimeout(async () => {
       setOutputAmount(undefined);
-      setExchangeRate(undefined);
-      setPriceImpact(undefined);
 
       try {
         const [marginalOutput, outputAmount] = await Promise.all([
@@ -137,8 +89,6 @@ export const SwapPane: React.FC = () => {
           : Decimal.ZERO;
 
         setOutputAmount(outputAmount ?? Decimal.ZERO);
-        setExchangeRate(exchangeRate ?? marginalExchangeRate);
-        setPriceImpact(priceImpact);
       } catch (error) {
         console.error("getExpectedSwapOutput() failed");
         console.log(error);
@@ -169,7 +119,7 @@ export const SwapPane: React.FC = () => {
       </Heading>
 
       <EditableRow
-        label="Sell"
+        label="Deposit"
         inputId="swap-input-amount"
         amount={inputAmount.prettify(2)}
         unit={tokenSymbol[inputToken]}
@@ -210,7 +160,6 @@ export const SwapPane: React.FC = () => {
               inputAmount.isZero ||
               !outputAmount ||
               isBalanceInsufficient ||
-              isSlippageToleranceInvalid ||
               isSwapPending
             }
           >
