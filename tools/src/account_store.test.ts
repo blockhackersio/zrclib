@@ -3,6 +3,8 @@ import { AccountStore } from "./account_store";
 import { PasswordEncryptor } from "./password_encryptor";
 import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
+import { fieldToString } from "./poseidon";
+import { toFixedHex } from "./utils";
 
 describe("AccountStore", () => {
   const password = "mySecretPassword";
@@ -29,7 +31,9 @@ describe("AccountStore", () => {
   test("Adding a Utxo's nullifier will spend the Utxo", async () => {
     const utxo = new Utxo({ amount: 1000, index: 1 });
     await accountState.addUtxo(utxo);
-    await accountState.addNullifier(utxo.getNullifier());
+    await accountState.addNullifier(
+      toFixedHex(fieldToString(utxo.getNullifier()))
+    );
     const unspent = await accountState.getUnspentUtxos();
     expect(unspent.length).toBe(0);
   });

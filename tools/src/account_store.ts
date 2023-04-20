@@ -5,6 +5,8 @@ import { PasswordEncryptor } from "./password_encryptor";
 import { Store } from "./types";
 import { Utxo, UtxoSerializer } from "./utxo";
 import { Keypair, KeypairSerializer } from "./keypair";
+import { fieldToString } from "./poseidon";
+import { toFixedHex } from "./utils";
 
 export class AccountStore {
   constructor(
@@ -42,7 +44,9 @@ export class AccountStore {
   }
 
   async isSpent(utxo: Utxo): Promise<boolean> {
-    return !!(await this.nullifierStore.get(`${utxo.getNullifier()}`));
+    return !!(await this.nullifierStore.get(
+      toFixedHex(fieldToString(utxo.getNullifier()))
+    ));
   }
 
   async getUnspentUtxos() {

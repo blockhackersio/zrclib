@@ -100,6 +100,6 @@ it("Test transfer", async function () {
     account.getBalance()
   );
   // XXX: Balance is including spent tokens!!
-  //  expect(privateBalance2).to.eq(transferAmount);
+  expect(privateBalance2).to.eq(transferAmount);
   console.log("Ok");
 });
