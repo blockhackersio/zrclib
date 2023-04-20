@@ -19,44 +19,13 @@ import { Decimal } from "@liquity/lib-base";
 export type BondViewContextType = {
   view: BondView;
   dispatchEvent: (event: BondEvent, payload?: Payload) => void;
-  selectedBondId?: string;
-  protocolInfo?: ProtocolInfo;
-  stats?: Stats;
-  bonds?: Bond[];
-  selectedBond?: Bond;
-  optimisticBond?: OptimisticBond;
-  bLusdBalance?: Decimal;
   lusdBalance?: Decimal;
-  lpTokenBalance?: Decimal;
-  stakedLpTokenBalance?: Decimal;
-  lpTokenSupply?: Decimal;
-  bLusdAmmBLusdBalance?: Decimal;
-  bLusdAmmLusdBalance?: Decimal;
   statuses: BondTransactionStatuses;
   isSynchronizing: boolean;
   getLusdFromFaucet: () => Promise<void>;
-  simulatedProtocolInfo?: ProtocolInfo;
-  setSimulatedMarketPrice: (marketPrice: Decimal) => void;
-  resetSimulatedMarketPrice: () => void;
   hasFoundContracts: boolean;
-  isBLusdApprovedWithBlusdAmm: boolean;
-  isLusdApprovedWithBlusdAmm: boolean;
-  isLusdApprovedWithAmmZapper: boolean;
-  isBLusdApprovedWithAmmZapper: boolean;
-  isBLusdLpApprovedWithAmmZapper: boolean;
-  isBLusdLpApprovedWithGauge: boolean;
   inputToken: TokenIndex.BLUSD | TokenIndex.ZUSD;
-  isInputTokenApprovedWithBLusdAmm: boolean;
-  getExpectedSwapOutput: (inputToken: TokenIndex, inputAmount: Decimal) => Promise<Decimal>;
-  getExpectedLpTokens: (bLusdAmount: Decimal, lusdAmount: Decimal) => Promise<Decimal>;
-  getExpectedWithdrawal: (
-    burnLp: Decimal,
-    output: TokenIndex | "both"
-  ) => Promise<Map<TokenIndex, Decimal>>;
-  isBootstrapPeriodActive?: boolean;
-  hasLoaded: boolean;
   addresses: Addresses;
-  lpRewards: BLusdLpRewards | undefined;
   shieldAction: ShieldAction;
 };
 

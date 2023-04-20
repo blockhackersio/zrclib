@@ -12,7 +12,7 @@ type ActionsProps = {
 };
 
 export const Actions: React.FC<ActionsProps> = ({ bondId, disabled = false }) => {
-  const { dispatchEvent, isBootstrapPeriodActive } = useBondView();
+  const { dispatchEvent } = useBondView();
 
   const handleCancelBondPressed = () => {
     dispatchEvent("CANCEL_BOND_PRESSED", { bondId } as SelectBondPayload);
@@ -37,33 +37,6 @@ export const Actions: React.FC<ActionsProps> = ({ bondId, disabled = false }) =>
       >
         {CANCEL_BOND.term}
       </Button>
-      {isBootstrapPeriodActive && (
-        <Tippy
-          interactive={true}
-          placement="right"
-          content="Bonds can be claimed after the bootstrap period is complete."
-          maxWidth="268px"
-        >
-          <span>
-            <Button disabled={true} variant="outline" sx={{ height: "44px" }}>
-              {CLAIM_BOND.term}
-            </Button>
-          </span>
-        </Tippy>
-      )}
-      {!isBootstrapPeriodActive && (
-        <Button
-          disabled={disabled}
-          variant="outline"
-          sx={{ height: "44px" }}
-          style={{
-            cursor: disabled ? "auto" : cursor
-          }}
-          onClick={handleClaimBondPressed}
-        >
-          {CLAIM_BOND.term}
-        </Button>
-      )}
     </>
   );
 };

@@ -24,25 +24,17 @@ export const SwapPane: React.FC = () => {
     statuses,
     inputToken,
     lusdBalance,
-    bLusdBalance,
-    isInputTokenApprovedWithBLusdAmm,
-    bLusdAmmBLusdBalance,
-    bLusdAmmLusdBalance,
-    getExpectedSwapOutput,
     shieldAction
   } = useBondView();
   const editingState = useState<string>();
   const inputTokenBalance = 
-    (inputToken === TokenIndex.BLUSD ? bLusdBalance : lusdBalance) ?? Decimal.ZERO;
+    lusdBalance ?? Decimal.ZERO;
   const [inputAmount, setInputAmount] = useState<Decimal>(Decimal.ZERO);
   const [outputAmount, setOutputAmount] = useState<Decimal>();
 
   const isApprovePending = statuses.APPROVE_AMM === "PENDING";
   const isSwapPending = statuses.SWAP === "PENDING";
   const isBalanceInsufficient = inputAmount.gt(inputTokenBalance);
-
-  // Used in dependency list of effect to recalculate output amount in case of pool changes
-  const poolState = `${bLusdAmmBLusdBalance},${bLusdAmmLusdBalance}`;
 
   const handleDismiss = () => {
     dispatchEvent("ABORT_PRESSED");
@@ -66,39 +58,6 @@ export const SwapPane: React.FC = () => {
   const handleBackPressed = () => {
     dispatchEvent("BACK_PRESSED");
   };
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const timeoutId = setTimeout(async () => {
-      setOutputAmount(undefined);
-
-      try {
-        const [marginalOutput, outputAmount] = await Promise.all([
-          getExpectedSwapOutput(inputToken, marginalAmount),
-          inputAmount.nonZero && getExpectedSwapOutput(inputToken, inputAmount)
-        ]);
-
-        if (cancelled) return;
-
-        const marginalExchangeRate = marginalOutput.div(marginalAmount);
-        const exchangeRate = outputAmount?.div(inputAmount);
-        const priceImpact = exchangeRate?.lte(marginalExchangeRate)
-          ? marginalExchangeRate.sub(exchangeRate).div(marginalExchangeRate)
-          : Decimal.ZERO;
-
-        setOutputAmount(outputAmount ?? Decimal.ZERO);
-      } catch (error) {
-        console.error("getExpectedSwapOutput() failed");
-        console.log(error);
-      }
-    }, 200);
-
-    return () => {
-      clearTimeout(timeoutId);
-      cancelled = true;
-    };
-  }, [inputToken, inputAmount, getExpectedSwapOutput, poolState]);
 
   return (
     <>
@@ -150,7 +109,7 @@ export const SwapPane: React.FC = () => {
           Back
         </Button>
 
-        {isInputTokenApprovedWithBLusdAmm ? (
+        {false ? (
           <Button
             variant="primary"
             onClick={handleConfirmPressed}
