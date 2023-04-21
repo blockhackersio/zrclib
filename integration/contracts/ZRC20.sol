@@ -3,14 +3,15 @@ pragma solidity ^0.8.9;
 
 import {ShieldedPool} from "@zrclib/tools/contracts/ShieldedPool.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract ZRC20 is ERC20, ShieldedPool {
+contract ZRC20 is ERC20, ShieldedPool, Ownable {
     constructor(
         address _hasherAddress,
         address _verifier
     ) ShieldedPool(5, _hasherAddress, _verifier) ERC20("ZUSD", "Zero USD") {}
 
-    function mint(address _address, uint256 _amount) public {
+    function mint(address _address, uint256 _amount) public onlyOwner {
         _mint(_address, _amount);
     }
 
@@ -30,7 +31,8 @@ contract ZRC20 is ERC20, ShieldedPool {
                 "Can't withdraw to zero address"
             );
 
-            transfer(
+            _transfer(
+                address(this),
                 _proof.extData.recipient,
                 uint256(-_proof.extData.extAmount)
             );

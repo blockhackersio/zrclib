@@ -28,7 +28,7 @@ export type ContractEvent = NewCommitment | NewNullifier;
 export type ProofArguments = {
   proof: string;
   root: string;
-  inputNullifiers: string[];
+  inputNullifiers: [string, string];
   outputCommitments: [string, string];
   publicAmount: BigNumber;
   extDataHash: string;
