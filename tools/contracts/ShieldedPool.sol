@@ -5,10 +5,12 @@ pragma solidity ^0.8.0;
 import {TransactionVerifier} from "./generated/TransactionVerifier.sol";
 import {MerkleTreeWithHistory} from "./MerkleTreeWithHistory.sol";
 
-contract ShieldedPool is TransactionVerifier, MerkleTreeWithHistory {
+contract ShieldedPool is MerkleTreeWithHistory {
     int256 public MAX_EXT_AMOUNT = 2 ** 248;
 
     mapping(bytes32 => bool) public nullifierHashes;
+
+    TransactionVerifier public verifier;
 
     struct Proof {
         ProofArguments proofArguments;
@@ -41,8 +43,10 @@ contract ShieldedPool is TransactionVerifier, MerkleTreeWithHistory {
 
     constructor(
         uint32 _levels,
-        address _hasher
+        address _hasher,
+        address _verifier
     ) MerkleTreeWithHistory(_levels, _hasher) {
+        verifier = TransactionVerifier(_verifier);
         _initialize(); // initialize the merkle tree
     }
 
@@ -78,7 +82,7 @@ contract ShieldedPool is TransactionVerifier, MerkleTreeWithHistory {
         pubSignals[5] = uint(_proof.proofArguments.outputCommitments[0]);
         pubSignals[6] = uint(_proof.proofArguments.outputCommitments[1]);
         require(
-            verifyProof(
+            verifier.verifyProof(
                 _proof.proofArguments.proof,
                 pubSignals
             ),

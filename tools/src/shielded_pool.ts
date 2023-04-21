@@ -50,7 +50,6 @@ export class ShieldedPoolProver {
       amount: inputsTotal.sub(amount),
       keypair: this.account.getKeypair(),
     });
-    console.log({ inputs, inputsTotal, toSend, change });
 
     const proof = await prepareTransaction({
       inputs,
