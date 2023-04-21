@@ -27,7 +27,6 @@ export type ContractEvent = NewCommitment | NewNullifier;
 
 export type ProofArguments = {
   proof: string;
-  pubSignals: string[];
   root: string;
   inputNullifiers: string[];
   outputCommitments: [string, string];

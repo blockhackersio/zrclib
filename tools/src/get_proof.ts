@@ -160,17 +160,8 @@ async function formatArguments(zrcProof: ZrcProof): Promise<FormattedProof> {
   } = args;
 
   // prepare proof arguments to the correct format
-  let pubSignals: string[] = [
-    root.toString(),
-    publicAmount,
-    extDataHash.toString(),
-    ...inputNullifiers.map((e) => e.toString()),
-    ...outputCommitments.map((e) => e.toString()),
-  ];
-
   const proofArguments: ProofArguments = {
     proof,
-    pubSignals,
     root: toFixedHex(root),
     inputNullifiers: inputNullifiers.map(toFixedHex),
     outputCommitments: outputCommitments.map(toFixedHex) as [string, string],

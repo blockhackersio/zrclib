@@ -24,9 +24,8 @@ contract ShieldedPool is TransactionVerifier, MerkleTreeWithHistory {
 
     struct ProofArguments {
         bytes proof;
-        uint[] pubSignals;
         bytes32 root;
-        bytes32[] inputNullifiers;
+        bytes32[2] inputNullifiers;
         bytes32[2] outputCommitments;
         uint256 publicAmount;
         bytes32 extDataHash;
@@ -70,10 +69,18 @@ contract ShieldedPool is TransactionVerifier, MerkleTreeWithHistory {
             "Invalid public amount"
         );
 
+        uint[] memory pubSignals = new uint[](7);
+        pubSignals[0] = uint(_proof.proofArguments.root);
+        pubSignals[1] = _proof.proofArguments.publicAmount;
+        pubSignals[2] = uint(_proof.proofArguments.extDataHash);
+        pubSignals[3] = uint(_proof.proofArguments.inputNullifiers[0]);
+        pubSignals[4] = uint(_proof.proofArguments.inputNullifiers[1]);
+        pubSignals[5] = uint(_proof.proofArguments.outputCommitments[0]);
+        pubSignals[6] = uint(_proof.proofArguments.outputCommitments[1]);
         require(
             verifyProof(
                 _proof.proofArguments.proof,
-                _proof.proofArguments.pubSignals
+                pubSignals
             ),
             "Invalid proof"
         );
