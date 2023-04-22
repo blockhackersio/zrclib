@@ -1,10 +1,10 @@
 // Need this or ethers fails in node
 
 import { ethers } from "hardhat";
-import { Account } from "@zrclib/tools";
+import { Account } from "../../sdk/src";
 import { Verifier__factory, ZRC20__factory } from "../typechain-types";
 import { expect } from "chai";
-import artifact from "../../tools/contracts/generated/Hasher.json";
+import artifact from "../../sdk/contracts/generated/Hasher.json";
 import { sleep, tend, time } from "../utils";
 
 async function deployZrc() {

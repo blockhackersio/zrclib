@@ -13,7 +13,7 @@ import {
   Verifier__factory,
 } from "../typechain-types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { Account } from "@zrclib/tools";
+import { Account } from "@zrclib/sdk";
 
 const artifactPath = path.join(
   __dirname,

@@ -1,5 +1,5 @@
 {
-  "name": "@zrclib/integration",
+  "name": "@zrclib/tests",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,7 +14,7 @@
   "dependencies": {
     "@ethersproject/bytes": "^5.7.0",
     "@openzeppelin/contracts": "^4.8.3",
-    "@zrclib/tools": "workspace:*",
+    "@zrclib/sdk": "workspace:*",
     "circomlibjs": "^0.1.7",
     "dotenv": "^16.0.3",
     "eth-sig-util": "^3.0.1",

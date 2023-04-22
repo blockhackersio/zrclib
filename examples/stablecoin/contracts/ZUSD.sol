@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import "@zrclib/tools/contracts/ShieldedPool.sol";
+import "@zrclib/sdk/contracts/ShieldedPool.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract ZUSD is ShieldedPool, ERC20 {
-
     address public immutable troveManagerAddress;
     address public immutable stabilityPoolAddress;
 
@@ -37,8 +36,16 @@ contract ZUSD is ShieldedPool, ERC20 {
     function transact(Proof calldata _proof) public {
         // Deposit functionality
         if (_proof.extData.extAmount > 0) {
-            _spendAllowance(msg.sender, address(this), uint256(_proof.extData.extAmount));
-            _transfer(msg.sender, address(this), uint256(_proof.extData.extAmount));
+            _spendAllowance(
+                msg.sender,
+                address(this),
+                uint256(_proof.extData.extAmount)
+            );
+            _transfer(
+                msg.sender,
+                address(this),
+                uint256(_proof.extData.extAmount)
+            );
         }
 
         // Proof determines whether we add to or remove from pool
@@ -51,7 +58,11 @@ contract ZUSD is ShieldedPool, ERC20 {
                 "Can't withdraw to zero address"
             );
 
-            _transfer(msg.sender, _proof.extData.recipient,uint256(_proof.extData.extAmount));
+            _transfer(
+                msg.sender,
+                _proof.extData.recipient,
+                uint256(_proof.extData.extAmount)
+            );
         }
     }
 
@@ -64,10 +75,16 @@ contract ZUSD is ShieldedPool, ERC20 {
     }
 
     function _requireCallerIsTroveManager() internal view {
-        require(msg.sender == troveManagerAddress, "LUSDToken: Caller is not TroveManager");
+        require(
+            msg.sender == troveManagerAddress,
+            "LUSDToken: Caller is not TroveManager"
+        );
     }
 
     function _requireCallerIsStabilityPool() internal view {
-        require(msg.sender == stabilityPoolAddress, "LUSDToken: Caller is not StabilityPool");
+        require(
+            msg.sender == stabilityPoolAddress,
+            "LUSDToken: Caller is not StabilityPool"
+        );
     }
 }

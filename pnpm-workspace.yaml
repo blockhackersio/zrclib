@@ -1,4 +1,4 @@
 packages:
-  - "integration"
-  - "tools"
+  - "tests"
+  - "sdk"
   - "examples/stablecoin"

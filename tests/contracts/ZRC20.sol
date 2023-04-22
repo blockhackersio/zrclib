@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import {ShieldedPool} from "@zrclib/tools/contracts/ShieldedPool.sol";
+import {ShieldedPool} from "@zrclib/sdk/contracts/ShieldedPool.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
