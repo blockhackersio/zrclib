@@ -46,7 +46,7 @@ pnpm build
 const token = await ethers.Contract(address, abi, signer);
 
 const account = ShieldedAccount.create(
-  contract,
+  token,
   "password123"
 );
 await account.loginWithEthersSigner(signer);
