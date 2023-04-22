@@ -53,37 +53,38 @@ it("Test transfer", async function () {
 
   const [deployer, aliceSigner, bobSigner] = await ethers.getSigners();
 
+  // CREATE ACCOUNTS
   const alice = await ShieldedAccount.create(zrc20, "password123");
   await alice.loginWithEthersSigner(aliceSigner);
 
   const bob = await ShieldedAccount.create(zrc20, "password123");
   await bob.loginWithEthersSigner(bobSigner);
 
+  // MINT TOKENS
   zrc20 = zrc20.connect(deployer);
-
-  await (await zrc20.mint(aliceSigner.address, TEN)).wait();
+  let tx = await zrc20.mint(aliceSigner.address, TEN);
+  await tx.wait();
 
   const aliceProver = alice.getProver();
   zrc20 = zrc20.connect(aliceSigner);
 
-  // Create proof
+  /// DEPOSIT
   const shieldProof = await t(
     "1. Creating shield proof",
     aliceProver.shield(TEN)
   );
-
-  // call verify proof
   await (
     await t("2. Approving ERC20 payment", zrc20.approve(zrc20.address, TEN))
   ).wait();
-  const tx = await t("3. Submitting transaction", zrc20.transact(shieldProof));
+  tx = await t("3. Submitting transaction", zrc20.transact(shieldProof));
   await tx.wait();
-  await sleep(10_000); // Must wait for events to fire after pool (cannot seem to speed up polling)
+  await sleep(10_000);
+
+  /// Check balances
   const publicBalance = await t(
     "4. Getting ERC20 balance",
     zrc20.balanceOf(aliceSigner.address)
   );
-
   expect(publicBalance).to.eq(0);
   const privateBalance = await t(
     "5. Getting private balance",
@@ -91,8 +92,8 @@ it("Test transfer", async function () {
   );
   expect(privateBalance).to.eq(TEN); // Transfer to the darkside worked! :)
 
-  // receiver has to send sender a public keypair
-  const bobKeypair = bob.getKeypair();
+  /// TRANSFER
+  const bobKeypair = bob.getKeypair(); // receiver has to send sender a public keypair
   const bobPubkey = bobKeypair.address(); // contains only the public key
   const zrcTransferProof = await t(
     "6. Creating transfer proof",
@@ -103,18 +104,21 @@ it("Test transfer", async function () {
     zrc20.transact(zrcTransferProof)
   );
   await tx2.wait();
-  await sleep(10_000); // Must wait for events to fire after pool (cannot seem to speed up polling)
+  await sleep(10_000);
 
+  // Check private balances
   const alicePrivateBal = await t(
-    "8. Getting private balance",
+    "8. Getting alices private balance",
     alice.getBalance()
   );
-
-  const bobPrivateBal = await t("9. Getting private balance", bob.getBalance());
-
+  const bobPrivateBal = await t(
+    "9. Getting bobs private balance",
+    bob.getBalance()
+  );
   expect(alicePrivateBal).to.eq(FIVE);
   expect(bobPrivateBal).to.eq(FIVE);
 
+  /// WITHDRAW
   const withdrawProof = await t(
     "10. Creating withdraw proof",
     aliceProver.unshield(FIVE, aliceSigner.address)
@@ -125,12 +129,12 @@ it("Test transfer", async function () {
   );
   await tx3.wait();
   await sleep(10_000); // Must wait for events to fire after pool (cannot seem to speed up polling)
+
+  /// Check balances
   const publicBalance2 = await t(
     "12. Getting ERC20 balance",
     zrc20.balanceOf(aliceSigner.address)
   );
-
   expect(publicBalance2).to.eq(FIVE);
-
   console.log("Ok");
 });
