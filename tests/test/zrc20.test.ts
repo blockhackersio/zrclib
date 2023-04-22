@@ -22,34 +22,34 @@ async function deployZrc() {
 
   // Deploy the ZRC20 passing in the hasher and verifier
   const zrc20Factory = new ZRC20__factory(deployer);
-  const zrc20 = await zrc20Factory.deploy(hasher.address, verifier.address);
+  const contract = await zrc20Factory.deploy(hasher.address, verifier.address);
 
-  return { zrc20 };
+  return { contract };
 }
 
 it("Test transfer", async function () {
   const TEN = 10 * 1_000_000;
   const FIVE = 5 * 1_000_000;
 
-  let { zrc20 } = await deployZrc();
+  let { contract } = await deployZrc();
 
   const [deployer, aliceEth, bobEth] = await ethers.getSigners();
 
   // CREATE ACCOUNTS
-  const alice = await Account.create(zrc20, "password123");
+  const alice = await Account.create(contract, "password123");
   await alice.loginWithEthersSigner(aliceEth);
 
-  const bob = await Account.create(zrc20, "password123");
+  const bob = await Account.create(contract, "password123");
   await bob.loginWithEthersSigner(bobEth);
 
   let tx, t, proof, publicBalance, privateBalance;
 
   // MINT TOKENS
-  zrc20 = zrc20.connect(deployer);
-  tx = await zrc20.mint(aliceEth.address, TEN);
+  contract = contract.connect(deployer);
+  tx = await contract.mint(aliceEth.address, TEN);
   await tx.wait();
 
-  zrc20 = zrc20.connect(aliceEth);
+  contract = contract.connect(aliceEth);
 
   /// DEPOSIT
   t = time("Alice creates shield proof for 10 coins");
@@ -57,12 +57,12 @@ it("Test transfer", async function () {
   tend(t);
 
   t = time("Alice approves ERC20 payment");
-  tx = await zrc20.approve(zrc20.address, TEN);
+  tx = await contract.approve(contract.address, TEN);
   await tx.wait();
   tend(t);
 
   t = time("Alice submits transaction");
-  tx = await zrc20.transact(proof);
+  tx = await contract.transact(proof);
   await tx.wait();
   tend(t);
 
@@ -70,7 +70,7 @@ it("Test transfer", async function () {
 
   /// Check balances
   t = time("Check that Alice's ERC20 balance is 0");
-  publicBalance = await zrc20.balanceOf(aliceEth.address);
+  publicBalance = await contract.balanceOf(aliceEth.address);
   expect(publicBalance).to.eq(0);
   tend(t);
 
@@ -88,7 +88,7 @@ it("Test transfer", async function () {
   tend(t);
 
   t = time("Alice submits her transaction");
-  tx = await zrc20.transact(proof);
+  tx = await contract.transact(proof);
   await tx.wait();
   tend(t);
 
@@ -112,7 +112,7 @@ it("Test transfer", async function () {
   tend(t);
 
   t = time("Alice submits her transaction");
-  tx = await zrc20.transact(proof);
+  tx = await contract.transact(proof);
   tx.wait();
   tend(t);
 
@@ -120,7 +120,7 @@ it("Test transfer", async function () {
 
   /// Check balances
   t = time("Check Alice's public balance is 5");
-  publicBalance = await zrc20.balanceOf(aliceEth.address);
+  publicBalance = await contract.balanceOf(aliceEth.address);
   expect(publicBalance).to.eq(FIVE);
   tend(t);
 
