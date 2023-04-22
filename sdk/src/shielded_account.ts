@@ -78,15 +78,15 @@ export class Account {
     return new Utxo({ amount, keypair: this.getKeypair() });
   }
 
-  async shield(amount: BigNumberish) {
+  async proveShield(amount: BigNumberish) {
     return await this.getProver().shield(amount);
   }
 
-  async unshield(amount: BigNumberish, recipient: string) {
+  async proveUnshield(amount: BigNumberish, recipient: string) {
     return await this.getProver().unshield(amount, recipient);
   }
 
-  async transfer(amount: BigNumberish, toPubkey: string) {
+  async proveTransfer(amount: BigNumberish, toPubkey: string) {
     return await this.getProver().transfer(amount, toPubkey);
   }
 

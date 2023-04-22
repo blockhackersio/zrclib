@@ -53,7 +53,7 @@ it("Test transfer", async function () {
 
   /// DEPOSIT
   t = time("Alice creates shield proof for 10 coins");
-  proof = await alice.shield(TEN);
+  proof = await alice.proveShield(TEN);
   tend(t);
 
   t = time("Alice approves ERC20 payment");
@@ -84,7 +84,7 @@ it("Test transfer", async function () {
   const bobPubkey = bobKeypair.address(); // contains only the public key
 
   t = time("Alice creates a proof to transfer 5 coins to Bob");
-  proof = await alice.transfer(FIVE, bobPubkey);
+  proof = await alice.proveTransfer(FIVE, bobPubkey);
   tend(t);
 
   t = time("Alice submits her transaction");
@@ -108,7 +108,7 @@ it("Test transfer", async function () {
   /// WITHDRAW
 
   t = time("Alice creates a proof to unshield 5");
-  proof = await alice.unshield(FIVE, aliceEth.address);
+  proof = await alice.proveUnshield(FIVE, aliceEth.address);
   tend(t);
 
   t = time("Alice submits her transaction");
