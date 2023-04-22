@@ -15,7 +15,7 @@ import { ShieldedAccount } from "@zrclib/tools";
 
 const artifactPath = path.join(
   __dirname,
-  "../../tools/contracts/generated/Hasher.json"
+  "../../../tools/contracts/generated/Hasher.json"
 );
 const artifact = require(artifactPath);
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));

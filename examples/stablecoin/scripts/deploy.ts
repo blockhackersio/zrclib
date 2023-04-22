@@ -3,7 +3,7 @@ import path from "path";
 
 const artifactPath = path.join(
   __dirname,
-  "../../tools/contracts/generated/Hasher.json"
+  "../../../tools/contracts/generated/Hasher.json"
 );
 const artifact = require(artifactPath);
 
@@ -29,9 +29,13 @@ async function main() {
   await hasher.deployed();
   console.log("Hasher deployed to:", hasher.address);
 
+  // Deploy the Verifier
+  const Verifier = new ethers.getContractFactory("Verifier");
+  const verifier = await Verifier.deploy();
+
   // deploy ZUSD
   const ZUSD = await ethers.getContractFactory("ZUSD");
-  const zusd = await ZUSD.deploy(hasher.address, troveManager.address, stabilityPool.address);
+  const zusd = await ZUSD.deploy(hasher.address, verifier.address, troveManager.address, stabilityPool.address);
   await zusd.deployed();
   console.log("ZUSD deployed to:", zusd.address);
 
