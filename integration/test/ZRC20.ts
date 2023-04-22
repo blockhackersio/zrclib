@@ -7,16 +7,15 @@ import path from "path";
 import { Verifier__factory, ZRC20__factory } from "../typechain-types";
 import { expect } from "chai";
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
-async function t<T>(
-  log: string,
-  promiseOrFn: Promise<T> | (() => Promise<T>)
-): Promise<T> {
-  const prom = typeof promiseOrFn === "function" ? promiseOrFn() : promiseOrFn;
+
+function time(log: string) {
   const started = Date.now();
   console.log(`${log}... `);
-  const result = await prom;
+  return started;
+}
+
+function tend(started: number) {
   console.log(`${Date.now() - started}ms`);
-  return result;
 }
 
 const artifactPath = path.join(
@@ -60,81 +59,88 @@ it("Test transfer", async function () {
   const bob = await ShieldedAccount.create(zrc20, "password123");
   await bob.loginWithEthersSigner(bobSigner);
 
+  let tx, t;
+
   // MINT TOKENS
   zrc20 = zrc20.connect(deployer);
-  let tx = await zrc20.mint(aliceSigner.address, TEN);
+  tx = await zrc20.mint(aliceSigner.address, TEN);
   await tx.wait();
 
-  const aliceProver = alice.getProver();
   zrc20 = zrc20.connect(aliceSigner);
 
   /// DEPOSIT
-  const shieldProof = await t(
-    "1. Creating shield proof",
-    aliceProver.shield(TEN)
-  );
-  await (
-    await t("2. Approving ERC20 payment", zrc20.approve(zrc20.address, TEN))
-  ).wait();
-  tx = await t("3. Submitting transaction", zrc20.transact(shieldProof));
+  t = time("Creating shield proof");
+  const shieldProof = await alice.shield(TEN);
+  tend(t);
+
+  t = time("Approving ERC20 payment");
+  tx = await zrc20.approve(zrc20.address, TEN);
   await tx.wait();
-  await sleep(10_000);
+  tend(t);
+
+  t = time("Submitting transaction");
+  tx = await zrc20.transact(shieldProof);
+  await tx.wait();
+  tend(t);
+
+  await sleep(10_000); // Waiting for sync
 
   /// Check balances
-  const publicBalance = await t(
-    "4. Getting ERC20 balance",
-    zrc20.balanceOf(aliceSigner.address)
-  );
+  t = time("Getting ERC20 balance");
+  const publicBalance = await zrc20.balanceOf(aliceSigner.address);
   expect(publicBalance).to.eq(0);
-  const privateBalance = await t(
-    "5. Getting private balance",
-    alice.getBalance()
-  );
+  tend(t);
+
+  t = time("Getting private balance");
+  const privateBalance = await alice.getBalance();
   expect(privateBalance).to.eq(TEN); // Transfer to the darkside worked! :)
+  tend(t);
 
   /// TRANSFER
   const bobKeypair = bob.getKeypair(); // receiver has to send sender a public keypair
   const bobPubkey = bobKeypair.address(); // contains only the public key
-  const zrcTransferProof = await t(
-    "6. Creating transfer proof",
-    aliceProver.transfer(FIVE, bobPubkey)
-  );
-  const tx2 = await t(
-    "7. Submitting transaction",
-    zrc20.transact(zrcTransferProof)
-  );
-  await tx2.wait();
-  await sleep(10_000);
+
+  t = time("Creating transfer proof");
+  const zrcTransferProof = await alice.transfer(FIVE, bobPubkey);
+  tend(t);
+
+  t = time("Submitting transaction");
+  tx = await zrc20.transact(zrcTransferProof);
+  await tx.wait();
+  tend(t);
+
+  await sleep(10_000); // Waiting for sync
 
   // Check private balances
-  const alicePrivateBal = await t(
-    "8. Getting alices private balance",
-    alice.getBalance()
-  );
-  const bobPrivateBal = await t(
-    "9. Getting bobs private balance",
-    bob.getBalance()
-  );
+  t = time("Getting alices private balance");
+  const alicePrivateBal = await alice.getBalance();
+  tend(t);
+
+  t = time("Getting bobs private balance");
+  const bobPrivateBal = await bob.getBalance();
+  tend(t);
+
   expect(alicePrivateBal).to.eq(FIVE);
   expect(bobPrivateBal).to.eq(FIVE);
 
   /// WITHDRAW
-  const withdrawProof = await t(
-    "10. Creating withdraw proof",
-    aliceProver.unshield(FIVE, aliceSigner.address)
-  );
-  const tx3 = await t(
-    "11. Submitting transaction",
-    zrc20.transact(withdrawProof)
-  );
-  await tx3.wait();
-  await sleep(10_000); // Must wait for events to fire after pool (cannot seem to speed up polling)
+
+  t = time("Creating withdraw proof");
+  const withdrawProof = await alice.unshield(FIVE, aliceSigner.address);
+  tend(t);
+
+  t = time("Submitting transaction");
+  tx = await zrc20.transact(withdrawProof);
+  tx.wait();
+  tend(t);
+
+  await sleep(10_000); // Waiting for sync
 
   /// Check balances
-  const publicBalance2 = await t(
-    "12. Getting ERC20 balance",
-    zrc20.balanceOf(aliceSigner.address)
-  );
+  t = time("Getting ERC20 balance");
+  const publicBalance2 = await zrc20.balanceOf(aliceSigner.address);
   expect(publicBalance2).to.eq(FIVE);
+  tend(t);
+
   console.log("Ok");
 });

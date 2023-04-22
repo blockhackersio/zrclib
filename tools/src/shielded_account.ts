@@ -9,6 +9,7 @@ import { buildMerkleTree } from "./buildMerkleTree";
 
 export class ShieldedAccount {
   private keypair?: Keypair;
+  private prover?: ShieldedPoolProver;
   private eventStoreWriter?: EventStoreWriter;
   constructor(
     private contract: ethers.Contract,
@@ -77,8 +78,22 @@ export class ShieldedAccount {
     return new Utxo({ amount, keypair: this.getKeypair() });
   }
 
-  getProver() {
-    return new ShieldedPoolProver(this);
+  async shield(amount: BigNumberish) {
+    return await this.getProver().shield(amount);
+  }
+
+  async unshield(amount: BigNumberish, recipient: string) {
+    return await this.getProver().unshield(amount, recipient);
+  }
+
+  async transfer(amount: BigNumberish, toPubkey: string) {
+    return await this.getProver().transfer(amount, toPubkey);
+  }
+
+  private getProver() {
+    if (this.prover) return this.prover;
+    this.prover = new ShieldedPoolProver(this);
+    return this.prover;
   }
 
   static async create(

@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers";
+import { BigNumber, BigNumberish } from "ethers";
 import { prepareTransaction } from "./prepare_transaction";
 import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
@@ -15,7 +15,7 @@ export class ShieldedPoolProver {
    * @param amount
    * @returns
    */
-  async shield(amount: number | BigNumber): Promise<FormattedProof> {
+  async shield(amount: BigNumberish): Promise<FormattedProof> {
     await ensurePoseidon();
 
     const deposit = this.account.createUtxo(amount);
@@ -33,7 +33,10 @@ export class ShieldedPoolProver {
    * @param toPubKey Keypair public key to send the note to
    * @returns
    */
-  async transfer(amount: number, toPubKey: string): Promise<FormattedProof> {
+  async transfer(
+    amount: BigNumberish,
+    toPubKey: string
+  ): Promise<FormattedProof> {
     await ensurePoseidon();
     const inputs = await this.account.getUtxosUpTo(amount);
     const inputsTotal = inputs.reduce(
@@ -68,7 +71,7 @@ export class ShieldedPoolProver {
    * @returns
    */
   async unshield(
-    amount: number | BigNumber,
+    amount: BigNumberish,
     recipientEthAddress: string
   ): Promise<FormattedProof> {
     await ensurePoseidon();
