@@ -51,11 +51,7 @@ contract ZUSD is ShieldedPool, ERC20 {
                 "Can't withdraw to zero address"
             );
 
-            transferFrom(
-                address(this),
-                _proof.extData.recipient,
-                uint256(-_proof.extData.extAmount)
-            );
+            _transfer(msg.sender, _proof.extData.recipient,uint256(_proof.extData.extAmount));
         }
     }
 
