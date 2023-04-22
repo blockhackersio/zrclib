@@ -1,4 +1,4 @@
 packages:
   - "tests"
   - "sdk"
-  - "examples/stablecoin"
+  - "examples/*"
