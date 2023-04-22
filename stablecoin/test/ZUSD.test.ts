@@ -2,9 +2,16 @@ import path from "path";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { FakeContract, smock } from '@defi-wonderland/smock';
-import { AggregatorV3Interface, TroveManager, StabilityPool, ZUSD } from "../typechain-types";
+import { 
+  AggregatorV3Interface, 
+  TroveManager,
+  TroveManager__factory, 
+  StabilityPool, 
+  StabilityPool__factory,
+  ZUSD,
+  ZUSD__factory, Verifier__factory } from "../typechain-types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { ShieldedAccount, ShieldedPool } from "@zrclib/tools";
+import { ShieldedAccount } from "@zrclib/tools";
 
 const artifactPath = path.join(
   __dirname,
@@ -19,6 +26,7 @@ describe("ZUSD", function () {
   let stabilityPool: StabilityPool;
   let zusd: ZUSD;
   let user: SignerWithAddress;
+  let account: ShieldedAccount;
   let zusdDecimals: number;
 
   before(async function() {
@@ -29,14 +37,12 @@ describe("ZUSD", function () {
     fakePriceFeed.latestRoundData.returns([0, ethers.utils.parseUnits('2000', 8), 0, 0, 0])
 
     // deploy trove manager
-    const TroveManager = await ethers.getContractFactory("TroveManager");
-    troveManager = await TroveManager.deploy();
-    await troveManager.deployed();
+    const troveManagerFactory = new TroveManager__factory(user);
+    troveManager = await troveManagerFactory.deploy();
 
     // deploy stability pool
-    const StabilityPool = await ethers.getContractFactory("StabilityPool");
-    stabilityPool = await StabilityPool.deploy(troveManager.address);
-    await stabilityPool.deployed();
+    const stabilityPoolFactory = new StabilityPool__factory(user);
+    stabilityPool = await stabilityPoolFactory.deploy(troveManager.address);
 
     // deploy Poseidon hasher contract
     const Hasher = await ethers.getContractFactory(
@@ -46,10 +52,13 @@ describe("ZUSD", function () {
     const hasher = await Hasher.deploy();
     await hasher.deployed();
 
+    // Deploy the Verifier
+    const verifierFactory = new Verifier__factory(user);
+    const verifier = await verifierFactory.deploy();
+
     // deploy ZUSD
-    const ZUSD = await ethers.getContractFactory("ZUSD");
-    zusd = await ZUSD.deploy(hasher.address, troveManager.address, stabilityPool.address);
-    await zusd.deployed();
+    const zusdFactory = new ZUSD__factory(user);
+    zusd = await zusdFactory.deploy(hasher.address, verifier.address, troveManager.address, stabilityPool.address);
     zusdDecimals = await zusd.decimals();
 
     // set addresses
@@ -77,8 +86,9 @@ describe("ZUSD", function () {
 
   it("Should be able to shield ZUSD", async function() {
     // Create shielded pool account
-    const account = await ShieldedAccount.fromSigner(user);
-    const prover = ShieldedPool.getProver(account);
+    account = await ShieldedAccount.create(zusd, "password123");
+    await account.loginWithEthersSigner(user);
+    const prover = account.getProver();
     const initialZUSDBalance = await zusd.balanceOf(user.address);
 
     // Create proof
@@ -94,20 +104,19 @@ describe("ZUSD", function () {
     expect(newZUSDBalance).to.equal(initialZUSDBalance.sub(deposit));
   });
 
-  // it("Should be able to unshield ZUSD", async function() {
-  //   // initial balance
-  //   const initialZUSDBalance = await zusd.balanceOf(user.address);
+  it("Should be able to unshield ZUSD", async function() {
+    // initial balance
+    const initialZUSDBalance = await zusd.balanceOf(user.address);
 
-  //   // create unshield proof
-  //   const account = await ShieldedAccount.fromSigner(user);
-  //   const prover = ShieldedPool.getProver(account);
-  //   const withdraw = ethers.utils.parseUnits("250", zusdDecimals);
-  //   const unshieldProof = await prover.unshield(withdraw, user.address);
-  //   console.log("Unshield proof: ", unshieldProof);
-  //   await zusd.transact(unshieldProof);
+    // create unshield proof
+    await account.loginWithEthersSigner(user);
+    const prover = account.getProver();
+    const withdraw = ethers.utils.parseUnits("250", zusdDecimals);
+    const unshieldProof = await prover.unshield(withdraw, user.address);
+    await zusd.transact(unshieldProof);
 
-  //   // new balance
-  //   const newZUSDBalance = await zusd.balanceOf(user.address);
-  //   expect(newZUSDBalance).to.equal(initialZUSDBalance.add(withdraw));
-  // })
+    // new balance
+    const newZUSDBalance = await zusd.balanceOf(user.address);
+    expect(newZUSDBalance).to.equal(initialZUSDBalance.add(withdraw));
+  })
 });

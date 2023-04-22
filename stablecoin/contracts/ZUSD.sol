@@ -11,9 +11,10 @@ contract ZUSD is ShieldedPool, ERC20 {
 
     constructor(
         address _hasherAddress,
+        address _verifierAddress,
         address _troveManagerAddress,
         address _stabilityPoolAddress
-    ) ShieldedPool(5, _hasherAddress) ERC20("ZUSD", "ZUSD") {
+    ) ShieldedPool(5, _hasherAddress, _verifierAddress) ERC20("ZUSD", "ZUSD") {
         troveManagerAddress = _troveManagerAddress;
         stabilityPoolAddress = _stabilityPoolAddress;
     }
