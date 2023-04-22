@@ -43,35 +43,39 @@ function HeaderLayout(p: {
   const router = useRouter();
   return (
     <Navbar
-      className=" bg-slate-200 py-6 px-4 flex justify-between w-full"
+      className="bg-slate-200 py-6 px-4 text-center"
       fluid={true}
       rounded={true}
     >
-      <Navbar.Brand href="/">
-        <span className="self-center whitespace-nowrap text-xl font-mono font-semibold dark:text-white">
-          {p.title}
-        </span>
-        {p.subtitle && <span className="dark:text-white"> : {p.subtitle}</span>}
-      </Navbar.Brand>
-      {links.length > 0 && (
-        <>
-          <Navbar.Toggle />
-          <Navbar.Collapse>
-            {links.map((link, index) => {
-              return (
-                <LinkWrapper
-                  key={index}
-                  href={link.path}
-                  active={router.asPath === link.path}
-                >
-                  {link.name}
-                </LinkWrapper>
-              );
-            })}
-          </Navbar.Collapse>
-        </>
-      )}
-      {p.rightpanel}
+      <div className="w-full flex justify-between m-auto text-left max-w-7xl">
+        <Navbar.Brand href="/">
+          <span className="self-center whitespace-nowrap text-xl font-mono font-semibold dark:text-white">
+            {p.title}
+          </span>
+          {p.subtitle && (
+            <span className="dark:text-white"> : {p.subtitle}</span>
+          )}
+        </Navbar.Brand>
+        {links.length > 0 && (
+          <>
+            <Navbar.Toggle />
+            <Navbar.Collapse>
+              {links.map((link, index) => {
+                return (
+                  <LinkWrapper
+                    key={index}
+                    href={link.path}
+                    active={router.asPath === link.path}
+                  >
+                    {link.name}
+                  </LinkWrapper>
+                );
+              })}
+            </Navbar.Collapse>
+          </>
+        )}
+        {p.rightpanel}
+      </div>
     </Navbar>
   );
 }

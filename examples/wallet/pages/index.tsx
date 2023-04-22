@@ -7,7 +7,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 export default function Home() {
   return (
     <PageLayout title="coinshield">
-      <code>Hello world</code>
+      <p className="text-center w-full p-20">Hello world</p>
     </PageLayout>
   );
 }
