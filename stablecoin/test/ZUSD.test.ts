@@ -18,6 +18,7 @@ const artifactPath = path.join(
   "../../tools/contracts/generated/Hasher.json"
 );
 const artifact = require(artifactPath);
+const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 describe("ZUSD", function () {
 
@@ -101,7 +102,9 @@ describe("ZUSD", function () {
     const newZUSDBalance = await zusd.balanceOf(user.address);
 
     // check balance
-    expect(newZUSDBalance).to.equal(initialZUSDBalance.sub(deposit));
+    await sleep(10_000); // wait for events to fire after pool
+    expect(await account.getBalance()).to.equal(deposit); // private balance
+    expect(newZUSDBalance).to.equal(initialZUSDBalance.sub(deposit)); // public balance
   });
 
   it("Should be able to unshield ZUSD", async function() {
@@ -109,7 +112,6 @@ describe("ZUSD", function () {
     const initialZUSDBalance = await zusd.balanceOf(user.address);
 
     // create unshield proof
-    await account.loginWithEthersSigner(user);
     const prover = account.getProver();
     const withdraw = ethers.utils.parseUnits("250", zusdDecimals);
     const unshieldProof = await prover.unshield(withdraw, user.address);
