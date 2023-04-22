@@ -5,6 +5,8 @@ import {ShieldedPool} from "@zrclib/tools/contracts/ShieldedPool.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
+// Shielded ERC20 example using zrclib's shielded pool
+// Supports shielding, unshielding and private transfers
 contract ZRC20 is ERC20, ShieldedPool, Ownable {
     constructor(
         address _hasherAddress,
