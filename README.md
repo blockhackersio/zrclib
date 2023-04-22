@@ -46,16 +46,9 @@ pnpm build
 const token = await ethers.Contract(address, abi, signer);
 
 const account = ShieldedAccount.create(
-  "0x123456781234567812345678123456871324",
+  contract,
   "password123"
 );
-try {
-  await account.loginFromLocalCache();
-} catch (err) {
-  console.error("Login was unsuccessful");
-}
-expect(account.isLoggedIn()).toBe(false);
-
 await account.loginWithEthersSigner(signer);
 
 expect(account.isLoggedIn()).toBe(true);
@@ -64,18 +57,18 @@ expect(account.isLoggedIn()).toBe(true);
 // Call the deposit method on the contract which will
 // call `transferFrom` to spend 1 of your ERC-20 tokens and
 // commit the transaction. If the transfer fails the transaction will fail
-const shieldProof = await prover.proveShield(1e18);
+const shieldProof = await account.proveShield(1e18);
 await token.deposit(shieldProof);
 
 // Generate proof that sends 0.5 tokens to toAddress
-const transferProof = await prover.proveTransfer(5e17, receiver);
+const transferProof = await account.proveTransfer(5e17, receiver);
 
 // Call the transfer method on the contract which will
 // verify and commit the transaction
 await token.tranfer(transferProof);
 
 // Generate proof that burns 0.5 tokens to the receiver address
-const unshieldProof = await prover.proveUnshield(5e17, receiver);
+const unshieldProof = await account.proveUnshield(5e17, receiver);
 
 // Call the withdraw method on the contract which will
 // call `transferFrom` to return 0.5 of your ERC-20 tokens to your public account
