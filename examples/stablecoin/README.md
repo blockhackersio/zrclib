@@ -6,7 +6,7 @@ In this example, we created a private decentralized stablecoin named as ZUSD, us
 
 ### Integration with ZRCLib
 
-Using ZRCLib, a shielded pool can be easily integrated into the stablecoin design. We simply add a function interface to the `ZUSD.sol` contract which takes in a zero knowledge proof. 
+Using ZRCLib, a shielded pool can be easily integrated into the stablecoin design. We simply add a function interface to the `ZUSD.sol` contract which takes in a zero knowledge proof.
 
 ```
 /**
@@ -36,11 +36,11 @@ function transact(Proof calldata _proof) public {
 }
 ```
 
-To call this function, you will also need to integrate with ZRCLib SDK. 
+To call this function, you will also need to integrate with ZRCLib SDK.
 
 ```
 // Create shielded pool account
-account = await ShieldedAccount.create(zusd, "password123");
+account = await Account.create(zusd, "password123");
 await account.loginWithEthersSigner(user);
 const prover = account.getProver();
 const initialZUSDBalance = await zusd.balanceOf(user.address);
@@ -56,4 +56,4 @@ await zusd.transact(shieldProof);
 
 ### Running the tests
 
-More details on ZRCLib integration can be seen in the test files. Run `npx hardhat test`. 
+More details on ZRCLib integration can be seen in the test files. Run `npx hardhat test`.

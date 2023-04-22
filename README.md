@@ -45,10 +45,7 @@ pnpm build
 // Get the standard ethers contract
 const token = await ethers.Contract(address, abi, signer);
 
-const account = ShieldedAccount.create(
-  token,
-  "password123"
-);
+const account = Account.create(token, "password123");
 await account.loginWithEthersSigner(signer);
 
 expect(account.isLoggedIn()).toBe(true);

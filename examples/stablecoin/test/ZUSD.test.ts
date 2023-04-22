@@ -1,17 +1,19 @@
 import path from "path";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { FakeContract, smock } from '@defi-wonderland/smock';
-import { 
-  AggregatorV3Interface, 
+import { FakeContract, smock } from "@defi-wonderland/smock";
+import {
+  AggregatorV3Interface,
   TroveManager,
-  TroveManager__factory, 
-  StabilityPool, 
+  TroveManager__factory,
+  StabilityPool,
   StabilityPool__factory,
   ZUSD,
-  ZUSD__factory, Verifier__factory } from "../typechain-types";
+  ZUSD__factory,
+  Verifier__factory,
+} from "../typechain-types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { ShieldedAccount } from "@zrclib/tools";
+import { Account } from "@zrclib/tools";
 
 const artifactPath = path.join(
   __dirname,
@@ -21,21 +23,26 @@ const artifact = require(artifactPath);
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 describe("ZUSD", function () {
-
-  let fakePriceFeed: FakeContract<AggregatorV3Interface>
+  let fakePriceFeed: FakeContract<AggregatorV3Interface>;
   let troveManager: TroveManager;
   let stabilityPool: StabilityPool;
   let zusd: ZUSD;
   let user: SignerWithAddress;
-  let account: ShieldedAccount;
+  let account: Account;
   let zusdDecimals: number;
 
-  before(async function() {
+  before(async function () {
     [user] = await ethers.getSigners();
 
-    fakePriceFeed = await smock.fake('AggregatorV3Interface');
+    fakePriceFeed = await smock.fake("AggregatorV3Interface");
     fakePriceFeed.decimals.returns(8);
-    fakePriceFeed.latestRoundData.returns([0, ethers.utils.parseUnits('2000', 8), 0, 0, 0])
+    fakePriceFeed.latestRoundData.returns([
+      0,
+      ethers.utils.parseUnits("2000", 8),
+      0,
+      0,
+      0,
+    ]);
 
     // deploy trove manager
     const troveManagerFactory = new TroveManager__factory(user);
@@ -59,35 +66,46 @@ describe("ZUSD", function () {
 
     // deploy ZUSD
     const zusdFactory = new ZUSD__factory(user);
-    zusd = await zusdFactory.deploy(hasher.address, verifier.address, troveManager.address, stabilityPool.address);
+    zusd = await zusdFactory.deploy(
+      hasher.address,
+      verifier.address,
+      troveManager.address,
+      stabilityPool.address
+    );
     zusdDecimals = await zusd.decimals();
 
     // set addresses
-    await troveManager.setAddresses(zusd.address, stabilityPool.address, fakePriceFeed.address);
+    await troveManager.setAddresses(
+      zusd.address,
+      stabilityPool.address,
+      fakePriceFeed.address
+    );
   });
 
-  it("Price feed should return correct data", async function() {
-    const expectedETHPrice = ethers.utils.parseUnits('2000', 8);
+  it("Price feed should return correct data", async function () {
+    const expectedETHPrice = ethers.utils.parseUnits("2000", 8);
     expect(await troveManager.getLatestPrice()).to.equal(expectedETHPrice);
   });
 
-  it("Should be able to deposit ETH collateral and mint ZUSD", async function() {
+  it("Should be able to deposit ETH collateral and mint ZUSD", async function () {
     // initial balance
     const initialZUSDBalance = await zusd.balanceOf(user.address);
     expect(initialZUSDBalance).to.equal(0);
 
     // Deposit 1 ETH and mint 1000 ZUSD in public pool
     const zusdMintAmount = ethers.utils.parseUnits("1000", zusdDecimals);
-    await troveManager.openTrove(zusdMintAmount, { value: ethers.utils.parseEther("1") });
+    await troveManager.openTrove(zusdMintAmount, {
+      value: ethers.utils.parseEther("1"),
+    });
 
     // balance after mint
     const newZUSDBalance = await zusd.balanceOf(user.address);
     expect(newZUSDBalance).to.equal(zusdMintAmount);
   });
 
-  it("Should be able to shield ZUSD", async function() {
+  it("Should be able to shield ZUSD", async function () {
     // Create shielded pool account
-    account = await ShieldedAccount.create(zusd, "password123");
+    account = await Account.create(zusd, "password123");
     await account.loginWithEthersSigner(user);
     const prover = account.getProver();
     const initialZUSDBalance = await zusd.balanceOf(user.address);
@@ -107,7 +125,7 @@ describe("ZUSD", function () {
     expect(newZUSDBalance).to.equal(initialZUSDBalance.sub(deposit)); // public balance
   });
 
-  it("Should be able to unshield ZUSD", async function() {
+  it("Should be able to unshield ZUSD", async function () {
     // initial balance
     const initialZUSDBalance = await zusd.balanceOf(user.address);
 
@@ -120,5 +138,5 @@ describe("ZUSD", function () {
     // new balance
     const newZUSDBalance = await zusd.balanceOf(user.address);
     expect(newZUSDBalance).to.equal(initialZUSDBalance.add(withdraw));
-  })
+  });
 });

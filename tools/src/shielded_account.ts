@@ -7,7 +7,7 @@ import { Utxo } from "./utxo";
 import { ShieldedPoolProver } from "./shielded_pool";
 import { buildMerkleTree } from "./buildMerkleTree";
 
-export class ShieldedAccount {
+export class Account {
   private keypair?: Keypair;
   private prover?: ShieldedPoolProver;
   private eventStoreWriter?: EventStoreWriter;
@@ -99,10 +99,10 @@ export class ShieldedAccount {
   static async create(
     contract: ethers.Contract,
     password: string
-  ): Promise<ShieldedAccount> {
+  ): Promise<Account> {
     // Ensure password length > 16
     const encryptor = PasswordEncryptor.fromPassword(password);
-    return new ShieldedAccount(contract, encryptor);
+    return new Account(contract, encryptor);
   }
 }
 

@@ -1,22 +1,11 @@
 // Need this or ethers fails in node
 
 import { ethers } from "hardhat";
-import { ShieldedAccount } from "@zrclib/tools";
+import { Account } from "@zrclib/tools";
 import { Verifier__factory, ZRC20__factory } from "../typechain-types";
 import { expect } from "chai";
 import artifact from "../../tools/contracts/generated/Hasher.json";
-
-const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
-function time(log: string) {
-  const started = Date.now();
-  console.log(`${log}... `);
-  return started;
-}
-
-function tend(started: number) {
-  console.log(` └─ ${Date.now() - started}ms`);
-}
+import { sleep, tend, time } from "../utils";
 
 async function deployZrc() {
   // Prepare signers
@@ -47,10 +36,10 @@ it("Test transfer", async function () {
   const [deployer, aliceEth, bobEth] = await ethers.getSigners();
 
   // CREATE ACCOUNTS
-  const alice = await ShieldedAccount.create(zrc20, "password123");
+  const alice = await Account.create(zrc20, "password123");
   await alice.loginWithEthersSigner(aliceEth);
 
-  const bob = await ShieldedAccount.create(zrc20, "password123");
+  const bob = await Account.create(zrc20, "password123");
   await bob.loginWithEthersSigner(bobEth);
 
   let tx, t, proof, publicBalance, privateBalance;

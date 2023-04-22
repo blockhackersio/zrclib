@@ -2,12 +2,12 @@ import { BigNumber, BigNumberish } from "ethers";
 import { prepareTransaction } from "./prepare_transaction";
 import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
-import { ShieldedAccount } from "./shielded_account";
+import { Account } from "./shielded_account";
 import { ensurePoseidon } from "./poseidon";
 import { FormattedProof } from "./types";
 
 export class ShieldedPoolProver {
-  constructor(private account: ShieldedAccount) {}
+  constructor(private account: Account) {}
 
   /**
    * Generate a proof to add tokens to the shielded pool
@@ -100,7 +100,7 @@ export class ShieldedPoolProver {
 }
 
 export class ShieldedPool {
-  static getProver(account: ShieldedAccount): ShieldedPoolProver {
+  static getProver(account: Account): ShieldedPoolProver {
     return new ShieldedPoolProver(account);
   }
 }
