@@ -2,10 +2,10 @@
 
 import { ethers } from "hardhat";
 import { ShieldedAccount } from "@zrclib/tools";
-
-import path from "path";
 import { Verifier__factory, ZRC20__factory } from "../typechain-types";
 import { expect } from "chai";
+import artifact from "../../tools/contracts/generated/Hasher.json";
+
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 function time(log: string) {
@@ -15,14 +15,8 @@ function time(log: string) {
 }
 
 function tend(started: number) {
-  console.log(`${Date.now() - started}ms`);
+  console.log(` └─ ${Date.now() - started}ms`);
 }
-
-const artifactPath = path.join(
-  __dirname,
-  "../../tools/contracts/generated/Hasher.json"
-);
-const artifact = require(artifactPath);
 
 async function deployZrc() {
   // Prepare signers
@@ -30,7 +24,7 @@ async function deployZrc() {
 
   // Deploy the poseidon hasher
   const { abi, bytecode } = artifact;
-  const Hasher: any = await ethers.getContractFactory(abi, bytecode);
+  const Hasher = await ethers.getContractFactory(abi, bytecode);
   const hasher = await Hasher.deploy();
 
   // Deploy the Verifier
@@ -50,49 +44,49 @@ it("Test transfer", async function () {
 
   let { zrc20 } = await deployZrc();
 
-  const [deployer, aliceSigner, bobSigner] = await ethers.getSigners();
+  const [deployer, aliceEth, bobEth] = await ethers.getSigners();
 
   // CREATE ACCOUNTS
   const alice = await ShieldedAccount.create(zrc20, "password123");
-  await alice.loginWithEthersSigner(aliceSigner);
+  await alice.loginWithEthersSigner(aliceEth);
 
   const bob = await ShieldedAccount.create(zrc20, "password123");
-  await bob.loginWithEthersSigner(bobSigner);
+  await bob.loginWithEthersSigner(bobEth);
 
-  let tx, t;
+  let tx, t, proof, publicBalance, privateBalance;
 
   // MINT TOKENS
   zrc20 = zrc20.connect(deployer);
-  tx = await zrc20.mint(aliceSigner.address, TEN);
+  tx = await zrc20.mint(aliceEth.address, TEN);
   await tx.wait();
 
-  zrc20 = zrc20.connect(aliceSigner);
+  zrc20 = zrc20.connect(aliceEth);
 
   /// DEPOSIT
-  t = time("Creating shield proof");
-  const shieldProof = await alice.shield(TEN);
+  t = time("Alice creates shield proof for 10 coins");
+  proof = await alice.shield(TEN);
   tend(t);
 
-  t = time("Approving ERC20 payment");
+  t = time("Alice approves ERC20 payment");
   tx = await zrc20.approve(zrc20.address, TEN);
   await tx.wait();
   tend(t);
 
-  t = time("Submitting transaction");
-  tx = await zrc20.transact(shieldProof);
+  t = time("Alice submits transaction");
+  tx = await zrc20.transact(proof);
   await tx.wait();
   tend(t);
 
   await sleep(10_000); // Waiting for sync
 
   /// Check balances
-  t = time("Getting ERC20 balance");
-  const publicBalance = await zrc20.balanceOf(aliceSigner.address);
+  t = time("Check that Alice's ERC20 balance is 0");
+  publicBalance = await zrc20.balanceOf(aliceEth.address);
   expect(publicBalance).to.eq(0);
   tend(t);
 
-  t = time("Getting private balance");
-  const privateBalance = await alice.getBalance();
+  t = time("Check Alice's private balance is 10");
+  privateBalance = await alice.getBalance();
   expect(privateBalance).to.eq(TEN); // Transfer to the darkside worked! :)
   tend(t);
 
@@ -100,46 +94,45 @@ it("Test transfer", async function () {
   const bobKeypair = bob.getKeypair(); // receiver has to send sender a public keypair
   const bobPubkey = bobKeypair.address(); // contains only the public key
 
-  t = time("Creating transfer proof");
-  const zrcTransferProof = await alice.transfer(FIVE, bobPubkey);
+  t = time("Alice creates a proof to transfer 5 coins to Bob");
+  proof = await alice.transfer(FIVE, bobPubkey);
   tend(t);
 
-  t = time("Submitting transaction");
-  tx = await zrc20.transact(zrcTransferProof);
+  t = time("Alice submits her transaction");
+  tx = await zrc20.transact(proof);
   await tx.wait();
   tend(t);
 
   await sleep(10_000); // Waiting for sync
 
   // Check private balances
-  t = time("Getting alices private balance");
+  t = time("Check Alice's private balance is 5");
   const alicePrivateBal = await alice.getBalance();
   tend(t);
+  expect(alicePrivateBal).to.eq(FIVE);
 
-  t = time("Getting bobs private balance");
+  t = time("Check Bob's private balance is 5");
   const bobPrivateBal = await bob.getBalance();
   tend(t);
-
-  expect(alicePrivateBal).to.eq(FIVE);
   expect(bobPrivateBal).to.eq(FIVE);
 
   /// WITHDRAW
 
-  t = time("Creating withdraw proof");
-  const withdrawProof = await alice.unshield(FIVE, aliceSigner.address);
+  t = time("Alice creates a proof to unshield 5");
+  proof = await alice.unshield(FIVE, aliceEth.address);
   tend(t);
 
-  t = time("Submitting transaction");
-  tx = await zrc20.transact(withdrawProof);
+  t = time("Alice submits her transaction");
+  tx = await zrc20.transact(proof);
   tx.wait();
   tend(t);
 
   await sleep(10_000); // Waiting for sync
 
   /// Check balances
-  t = time("Getting ERC20 balance");
-  const publicBalance2 = await zrc20.balanceOf(aliceSigner.address);
-  expect(publicBalance2).to.eq(FIVE);
+  t = time("Check Alice's public balance is 5");
+  publicBalance = await zrc20.balanceOf(aliceEth.address);
+  expect(publicBalance).to.eq(FIVE);
   tend(t);
 
   console.log("Ok");
