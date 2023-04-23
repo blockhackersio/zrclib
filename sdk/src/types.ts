@@ -31,6 +31,7 @@ export type ProofArguments = {
   inputNullifiers: [string, string];
   outputCommitments: [string, string];
   publicAmount: BigNumber;
+  publicAsset: BigNumber;
   extDataHash: string;
 };
 
