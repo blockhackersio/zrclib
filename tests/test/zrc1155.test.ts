@@ -129,6 +129,8 @@ it("Test zrc1155 transfer", async function () {
   tend(t);
   expect(bobPrivateBal).to.eq(FIVE);
 
+  publicBalance = await contract.balanceOf(aliceEth.address, tokenB);
+
   /// WITHDRAW
   t = time("Alice creates a proof to unshield 5 (B)");
   proof = await alice.proveUnshield(FIVE, aliceEth.address, tokenB);

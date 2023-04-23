@@ -62,7 +62,7 @@ export class Account {
     throw new Error("USER_NOT_LOGGED_IN");
   }
 
-  async getUtxosUpTo(amount: BigNumberish, asset: BigNumberish = 0) {
+  async getUtxosUpTo(amount: BigNumberish, asset: BigNumberish) {
     return await this.getStore().getUtxosUpTo(amount, asset);
   }
 

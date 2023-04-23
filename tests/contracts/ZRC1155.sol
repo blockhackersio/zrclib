@@ -40,7 +40,7 @@ contract ZRC1155 is ERC1155, ShieldedPool, Ownable {
             _mint(
                 _proof.extData.recipient,
                 _proof.proofArguments.publicAsset, 
-                uint256(_proof.extData.extAmount),
+                uint256(-_proof.extData.extAmount),
                 ""
             );
         }

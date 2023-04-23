@@ -40,18 +40,20 @@ export class ShieldedPoolProver {
     asset: BigNumberish = 0
   ): Promise<FormattedProof> {
     await ensurePoseidon();
-    const inputs = await this.account.getUtxosUpTo(amount);
+    const inputs = await this.account.getUtxosUpTo(amount, asset);
     const inputsTotal = inputs.reduce(
       (sum, x) => sum.add(x.amount),
       BigNumber.from(0)
     );
 
     const toSend = new Utxo({
+      asset: BigNumber.from(asset),
       amount: BigNumber.from(amount),
       keypair: Keypair.fromString(toPubKey),
     });
 
     const change = new Utxo({
+      asset: BigNumber.from(asset),
       amount: inputsTotal.sub(amount),
       keypair: this.account.getKeypair(),
     });
@@ -79,7 +81,7 @@ export class ShieldedPoolProver {
     asset: BigNumberish = 0
   ): Promise<FormattedProof> {
     await ensurePoseidon();
-    const inputs = await this.account.getUtxosUpTo(amount);
+    const inputs = await this.account.getUtxosUpTo(amount, asset);
 
     const inputsTotal = inputs.reduce(
       (sum, x) => sum.add(x.amount),
@@ -87,6 +89,7 @@ export class ShieldedPoolProver {
     );
 
     const change = new Utxo({
+      asset: BigNumber.from(asset),
       amount: BigNumber.from(amount).sub(inputsTotal),
     });
 
