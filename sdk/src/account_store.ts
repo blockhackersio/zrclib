@@ -51,6 +51,7 @@ export class AccountStore {
 
   async getUnspentUtxos() {
     const all = await this.utxoStore.getAll();
+    // TODO: filter by asset type
     const unspent: Utxo[] = [];
     for (const utxo of all) {
       if (!(await this.isSpent(utxo))) {

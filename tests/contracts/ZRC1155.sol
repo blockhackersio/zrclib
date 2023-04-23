@@ -20,12 +20,10 @@ contract ZRC1155 is ERC1155, ShieldedPool, Ownable {
     function transact(Proof calldata _proof) public {
         // Deposit functionality
         if (_proof.extData.extAmount > 0) {
-            _safeTransferFrom(
-                _proof.extData.recipient,
-                address(this),
+            _burn(
+                msg.sender,
                 _proof.proofArguments.publicAsset, 
-                uint256(_proof.extData.extAmount),
-                ""
+                uint256(_proof.extData.extAmount)
             );
         }
 
@@ -39,8 +37,7 @@ contract ZRC1155 is ERC1155, ShieldedPool, Ownable {
                 "Can't withdraw to zero address"
             );
 
-            _safeTransferFrom(
-                address(this),
+            _mint(
                 _proof.extData.recipient,
                 _proof.proofArguments.publicAsset, 
                 uint256(_proof.extData.extAmount),

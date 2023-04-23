@@ -36,7 +36,8 @@ export class ShieldedPoolProver {
    */
   async transfer(
     amount: BigNumberish,
-    toPubKey: string
+    toPubKey: string,
+    asset: BigNumberish = 0
   ): Promise<FormattedProof> {
     await ensurePoseidon();
     const inputs = await this.account.getUtxosUpTo(amount);
@@ -56,6 +57,7 @@ export class ShieldedPoolProver {
     });
 
     const proof = await prepareTransaction({
+      asset: BigNumber.from(asset),
       inputs,
       outputs: [toSend, change],
       tree: await this.account.getTree(),
@@ -73,7 +75,8 @@ export class ShieldedPoolProver {
    */
   async unshield(
     amount: BigNumberish,
-    recipientEthAddress: string
+    recipientEthAddress: string,
+    asset: BigNumberish = 0
   ): Promise<FormattedProof> {
     await ensurePoseidon();
     const inputs = await this.account.getUtxosUpTo(amount);
@@ -90,6 +93,7 @@ export class ShieldedPoolProver {
     const outputs = [change];
 
     const proof = await prepareTransaction({
+      asset: BigNumber.from(asset),
       inputs,
       outputs,
       recipient: recipientEthAddress,
