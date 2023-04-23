@@ -39,7 +39,7 @@ export class EventStoreWriter {
     return this._store.getUnspentUtxos();
   }
 
-  async getUtxosUpTo(amount: number | BigNumber): Promise<Utxo[]> {
-    return this._store.getUtxosUpTo(amount);
+  async getUtxosUpTo(amount: number | BigNumber, asset: number | BigNumber): Promise<Utxo[]> {
+    return this._store.getUtxosUpTo(amount, asset);
   }
 }

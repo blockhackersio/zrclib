@@ -62,32 +62,32 @@ export class Account {
     throw new Error("USER_NOT_LOGGED_IN");
   }
 
-  async getUtxosUpTo(amount: BigNumberish) {
-    return await this.getStore().getUtxosUpTo(amount);
+  async getUtxosUpTo(amount: BigNumberish, asset: BigNumberish) {
+    return await this.getStore().getUtxosUpTo(amount, asset);
   }
 
-  async getBalance() {
-    return await this.getStore().getBalance();
+  async getBalance(asset: BigNumberish = 0) {
+    return await this.getStore().getBalance(asset);
   }
 
   async getTree() {
     return await buildMerkleTree(this.contract);
   }
 
-  createUtxo(amount: BigNumberish) {
-    return new Utxo({ amount, keypair: this.getKeypair() });
+  createUtxo(amount: BigNumberish, asset: BigNumberish) {
+    return new Utxo({ asset, amount, keypair: this.getKeypair() });
   }
 
-  async proveShield(amount: BigNumberish) {
-    return await this.getProver().shield(amount);
+  async proveShield(amount: BigNumberish, asset: BigNumberish = 0) {
+    return await this.getProver().shield(amount, asset);
   }
 
-  async proveUnshield(amount: BigNumberish, recipient: string) {
-    return await this.getProver().unshield(amount, recipient);
+  async proveUnshield(amount: BigNumberish, recipient: string, asset: BigNumberish = 0) {
+    return await this.getProver().unshield(amount, recipient, asset);
   }
 
-  async proveTransfer(amount: BigNumberish, toPubkey: string) {
-    return await this.getProver().transfer(amount, toPubkey);
+  async proveTransfer(amount: BigNumberish, toPubkey: string, asset: BigNumberish = 0) {
+    return await this.getProver().transfer(amount, toPubkey, asset);
   }
 
   private getProver() {

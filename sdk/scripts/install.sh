@@ -3,12 +3,12 @@
 mkdir -p pot
 
 if [ ! -f ./pot/pot.ptau ]; then
-  curl -o pot/pot.ptau https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_16.ptau
+  curl -o pot/pot.ptau https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_17.ptau
 fi
 
 B2_DOWNLOAD=$(b2sum pot/pot.ptau | awk '{ print $1 }')
 
-if [ "$B2_DOWNLOAD" = "6a6277a2f74e1073601b4f9fed6e1e55226917efb0f0db8a07d98ab01df1ccf43eb0e8c3159432acd4960e2f29fe84a4198501fa54c8dad9e43297453efec125" ];then 
+if [ "$B2_DOWNLOAD" = "6247a3433948b35fbfae414fa5a9355bfb45f56efa7ab4929e669264a0258976741dfbe3288bfb49828e5df02c2e633df38d2245e30162ae7e3bcca5b8b49345" ];then 
   echo "Ptau file has been validated and is correct!"
 else
   echo "Danger!!! Powers of Tau file is incorrect. "

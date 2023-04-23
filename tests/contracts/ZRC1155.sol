@@ -2,26 +2,27 @@
 pragma solidity ^0.8.9;
 
 import {ShieldedPool} from "@zrclib/sdk/contracts/ShieldedPool.sol";
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-// Shielded ERC20 example using zrclib's shielded pool
+// Shielded ERC1155 example using zrclib's shielded pool
 // Supports shielding, unshielding and private transfers
-contract ZRC20 is ERC20, ShieldedPool, Ownable {
+contract ZRC1155 is ERC1155, ShieldedPool, Ownable {
     constructor(
         address _hasherAddress,
         address _verifier
-    ) ShieldedPool(5, _hasherAddress, _verifier) ERC20("ZUSD", "Zero USD") {}
+    ) ShieldedPool(5, _hasherAddress, _verifier) ERC1155("") {}
 
-    function mint(address _address, uint256 _amount) public onlyOwner {
-        _mint(_address, _amount);
+    function mint(address _address, uint256 _tokenId, uint256 _amount) public onlyOwner {
+        _mint(_address, _tokenId, _amount, "");
     }
 
     function transact(Proof calldata _proof) public {
         // Deposit functionality
         if (_proof.extData.extAmount > 0) {
-            transfer(
-                address(this), 
+            _burn(
+                msg.sender,
+                _proof.proofArguments.publicAsset, 
                 uint256(_proof.extData.extAmount)
             );
         }
@@ -36,10 +37,11 @@ contract ZRC20 is ERC20, ShieldedPool, Ownable {
                 "Can't withdraw to zero address"
             );
 
-            _transfer(
-                address(this),
+            _mint(
                 _proof.extData.recipient,
-                uint256(-_proof.extData.extAmount)
+                _proof.proofArguments.publicAsset, 
+                uint256(-_proof.extData.extAmount),
+                ""
             );
         }
     }

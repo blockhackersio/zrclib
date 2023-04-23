@@ -31,6 +31,7 @@ export type ProofArguments = {
   inputNullifiers: [string, string];
   outputCommitments: [string, string];
   publicAmount: BigNumber;
+  publicAsset: BigNumber;
   extDataHash: string;
 };
 
@@ -58,6 +59,7 @@ export type CommitmentEvents = CommitmentEvent[];
 
 export interface UtxoOptions {
   amount?: BigNumberish;
+  asset?: BigNumberish;
   blinding?: BigNumber;
   index?: number | null;
   keypair?: Keypair;
@@ -106,19 +108,6 @@ export type PrepareTxParams = {
   events?: CommitmentEvents;
   isL1Withdrawal?: boolean;
   l1Fee?: BigNumber;
-};
-
-export type ProofParams = {
-  inputs: BaseUtxo[];
-  outputs: BaseUtxo[];
-  // eslint-disable-next-line
-  tree: any;
-  isL1Withdrawal: boolean;
-  l1Fee: BigNumber;
-  extAmount: BigNumber;
-  fee: BigNumber;
-  recipient: string | BigNumber;
-  relayer: string | BigNumber;
 };
 
 export type ArgsProof = {
