@@ -22,11 +22,11 @@ export async function prepareTransaction({
 }): Promise<FormattedProof> {
   while (inputs.length < 2) {
     const keypair = await Keypair.generate();
-    inputs.push(new Utxo({ keypair: keypair }));
+    inputs.push(new Utxo({ asset, keypair: keypair }));
   }
   while (outputs.length < 2) {
     const keypair = await Keypair.generate();
-    outputs.push(new Utxo({ keypair: keypair }));
+    outputs.push(new Utxo({ asset, keypair: keypair }));
   }
 
   let extAmount = BigNumber.from(0)

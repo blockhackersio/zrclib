@@ -78,7 +78,6 @@ it("Test zrc1155 transfer", async function () {
   /// DEPOSIT token B
   t = time("Alice creates shield proof for 10 coins (B)");
   proof = await alice.proveShield(TEN, tokenB);
-  console.log("Proof", proof)
   tend(t);
 
   t = time("Alice submits transaction");
@@ -93,6 +92,4 @@ it("Test zrc1155 transfer", async function () {
   publicBalance = await contract.balanceOf(aliceEth.address, tokenB);
   expect(publicBalance).to.eq(0);
   tend(t);
-  
-  console.log("Ok");
 });
