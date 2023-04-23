@@ -70,9 +70,14 @@ it("Test zrc1155 transfer", async function () {
   await sleep(10_000); // Waiting for sync
 
   /// Check balances
-  t = time("Check that Alice's ERC20 balance is 0");
+  t = time("Check that Alice's ERC20 balance is 0 (A)");
   publicBalance = await contract.balanceOf(aliceEth.address, tokenA);
   expect(publicBalance).to.eq(0);
+  tend(t);
+
+  t = time("Check Alice's private balance is 10 (A)");
+  privateBalance = await alice.getBalance(tokenA);
+  expect(privateBalance).to.eq(TEN); // Transfer to the darkside worked! :)
   tend(t);
 
   /// DEPOSIT token B
@@ -91,5 +96,10 @@ it("Test zrc1155 transfer", async function () {
   t = time("Check that Alice's ERC20 balance is 0");
   publicBalance = await contract.balanceOf(aliceEth.address, tokenB);
   expect(publicBalance).to.eq(0);
+  tend(t);
+
+  t = time("Check Alice's private balance is 10 (B)");
+  privateBalance = await alice.getBalance(tokenB);
+  expect(privateBalance).to.eq(TEN); // Transfer to the darkside worked! :)
   tend(t);
 });

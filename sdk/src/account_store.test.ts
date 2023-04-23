@@ -22,7 +22,8 @@ describe("AccountStore", () => {
     const utxo = new Utxo({ amount: 1000, index: 1 });
     await accountState.addUtxo(utxo);
 
-    const unspent = await accountState.getUnspentUtxos();
+    const allUnspent = await accountState.getUnspentUtxos();
+    const unspent = allUnspent[0]; // By default asset type is 0
 
     expect(unspent.length).toBe(1);
     expect(unspent[0].getCommitment()).toEqual(utxo.getCommitment());
@@ -34,8 +35,9 @@ describe("AccountStore", () => {
     await accountState.addNullifier(
       toFixedHex(fieldToString(utxo.getNullifier()))
     );
-    const unspent = await accountState.getUnspentUtxos();
-    expect(unspent.length).toBe(0);
+    const allUnspent = await accountState.getUnspentUtxos();
+    const unspent = allUnspent[0]; // By default asset type is 0
+    expect(unspent).toBe(undefined);
   });
 
   test("getUtxosUpTo should return an array of Utxos that add up to the requested amount", async () => {
@@ -46,7 +48,7 @@ describe("AccountStore", () => {
     await accountState.addUtxo(utxo2);
     await accountState.addUtxo(utxo3);
 
-    const result = await accountState.getUtxosUpTo(BigNumber.from(250));
+    const result = await accountState.getUtxosUpTo(BigNumber.from(250), 0);
     expect(result.map((u) => u.getCommitment())).toEqual([
       utxo1.getCommitment(),
       utxo2.getCommitment(),
@@ -58,12 +60,12 @@ describe("AccountStore", () => {
     await accountState.addUtxo(utxo);
 
     await expect(
-      accountState.getUtxosUpTo(BigNumber.from(200))
+      accountState.getUtxosUpTo(BigNumber.from(200), 0)
     ).rejects.toThrow("INSUFFICIENT_BALANCE");
   });
 
   test("getBalance should get the balance", async () => {
-    const resultZero = await accountState.getBalance();
+    const resultZero = await accountState.getBalance(0);
     expect(resultZero.toNumber()).toBe(0);
     const utxo1 = new Utxo({ amount: 100, index: 1 });
     const utxo2 = new Utxo({ amount: 200, index: 2 });
@@ -71,7 +73,7 @@ describe("AccountStore", () => {
     await accountState.addUtxo(utxo1);
     await accountState.addUtxo(utxo2);
     await accountState.addUtxo(utxo3);
-    const result = await accountState.getBalance();
+    const result = await accountState.getBalance(0);
     expect(result.toNumber()).toBe(600);
   });
 
