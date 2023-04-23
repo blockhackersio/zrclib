@@ -15,11 +15,12 @@ export class ShieldedPoolProver {
    * @param amount
    * @returns
    */
-  async shield(amount: BigNumberish): Promise<FormattedProof> {
+  async shield(amount: BigNumberish, asset: BigNumberish = 0): Promise<FormattedProof> {
     await ensurePoseidon();
 
-    const deposit = this.account.createUtxo(amount);
+    const deposit = this.account.createUtxo(amount, asset);
     const proof = await prepareTransaction({
+      asset: BigNumber.from(asset),
       outputs: [deposit],
       tree: await this.account.getTree(),
     });

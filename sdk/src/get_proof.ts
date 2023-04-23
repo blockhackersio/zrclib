@@ -12,6 +12,7 @@ import { Element } from "fixed-merkle-tree";
 import { FormattedProof, ProofArguments } from "./types";
 
 export type ProofParams = {
+  asset: BigNumber;
   inputs: Utxo[];
   outputs: Utxo[];
   tree: MerkleTree;
@@ -38,6 +39,7 @@ type ProofArgs = {
   inputNullifiers: bigint[];
   outputCommitments: bigint[];
   publicAmount: string;
+  publicAsset: string;
   extDataHash: BigNumber;
 };
 
@@ -54,6 +56,7 @@ export type ZrcProof = {
 };
 
 export async function getProof({
+  asset,
   inputs,
   outputs,
   tree,
@@ -91,6 +94,12 @@ export async function getProof({
     encryptedOutput2: outputs[1].encrypt(),
   };
 
+  // Check if extAmount is not zero
+  let publicAsset: BigNumber = BigNumber.from(0); // default to zero
+  if (!extAmount.isZero()) {
+    publicAsset = asset;
+  }
+
   const inputNullifier: bigint[] = [];
   const extDataHash = getExtDataHash(extData);
   for (const input of inputs) {
@@ -104,9 +113,6 @@ export async function getProof({
   }
 
   let input = {
-    // root: fieldToObject(
-    //   (tree as any)._layers[tree.levels][0] ?? (tree as any)._zeros[tree.levels]
-    // ),
     root: BigInt(`${tree.root}`),
     inputNullifier: inputNullifier,
     outputCommitment: outputCommitment,
@@ -115,7 +121,9 @@ export async function getProof({
       .add(FIELD_SIZE)
       .mod(FIELD_SIZE)
       .toString(),
+    publicAsset: BigNumber.from(publicAsset).toString(),
     extDataHash: extDataHash.toBigInt(),
+    asset: BigNumber.from(asset),
 
     // data for 2 transaction inputs
     inAmount: inputs.map((x) => x.amount.toBigInt()),
@@ -138,6 +146,7 @@ export async function getProof({
     inputNullifiers: inputNullifier,
     outputCommitments: outputCommitment,
     publicAmount: input.publicAmount,
+    publicAsset: input.publicAsset,
     extDataHash: extDataHash,
   };
 

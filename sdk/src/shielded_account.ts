@@ -74,8 +74,8 @@ export class Account {
     return await buildMerkleTree(this.contract);
   }
 
-  createUtxo(amount: BigNumberish) {
-    return new Utxo({ amount, keypair: this.getKeypair() });
+  createUtxo(amount: BigNumberish, asset: BigNumberish) {
+    return new Utxo({ asset, amount, keypair: this.getKeypair() });
   }
 
   async proveShield(amount: BigNumberish) {

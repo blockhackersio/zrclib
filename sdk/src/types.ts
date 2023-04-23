@@ -109,19 +109,6 @@ export type PrepareTxParams = {
   l1Fee?: BigNumber;
 };
 
-export type ProofParams = {
-  inputs: BaseUtxo[];
-  outputs: BaseUtxo[];
-  // eslint-disable-next-line
-  tree: any;
-  isL1Withdrawal: boolean;
-  l1Fee: BigNumber;
-  extAmount: BigNumber;
-  fee: BigNumber;
-  recipient: string | BigNumber;
-  relayer: string | BigNumber;
-};
-
 export type ArgsProof = {
   proof: BytesLike;
   root: BytesLike;
