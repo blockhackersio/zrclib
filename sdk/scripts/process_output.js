@@ -30,31 +30,6 @@ const FILE_TANSFORMS = [
       ],
     ],
   },
-  {
-    filename: "./contracts/generated/MultitransactionVerifier.sol",
-    edits: [
-      [`contract PlonkVerifier`, `contract MultiTransactionVerifier`],
-      [
-        `        assembly {`,
-        `        bool result;
-        assembly {`,
-      ],
-      [
-        `            mstore(0, isValid)
-            return(0,0x20)
-        }
-        
-    }
-}`,
-        `            mstore(0, isValid)
-            result := mload(0)
-        }
-        return result;
-    }
-}`,
-      ],
-    ],
-  }
 ];
 
 async function transformFile(specs) {

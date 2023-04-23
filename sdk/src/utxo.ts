@@ -8,6 +8,7 @@ import { Serializer } from "./serializer";
 export class Utxo {
   public keypair: Keypair;
   public amount: BigNumber;
+  public asset: BigNumber;
   public transactionHash?: string;
   public blinding: BigNumber;
   public index: number | null;
@@ -26,11 +27,13 @@ export class Utxo {
   }
 
   public constructor({
+    asset = 0,
     amount = 0,
     keypair = new Keypair(),
     blinding = randomBN(),
     index = null,
   }: UtxoOptions = {}) {
+    this.asset = BigNumber.from(asset);
     this.amount = BigNumber.from(amount);
     this.blinding = BigNumber.from(blinding);
     this.keypair = keypair;
@@ -43,6 +46,7 @@ export class Utxo {
         this.amount,
         this.keypair.pubkey,
         this.blinding,
+        this.asset
       ]);
     }
     return this.commitment;

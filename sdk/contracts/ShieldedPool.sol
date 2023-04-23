@@ -30,6 +30,7 @@ contract ShieldedPool is MerkleTreeWithHistory {
         bytes32[2] inputNullifiers;
         bytes32[2] outputCommitments;
         uint256 publicAmount;
+        uint256 publicAsset;
         bytes32 extDataHash;
     }
 
@@ -73,14 +74,15 @@ contract ShieldedPool is MerkleTreeWithHistory {
             "Invalid public amount"
         );
 
-        uint[] memory pubSignals = new uint[](7);
+        uint[] memory pubSignals = new uint[](8);
         pubSignals[0] = uint(_proof.proofArguments.root);
         pubSignals[1] = _proof.proofArguments.publicAmount;
-        pubSignals[2] = uint(_proof.proofArguments.extDataHash);
-        pubSignals[3] = uint(_proof.proofArguments.inputNullifiers[0]);
-        pubSignals[4] = uint(_proof.proofArguments.inputNullifiers[1]);
-        pubSignals[5] = uint(_proof.proofArguments.outputCommitments[0]);
-        pubSignals[6] = uint(_proof.proofArguments.outputCommitments[1]);
+        pubSignals[2] = _proof.proofArguments.publicAsset;
+        pubSignals[3] = uint(_proof.proofArguments.extDataHash);
+        pubSignals[4] = uint(_proof.proofArguments.inputNullifiers[0]);
+        pubSignals[5] = uint(_proof.proofArguments.inputNullifiers[1]);
+        pubSignals[6] = uint(_proof.proofArguments.outputCommitments[0]);
+        pubSignals[7] = uint(_proof.proofArguments.outputCommitments[1]);
         require(
             verifier.verifyProof(
                 _proof.proofArguments.proof,

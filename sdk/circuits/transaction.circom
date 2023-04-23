@@ -10,8 +10,9 @@ Utxo structure:
     amount,
     pubkey,
     blinding, // random number
+    asset
 }
-commitment = hash(amount, pubKey, blinding)
+commitment = hash(amount, pubKey, blinding, asset)
 nullifier = hash(commitment, merklePath, sign(privKey, commitment, merklePath))
 */
 
@@ -22,9 +23,11 @@ template Transaction(levels, nIns, nOuts, zeroLeaf) {
     // correct extAmount range is enforced on the smart contract
     // publicAmount = extAmount - fee
     signal input publicAmount;
+    signal input publicAsset;
     signal input extDataHash;
 
     // data for transaction inputs
+    signal input asset;
     signal input inputNullifier[nIns];
     signal input inAmount[nIns];
     signal input inPrivateKey[nIns];
@@ -44,17 +47,25 @@ template Transaction(levels, nIns, nOuts, zeroLeaf) {
     component inNullifierHasher[nIns];
     component inTree[nIns];
     component inCheckRoot[nIns];
+    component inCheckAsset;
     var sumIns = 0;
+
+    // check publicAsset vs asset only if publicAsset is not default value (i.e. deposit or withdrawal)
+    inCheckAsset = ForceEqualIfEnabled();
+    inCheckAsset.in[0] <== asset;
+    inCheckAsset.in[1] <== publicAsset;
+    inCheckAsset.enabled <-- (publicAsset == 0) ? 0 : 1;
 
     // verify correctness of transaction inputs
     for (var tx = 0; tx < nIns; tx++) {
         inKeypair[tx] = Keypair();
         inKeypair[tx].privateKey <== inPrivateKey[tx];
 
-        inCommitmentHasher[tx] = Poseidon(3);
+        inCommitmentHasher[tx] = Poseidon(4);
         inCommitmentHasher[tx].inputs[0] <== inAmount[tx];
         inCommitmentHasher[tx].inputs[1] <== inKeypair[tx].publicKey;
         inCommitmentHasher[tx].inputs[2] <== inBlinding[tx];
+        inCommitmentHasher[tx].inputs[3] <== asset;
 
         inSignature[tx] = Signature();
         inSignature[tx].privateKey <== inPrivateKey[tx];
@@ -93,10 +104,11 @@ template Transaction(levels, nIns, nOuts, zeroLeaf) {
 
     // verify correctness of transaction outputs
     for (var tx = 0; tx < nOuts; tx++) {
-        outCommitmentHasher[tx] = Poseidon(3);
+        outCommitmentHasher[tx] = Poseidon(4);
         outCommitmentHasher[tx].inputs[0] <== outAmount[tx];
         outCommitmentHasher[tx].inputs[1] <== outPubkey[tx];
         outCommitmentHasher[tx].inputs[2] <== outBlinding[tx];
+        outCommitmentHasher[tx].inputs[3] <== asset;
         outCommitmentHasher[tx].out === outputCommitment[tx];
 
         // Check that amount fits into 248 bits to prevent overflow
@@ -126,4 +138,4 @@ template Transaction(levels, nIns, nOuts, zeroLeaf) {
     signal extDataSquare <== extDataHash * extDataHash;
 }
 
-component main { public [root, publicAmount, extDataHash, inputNullifier, outputCommitment] } = Transaction(5, 2, 2, 11850551329423159860688778991827824730037759162201783566284850822760196767874);
+component main { public [root, publicAmount, publicAsset, extDataHash, inputNullifier, outputCommitment] } = Transaction(5, 2, 2, 11850551329423159860688778991827824730037759162201783566284850822760196767874);
