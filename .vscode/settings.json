@@ -1,3 +1,3 @@
 {
-  "solidity.packageDefaultDependenciesDirectory": "./test/node_modules"
+  "solidity.packageDefaultDependenciesDirectory": "./tests/node_modules"
 }
