@@ -21,6 +21,7 @@ export class Utxo {
     return new Utxo({
       amount: BigNumber.from("0x" + buf.slice(0, 31).toString("hex")),
       blinding: BigNumber.from("0x" + buf.slice(31, 62).toString("hex")),
+      asset: BigNumber.from("0x" + buf.slice(62, 93).toString("hex")),
       keypair,
       index,
     });
@@ -80,27 +81,30 @@ export class Utxo {
     const bytes = Buffer.concat([
       toBuffer(this.amount, 31),
       toBuffer(this.blinding, 31),
+      toBuffer(this.asset, 31),
     ]);
     return this.keypair.encrypt(bytes);
   }
 }
 export class UtxoSerializer implements Serializer<Utxo> {
   serialize(o: Utxo): string {
-    const { amount, blinding, keypair, index } = o;
+    const { amount, blinding, asset, keypair, index } = o;
 
     return JSON.stringify({
       amount,
       blinding,
+      asset,
       keypair: keypair.privkey,
       index,
     });
   }
 
   deserialize(o: string): Utxo {
-    const { amount, blinding, keypair, index } = JSON.parse(o);
+    const { amount, blinding, asset, keypair, index } = JSON.parse(o);
     return new Utxo({
       amount: BigNumber.from(amount),
       blinding: BigNumber.from(blinding),
+      asset: BigNumber.from(asset),
       keypair: new Keypair(keypair),
       index,
     });
