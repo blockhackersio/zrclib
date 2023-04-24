@@ -149,7 +149,7 @@ classDiagram
 
 ## Defiant Pool 
 
-Defiant pool is an iterative feature that separates the pool's state from the public funds that are locked within it. The output is that the deposit funds for every transaction is held in a different address making it more difficult to censor via address. A future iteration will encrypt the addresses in the list to a BLS theshold public key that can be consulted to decrypt the next deposit address upon a withdraw. 
+Defiant pool is an iterative feature that separates the pool's state from the public funds that are locked within it. The output is that the deposit funds for every transaction is held in a different address making it more difficult to censor via address. This makes it difficult  to isolate all the addresses that comprise of the protocol as the address count grows with every deposit.
 
 ![Defiant Architecture](https://user-images.githubusercontent.com/1256409/233891119-36fbad1e-c69f-4797-8308-4838549b8c17.png)
 
