@@ -17,7 +17,7 @@ contract ZRC1155 is ERC1155, ShieldedPool, Ownable {
         _mint(_address, _tokenId, _amount, "");
     }
 
-    function transact(Proof calldata _proof) public {
+    function transact(Proof calldata _proof) public override {
         // Deposit functionality
         if (_proof.extData.extAmount > 0) {
             _burn(

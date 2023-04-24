@@ -17,7 +17,7 @@ contract ZRC20 is ERC20, ShieldedPool, Ownable {
         _mint(_address, _amount);
     }
 
-    function transact(Proof calldata _proof) public {
+    function transact(Proof calldata _proof) public override {
         // Deposit functionality
         if (_proof.extData.extAmount > 0) {
             transfer(
