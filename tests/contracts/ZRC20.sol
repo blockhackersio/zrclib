@@ -10,8 +10,9 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract ZRC20 is ERC20, ShieldedPool, Ownable {
     constructor(
         address _hasherAddress,
-        address _verifier
-    ) ShieldedPool(5, _hasherAddress, _verifier) ERC20("ZUSD", "Zero USD") {}
+        address _verifier,
+        address _swapExecutor
+    ) ShieldedPool(5, _hasherAddress, _verifier, _swapExecutor) ERC20("ZUSD", "Zero USD") {}
 
     function mint(address _address, uint256 _amount) public onlyOwner {
         _mint(_address, _amount);

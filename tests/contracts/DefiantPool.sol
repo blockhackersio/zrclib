@@ -58,8 +58,9 @@ contract DefiantPool is ShieldedPool {
 
     constructor(
         address _hasherAddress,
-        address _verifier
-    ) ShieldedPool(5, _hasherAddress, _verifier) {}
+        address _verifier,
+        address _swapExecutor
+    ) ShieldedPool(5, _hasherAddress, _verifier, _swapExecutor) {}
 
     function getWithdrawalAmounts(
         uint256 _amount
