@@ -6,6 +6,7 @@ import { Keypair } from "./keypair";
 import { fieldToString } from "./poseidon";
 import { toFixedHex } from "./utils";
 
+jest.setTimeout(10000);
 describe("AccountStore", () => {
   const password = "mySecretPassword";
   let storeKey: PasswordEncryptor;

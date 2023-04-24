@@ -40,6 +40,12 @@ export type ExtData = {
   extAmount: BigNumber;
   encryptedOutput1: string;
   encryptedOutput2: string;
+  tokenOut: string;
+  amountOutMin: BigNumber;
+  swapRecipient: string;
+  swapRouter: string;
+  swapData: string;
+  transactData: string;
 };
 
 export type FormattedProof = {

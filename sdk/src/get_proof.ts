@@ -54,6 +54,12 @@ type ProofExtData = {
   extAmount: string;
   encryptedOutput1: string;
   encryptedOutput2: string;
+  tokenOut: string;
+  amountOutMin: BigNumber;
+  swapRecipient: string;
+  swapRouter: string;
+  swapData: string;
+  transactData: string;
 };
 
 export type ZrcProof = {
@@ -105,7 +111,7 @@ export async function getProof({
     encryptedOutput1: outputs[0].encrypt(),
     encryptedOutput2: outputs[1].encrypt(),
     tokenOut: toFixedHex(tokenOut, 20),
-    amountOutMin: toFixedHex(amountOutMin),
+    amountOutMin: amountOutMin,
     swapRecipient: toFixedHex(swapRecipient, 20),
     swapRouter: toFixedHex(swapRouter, 20),
     swapData: toFixedHex(swapData),

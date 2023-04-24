@@ -15,7 +15,7 @@ interface Params {
   extAmount: string;
   encryptedOutput2: string;
   tokenOut: string;
-  amountOutMin: string;
+  amountOutMin: BigNumber;
   swapRecipient: string;
   swapRouter: string;
   swapData: string;

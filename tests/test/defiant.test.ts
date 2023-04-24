@@ -11,6 +11,7 @@ import {
   DefiantWithdrawal__factory,
   MockErc20__factory,
   Verifier__factory,
+  SwapExecutor__factory
 } from "../typechain-types";
 import { expect } from "chai";
 import artifact from "../../sdk/contracts/generated/Hasher.json";
@@ -35,9 +36,13 @@ async function deploy() {
   const verifierFactory = new Verifier__factory(deployer);
   const verifier = await verifierFactory.deploy();
 
+  // Deploy the Swap Executor
+  const swapExecutorFactory = new SwapExecutor__factory(deployer);
+  const swapExecutor = await swapExecutorFactory.deploy();
+
   // DefiantPool
   const poolFactory = new DefiantPool__factory(deployer);
-  const pool = await poolFactory.deploy(hasher.address, verifier.address);
+  const pool = await poolFactory.deploy(hasher.address, verifier.address, swapExecutor.address);
 
   // DefiantDeposit
   const depositFactory = new DefiantDeposit__factory(deployer);
