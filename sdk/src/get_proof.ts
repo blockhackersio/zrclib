@@ -200,7 +200,7 @@ async function formatArguments(zrcProof: ZrcProof): Promise<FormattedProof> {
     inputNullifiers: inputNullifiers.map(toFixedHex) as [string, string],
     outputCommitments: outputCommitments.map(toFixedHex) as [string, string],
     publicAmount: BigNumber.from(publicAmount),
-    publicAsset: BigNumber.from(publicAsset),
+    publicAsset: toFixedHex(publicAsset, 20),
     extDataHash: toFixedHex(extDataHash),
   };
 
