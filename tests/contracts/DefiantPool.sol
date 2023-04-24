@@ -130,7 +130,7 @@ contract DefiantPool is ShieldedPool {
         }
     }
 
-    function transact(Proof calldata _proof) public {
+    function transact(Proof calldata _proof) public override {
         require(_proof.extData.extAmount == 0, "extAmount must be 0");
 
         _transact(_proof);
