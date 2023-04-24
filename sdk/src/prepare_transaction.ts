@@ -12,12 +12,24 @@ export async function prepareTransaction({
   inputs = [],
   outputs = [],
   recipient = 0,
+  tokenOut = BigNumber.from(0),
+  amountOutMin = BigNumber.from(0),
+  swapRecipient = BigNumber.from(0),
+  swapRouter = BigNumber.from(0),
+  swapData = BigNumber.from(0),
+  transactData = BigNumber.from(0),
   tree,
 }: {
   asset? : BigNumber;
   inputs?: Utxo[];
   outputs?: Utxo[];
   recipient?: string | 0;
+  tokenOut?: BigNumber;
+  amountOutMin?: BigNumber;
+  swapRecipient?: BigNumber;
+  swapRouter?: BigNumber;
+  swapData?: BigNumber;
+  transactData?: BigNumber;
   tree: MerkleTree;
 }): Promise<FormattedProof> {
   while (inputs.length < 2) {
@@ -40,6 +52,12 @@ export async function prepareTransaction({
     tree,
     extAmount,
     recipient,
+    tokenOut,
+    amountOutMin,
+    swapRecipient,
+    swapRouter,
+    swapData,
+    transactData
   });
 
   return zrcProof;
