@@ -51,6 +51,11 @@ contract ShieldedPool is MerkleTreeWithHistory {
         _initialize(); // initialize the merkle tree
     }
 
+    // expose a public function to allow users to submit proofs (to be overriden by child contracts)
+    function transact(Proof calldata _proof) public virtual {
+        _transact(_proof);
+    }
+
     function _transact(Proof calldata _proof) internal {
         require(isKnownRoot(_proof.proofArguments.root), "Invalid merkle root");
         for (
