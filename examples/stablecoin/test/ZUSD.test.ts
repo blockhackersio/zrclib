@@ -105,14 +105,14 @@ describe("ZUSD", function () {
 
   it("Should be able to shield ZUSD", async function () {
     // Create shielded pool account
-    account = await Account.create(zusd, "password123");
-    await account.loginWithEthersSigner(user);
-    const prover = account.getProver();
+    account = await Account.create(zusd, user, "password123");
+    await account.login();
+    const prover = account;
     const initialZUSDBalance = await zusd.balanceOf(user.address);
 
     // Create proof
     const deposit = ethers.utils.parseUnits("500", zusdDecimals);
-    const shieldProof = await prover.shield(deposit);
+    const shieldProof = await prover.proveShield(deposit);
 
     // call verify proof
     await zusd.approve(zusd.address, ethers.utils.parseEther("1000"));
@@ -130,9 +130,8 @@ describe("ZUSD", function () {
     const initialZUSDBalance = await zusd.balanceOf(user.address);
 
     // create unshield proof
-    const prover = account.getProver();
     const withdraw = ethers.utils.parseUnits("250", zusdDecimals);
-    const unshieldProof = await prover.unshield(withdraw, user.address);
+    const unshieldProof = await account.proveUnshield(withdraw, user.address);
     await zusd.transact(unshieldProof);
 
     // new balance

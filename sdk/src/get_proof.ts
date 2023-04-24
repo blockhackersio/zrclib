@@ -123,7 +123,7 @@ export async function getProof({
       .toString(),
     publicAsset: BigNumber.from(publicAsset).toString(),
     extDataHash: extDataHash.toBigInt(),
-    asset: BigNumber.from(asset),
+    asset: BigNumber.from(asset).toString(),
 
     // data for 2 transaction inputs
     inAmount: inputs.map((x) => x.amount.toBigInt()),
@@ -138,6 +138,7 @@ export async function getProof({
     outPubkey: outputs.map((x) => fieldToObject(x.keypair!.pubkey)),
   };
   const istring = stringifyBigInts(input);
+
   const proof = await generateProof(istring);
 
   const args: ZrcProof["args"] = {

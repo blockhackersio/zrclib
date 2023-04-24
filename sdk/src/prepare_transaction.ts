@@ -14,7 +14,7 @@ export async function prepareTransaction({
   recipient = 0,
   tree,
 }: {
-  asset? : BigNumber;
+  asset?: BigNumber;
   inputs?: Utxo[];
   outputs?: Utxo[];
   recipient?: string | 0;
