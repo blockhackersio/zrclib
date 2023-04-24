@@ -1,3 +1,4 @@
 {
-  "solidity.packageDefaultDependenciesDirectory": "./tests/node_modules"
+  "solidity.packageDefaultDependenciesDirectory": "./tests/node_modules",
+  "solidity.compileUsingRemoteVersion": "latest"
 }
