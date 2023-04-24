@@ -22,7 +22,10 @@ async function deployZrc() {
 
   // Deploy the ZRC20 passing in the hasher and verifier
   const zrc1155Factory = new ZRC1155__factory(deployer);
-  const contract = await zrc1155Factory.deploy(hasher.address, verifier.address);
+  const contract = await zrc1155Factory.deploy(
+    hasher.address,
+    verifier.address
+  );
 
   return { contract };
 }
