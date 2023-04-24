@@ -124,5 +124,8 @@ it("Test zrc20 transfer", async function () {
   expect(publicBalance).to.eq(FIVE);
   tend(t);
 
+  alice.destroy();
+  bob.destroy();
+
   console.log("Ok");
 });
