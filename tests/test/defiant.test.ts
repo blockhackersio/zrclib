@@ -154,4 +154,7 @@ it("should deposit", async () => {
   alicePublicBal = await token.balanceOf(aliceEth.address);
   expect(alicePublicBal.toNumber()).to.eq(100_000000);
   tend(t);
+
+  alice.destroy();
+  bob.destroy();
 });

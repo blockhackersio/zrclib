@@ -1,6 +1,6 @@
 import { EventStoreWriter } from "./event_store_writer";
 import { Keypair } from "./keypair";
-import { BigNumberish, ethers, providers } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 import { PasswordEncryptor } from "./password_encryptor";
 import { AccountStore } from "./account_store";
 import { Utxo } from "./utxo";
@@ -82,11 +82,19 @@ export class Account {
     return await this.getProver().shield(amount, asset);
   }
 
-  async proveUnshield(amount: BigNumberish, recipient: string, asset: BigNumberish = 0) {
+  async proveUnshield(
+    amount: BigNumberish,
+    recipient: string,
+    asset: BigNumberish = 0
+  ) {
     return await this.getProver().unshield(amount, recipient, asset);
   }
 
-  async proveTransfer(amount: BigNumberish, toPubkey: string, asset: BigNumberish = 0) {
+  async proveTransfer(
+    amount: BigNumberish,
+    toPubkey: string,
+    asset: BigNumberish = 0
+  ) {
     return await this.getProver().transfer(amount, toPubkey, asset);
   }
 
@@ -94,6 +102,10 @@ export class Account {
     if (this.prover) return this.prover;
     this.prover = new ShieldedPoolProver(this);
     return this.prover;
+  }
+
+  destroy() {
+    this.getEventStoreWriter().stop();
   }
 
   static async create(
@@ -104,9 +116,4 @@ export class Account {
     const encryptor = PasswordEncryptor.fromPassword(password);
     return new Account(contract, encryptor);
   }
-}
-
-type WithStateManager = { eventStoreWriter: EventStoreWriter };
-function ensureStatemanager(value: any): value is WithStateManager {
-  return !!value.eventStoreWriter;
 }

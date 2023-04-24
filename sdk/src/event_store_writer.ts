@@ -31,6 +31,10 @@ export class EventStoreWriter {
     this.utxoEventDecryptor.start();
   }
 
+  stop() {
+    this.utxoEventDecryptor.stop();
+  }
+
   store() {
     return this._store;
   }
@@ -39,7 +43,10 @@ export class EventStoreWriter {
     return this._store.getUnspentUtxos();
   }
 
-  async getUtxosUpTo(amount: number | BigNumber, asset: number | BigNumber): Promise<Utxo[]> {
+  async getUtxosUpTo(
+    amount: number | BigNumber,
+    asset: number | BigNumber
+  ): Promise<Utxo[]> {
     return this._store.getUtxosUpTo(amount, asset);
   }
 }
