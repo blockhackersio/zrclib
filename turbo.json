@@ -13,6 +13,9 @@
         "pot/**"
       ]
     },
+    "dev": {
+      "dependsOn": ["^build"]
+    },
     "test": {
       "dependsOn": ["^test"]
     },

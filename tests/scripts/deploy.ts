@@ -1,19 +1,24 @@
 import { ethers } from "hardhat";
+import artifact from "@zrclib/sdk/contracts/generated/Hasher.json";
+import { Verifier__factory, ZRC20__factory } from "../typechain-types";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  const [deployer] = await ethers.getSigners();
 
-  const lockedAmount = ethers.utils.parseEther("0.001");
+  // Deploy the poseidon hasher
+  const { abi, bytecode } = artifact;
+  const Hasher = await ethers.getContractFactory(abi, bytecode);
+  const hasher = await Hasher.deploy();
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  // Deploy the Verifier
+  const verifierFactory = new Verifier__factory(deployer);
+  const verifier = await verifierFactory.deploy();
 
-  await lock.deployed();
+  // Deploy the ZRC20 passing in the hasher and verifier
+  const zrc20Factory = new ZRC20__factory(deployer);
+  const contract = await zrc20Factory.deploy(hasher.address, verifier.address);
 
-  console.log(
-    `Lock with ${ethers.utils.formatEther(lockedAmount)}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  );
+  return { contract };
 }
 
 // We recommend this pattern to be able to use async/await everywhere

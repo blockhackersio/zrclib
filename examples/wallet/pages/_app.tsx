@@ -6,6 +6,8 @@ import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { mainnet, localhost } from "wagmi/chains";
+import { Flowbite } from "flowbite-react";
+import { theme } from "../styles/theme";
 const { chains, provider } = configureChains(
   [mainnet, { ...localhost, id: 31337 }],
   [alchemyProvider({ apiKey: process.env.ALCHEMY_ID! }), publicProvider()]
@@ -24,10 +26,12 @@ const wagmiClient = createClient({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>
-        <Component {...pageProps} />
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <Flowbite theme={{ theme }}>
+      <WagmiConfig client={wagmiClient}>
+        <RainbowKitProvider chains={chains}>
+          <Component {...pageProps} />
+        </RainbowKitProvider>
+      </WagmiConfig>
+    </Flowbite>
   );
 }

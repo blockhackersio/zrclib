@@ -6,7 +6,8 @@
   "scripts": {
     "build": "turbo run build --force --no-daemon",
     "test": "pnpm build && turbo run test --force --no-daemon",
-    "clean": "turbo run clean --force --no-daemon"
+    "clean": "turbo run clean --force --no-daemon",
+    "wallet": "concurrently \"turbo run --scope @zrclib/tests dev\" \"turbo run --scope @zrclib/wallet dev\""
   },
   "keywords": [],
   "author": "",
@@ -14,5 +15,8 @@
   "devDependencies": {
     "turbo": "^1.9.1"
   },
-  "packageManager": "pnpm@7.22.0"
+  "packageManager": "pnpm@7.22.0",
+  "dependencies": {
+    "concurrently": "^8.0.1"
+  }
 }

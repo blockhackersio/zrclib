@@ -43,13 +43,13 @@ function HeaderLayout(p: {
   const router = useRouter();
   return (
     <Navbar
-      className="bg-slate-200 py-6 px-4 text-center"
+      className="bg-black dark:bg-black py-6 px-4 text-center"
       fluid={true}
-      rounded={true}
+      rounded={false}
     >
       <div className="w-full flex justify-between m-auto text-left max-w-7xl">
         <Navbar.Brand href="/">
-          <span className="self-center whitespace-nowrap text-xl font-mono font-semibold dark:text-white">
+          <span className="self-center whitespace-nowrap text-xl font-mono font-semibold text-white">
             {p.title}
           </span>
           {p.subtitle && (

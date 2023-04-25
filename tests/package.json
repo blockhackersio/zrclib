@@ -6,7 +6,8 @@
   "scripts": {
     "test": "hardhat test",
     "build": "hardhat compile",
-    "clean": "./scripts/clean.sh"
+    "clean": "./scripts/clean.sh",
+    "dev": "concurrently \"hardhat node\" \"sleep 5 && hardhat run --network localhost scripts/deploy.ts\""
   },
   "keywords": [],
   "author": "",

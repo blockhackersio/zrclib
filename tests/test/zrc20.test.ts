@@ -1,10 +1,14 @@
 // Need this or ethers fails in node
 
 import { ethers } from "hardhat";
-import { Account } from "../../sdk/src";
-import { Verifier__factory, ZRC20__factory, SwapExecutor__factory } from "../typechain-types";
+import { Account } from "@zrclib/sdk";
+import {
+  Verifier__factory,
+  ZRC20__factory,
+  SwapExecutor__factory,
+} from "../typechain-types";
 import { expect } from "chai";
-import artifact from "../../sdk/contracts/generated/Hasher.json";
+import artifact from "@zrclib/sdk/contracts/generated/Hasher.json";
 import { sleep, tend, time } from "../utils";
 
 async function deployZrc() {
@@ -26,7 +30,11 @@ async function deployZrc() {
 
   // Deploy the ZRC20 passing in the hasher and verifier
   const zrc20Factory = new ZRC20__factory(deployer);
-  const contract = await zrc20Factory.deploy(hasher.address, verifier.address, swapExecutor.address);
+  const contract = await zrc20Factory.deploy(
+    hasher.address,
+    verifier.address,
+    swapExecutor.address
+  );
 
   return { contract };
 }
