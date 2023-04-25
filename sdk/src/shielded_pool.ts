@@ -17,7 +17,15 @@ export class ShieldedPoolProver {
    */
   async shield(
     amount: BigNumberish,
-    asset: BigNumberish = 0
+    asset: BigNumberish = 0,
+    swapParams = {
+      tokenOut: BigNumber.from(0),
+      amountOutMin: BigNumber.from(0),
+      swapRecipient: BigNumber.from(0),
+      swapRouter: BigNumber.from(0),
+      swapData: BigNumber.from(0),
+      transactData: BigNumber.from(0),
+    }
   ): Promise<FormattedProof> {
     await ensurePoseidon();
 
@@ -26,6 +34,7 @@ export class ShieldedPoolProver {
     const proof = await prepareTransaction({
       asset: BigNumber.from(asset),
       outputs: [deposit],
+      swapParams: swapParams,
       tree: await this.account.getTree(),
     });
     return proof;
@@ -41,7 +50,15 @@ export class ShieldedPoolProver {
   async transfer(
     amount: BigNumberish,
     toPubKey: string,
-    asset: BigNumberish = 0
+    asset: BigNumberish = 0,
+    swapParams = {
+      tokenOut: BigNumber.from(0),
+      amountOutMin: BigNumber.from(0),
+      swapRecipient: BigNumber.from(0),
+      swapRouter: BigNumber.from(0),
+      swapData: BigNumber.from(0),
+      transactData: BigNumber.from(0),
+    }
   ): Promise<FormattedProof> {
     await ensurePoseidon();
     const inputs = await this.account.getUtxosUpTo(amount, asset);
@@ -66,6 +83,7 @@ export class ShieldedPoolProver {
       asset: BigNumber.from(asset),
       inputs,
       outputs: [toSend, change],
+      swapParams: swapParams,
       tree: await this.account.getTree(),
     });
 
@@ -82,7 +100,15 @@ export class ShieldedPoolProver {
   async unshield(
     amount: BigNumberish,
     recipientEthAddress: string,
-    asset: BigNumberish = 0
+    asset: BigNumberish = 0,
+    swapParams = {
+      tokenOut: BigNumber.from(0),
+      amountOutMin: BigNumber.from(0),
+      swapRecipient: BigNumber.from(0),
+      swapRouter: BigNumber.from(0),
+      swapData: BigNumber.from(0),
+      transactData: BigNumber.from(0),
+    }
   ): Promise<FormattedProof> {
     await ensurePoseidon();
     const inputs = await this.account.getUtxosUpTo(amount, asset);
@@ -104,6 +130,7 @@ export class ShieldedPoolProver {
       inputs,
       outputs,
       recipient: recipientEthAddress,
+      swapParams: swapParams,
       tree: await this.account.getTree(),
     });
 

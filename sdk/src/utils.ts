@@ -14,6 +14,12 @@ interface Params {
   encryptedOutput1: string;
   extAmount: string;
   encryptedOutput2: string;
+  tokenOut: string;
+  amountOutMin: BigNumber;
+  swapRecipient: string;
+  swapRouter: string;
+  swapData: string;
+  transactData: string;
 }
 
 function getExtDataHash({
@@ -21,12 +27,18 @@ function getExtDataHash({
   extAmount,
   encryptedOutput1,
   encryptedOutput2,
+  tokenOut,
+  amountOutMin,
+  swapRecipient,
+  swapRouter,
+  swapData,
+  transactData
 }: Params) {
   const abi = new utils.AbiCoder();
 
   const encodedData = abi.encode(
     [
-      "tuple(address recipient,int256 extAmount,bytes encryptedOutput1,bytes encryptedOutput2)",
+      "tuple(address recipient,int256 extAmount,bytes encryptedOutput1,bytes encryptedOutput2,address tokenOut,uint256 amountOutMin,address swapRecipient,address swapRouter,bytes swapData,bytes transactData)",
     ],
     [
       {
@@ -34,6 +46,12 @@ function getExtDataHash({
         extAmount: toFixedHex(extAmount),
         encryptedOutput1: encryptedOutput1,
         encryptedOutput2: encryptedOutput2,
+        tokenOut: toFixedHex(tokenOut, 20),
+        amountOutMin: toFixedHex(amountOutMin),
+        swapRecipient: toFixedHex(swapRecipient, 20),
+        swapRouter: toFixedHex(swapRouter, 20),
+        swapData: toFixedHex(swapData),
+        transactData: toFixedHex(transactData),
       },
     ]
   );

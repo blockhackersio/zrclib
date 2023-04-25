@@ -31,7 +31,7 @@ export type ProofArguments = {
   inputNullifiers: [string, string];
   outputCommitments: [string, string];
   publicAmount: BigNumber;
-  publicAsset: BigNumber;
+  publicAsset: string;
   extDataHash: string;
 };
 
@@ -40,6 +40,12 @@ export type ExtData = {
   extAmount: BigNumber;
   encryptedOutput1: string;
   encryptedOutput2: string;
+  tokenOut: string;
+  amountOutMin: BigNumber;
+  swapRecipient: string;
+  swapRouter: string;
+  swapData: string;
+  transactData: string;
 };
 
 export type FormattedProof = {
@@ -148,3 +154,12 @@ export type EstimateTransactParams = {
   args: ArgsProof;
   extData: ExtData;
 };
+
+export type SwapParams = {
+  tokenOut?: BigNumberish;
+  amountOutMin?: BigNumberish;
+  swapRecipient?: BigNumberish;
+  swapRouter?: BigNumberish;
+  swapData?: BigNumberish;
+  transactData?: BigNumberish;
+}

@@ -33,7 +33,7 @@ contract ZUSD is ShieldedPool, ERC20 {
      * If deposit, subsequent transfer will be private in the shielded pool
      * If withdraw, subsequent transfer will be normal ERC20 token transfer
      */
-    function transact(Proof calldata _proof) public {
+    function transact(Proof calldata _proof) public override {
         // Deposit functionality
         if (_proof.extData.extAmount > 0) {
             _spendAllowance(
@@ -64,14 +64,6 @@ contract ZUSD is ShieldedPool, ERC20 {
                 uint256(_proof.extData.extAmount)
             );
         }
-    }
-
-    /**
-     * @notice Private transfer within the shielded pool
-     */
-    function transfer(Proof calldata _proof) public {
-        // Proof enabling transfer within the shielded pool
-        _transact(_proof);
     }
 
     function _requireCallerIsTroveManager() internal view {

@@ -2,7 +2,7 @@
 
 import { ethers } from "hardhat";
 import { Account } from "../../sdk/src";
-import { Verifier__factory, ZRC1155__factory } from "../typechain-types";
+import { Verifier__factory, ZRC1155__factory, SwapExecutor__factory } from "../typechain-types";
 import { expect } from "chai";
 import artifact from "../../sdk/contracts/generated/Hasher.json";
 import { sleep, tend, time } from "../utils";
@@ -20,11 +20,16 @@ async function deployZrc() {
   const verifierFactory = new Verifier__factory(deployer);
   const verifier = await verifierFactory.deploy();
 
+  // Deploy the Swap Executor
+  const swapExecutorFactory = new SwapExecutor__factory(deployer);
+  const swapExecutor = await swapExecutorFactory.deploy();
+
   // Deploy the ZRC20 passing in the hasher and verifier
   const zrc1155Factory = new ZRC1155__factory(deployer);
   const contract = await zrc1155Factory.deploy(
     hasher.address,
-    verifier.address
+    verifier.address,
+    swapExecutor.address
   );
 
   return { contract };

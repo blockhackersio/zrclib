@@ -18,6 +18,12 @@ export type ProofParams = {
   tree: MerkleTree;
   extAmount: BigNumber;
   recipient: string | 0;
+  tokenOut: BigNumber;
+  amountOutMin: BigNumber;
+  swapRecipient: BigNumber;
+  swapRouter: BigNumber;
+  swapData: BigNumber;
+  transactData: BigNumber;
 };
 
 async function generateProof(inputs: object) {
@@ -48,6 +54,12 @@ type ProofExtData = {
   extAmount: string;
   encryptedOutput1: string;
   encryptedOutput2: string;
+  tokenOut: string;
+  amountOutMin: BigNumber;
+  swapRecipient: string;
+  swapRouter: string;
+  swapData: string;
+  transactData: string;
 };
 
 export type ZrcProof = {
@@ -62,6 +74,12 @@ export async function getProof({
   tree,
   extAmount,
   recipient,
+  tokenOut,
+  amountOutMin,
+  swapRecipient,
+  swapRouter,
+  swapData,
+  transactData
 }: ProofParams): Promise<FormattedProof> {
   inputs = shuffle(inputs);
   outputs = shuffle(outputs);
@@ -92,6 +110,12 @@ export async function getProof({
     extAmount: toFixedHex(extAmount),
     encryptedOutput1: outputs[0].encrypt(),
     encryptedOutput2: outputs[1].encrypt(),
+    tokenOut: toFixedHex(tokenOut, 20),
+    amountOutMin: amountOutMin,
+    swapRecipient: toFixedHex(swapRecipient, 20),
+    swapRouter: toFixedHex(swapRouter, 20),
+    swapData: toFixedHex(swapData),
+    transactData: toFixedHex(transactData),
   };
 
   // Check if extAmount is not zero
@@ -177,7 +201,7 @@ async function formatArguments(zrcProof: ZrcProof): Promise<FormattedProof> {
     inputNullifiers: inputNullifiers.map(toFixedHex) as [string, string],
     outputCommitments: outputCommitments.map(toFixedHex) as [string, string],
     publicAmount: BigNumber.from(publicAmount),
-    publicAsset: BigNumber.from(publicAsset),
+    publicAsset: toFixedHex(publicAsset.toString(), 20),
     extDataHash: toFixedHex(extDataHash),
   };
 

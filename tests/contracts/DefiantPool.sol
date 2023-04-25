@@ -47,8 +47,9 @@ contract DefiantPool is ShieldedPool, WithdrawalAmountManagerImpl {
 
     constructor(
         address _hasherAddress,
-        address _verifier
-    ) ShieldedPool(5, _hasherAddress, _verifier) {}
+        address _verifier,
+        address _swapExecutor
+    ) ShieldedPool(5, _hasherAddress, _verifier, _swapExecutor) {}
 
     function deposit(Proof calldata _proof) external onlyDepositProxy {
         address _proxy = msg.sender;
@@ -83,7 +84,7 @@ contract DefiantPool is ShieldedPool, WithdrawalAmountManagerImpl {
         }
     }
 
-    function transact(Proof calldata _proof) public {
+    function transact(Proof calldata _proof) public override {
         require(_proof.extData.extAmount == 0, "extAmount must be 0");
 
         _transact(_proof);

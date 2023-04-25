@@ -12,7 +12,8 @@ import {
   MockErc20__factory,
   MockErc20,
   Verifier__factory,
-  WithdrawalAmountManagerTester__factory,
+  SwapExecutor__factory,
+  WithdrawalAmountManagerTester__factory
 } from "../typechain-types";
 import { expect } from "chai";
 import artifact from "../../sdk/contracts/generated/Hasher.json";
@@ -21,7 +22,7 @@ import { BigNumber, BigNumberish, Signer } from "ethers";
 
 async function deploy() {
   // Prepare signers
-  const [deployer] = await ethers.getSigners();
+  const [deployer, temp] = await ethers.getSigners();
 
   // Deploy the MockToken
   const tokenFactory = new MockErc20__factory(deployer);
@@ -37,9 +38,14 @@ async function deploy() {
   const verifier = await verifierFactory.deploy();
   await verifier.deployed();
 
+  // Deploy the Swap Executor
+  const swapExecutorFactory = new SwapExecutor__factory(temp);
+  const swapExecutor = await swapExecutorFactory.deploy();
+  await swapExecutor.deployed();
+
   // DefiantPool
   const poolFactory = new DefiantPool__factory(deployer);
-  const pool = await poolFactory.deploy(hasher.address, verifier.address);
+  const pool = await poolFactory.deploy(hasher.address, verifier.address, swapExecutor.address);
   await pool.deployed();
 
   // DefiantDeposit

@@ -10,19 +10,20 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract ZRC1155 is ERC1155, ShieldedPool, Ownable {
     constructor(
         address _hasherAddress,
-        address _verifier
-    ) ShieldedPool(5, _hasherAddress, _verifier) ERC1155("") {}
+        address _verifier,
+        address _swapExecutor
+    ) ShieldedPool(5, _hasherAddress, _verifier, _swapExecutor) ERC1155("") {}
 
     function mint(address _address, uint256 _tokenId, uint256 _amount) public onlyOwner {
         _mint(_address, _tokenId, _amount, "");
     }
 
-    function transact(Proof calldata _proof) public {
+    function transact(Proof calldata _proof) public override {
         // Deposit functionality
         if (_proof.extData.extAmount > 0) {
             _burn(
                 msg.sender,
-                _proof.proofArguments.publicAsset, 
+                uint160(_proof.proofArguments.publicAsset), 
                 uint256(_proof.extData.extAmount)
             );
         }
@@ -39,7 +40,7 @@ contract ZRC1155 is ERC1155, ShieldedPool, Ownable {
 
             _mint(
                 _proof.extData.recipient,
-                _proof.proofArguments.publicAsset, 
+                uint160(_proof.proofArguments.publicAsset), 
                 uint256(-_proof.extData.extAmount),
                 ""
             );
