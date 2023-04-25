@@ -1,6 +1,6 @@
 import { EventStoreWriter } from "./event_store_writer";
 import { Keypair } from "./keypair";
-import { BigNumberish, ethers, providers } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 import { PasswordEncryptor } from "./password_encryptor";
 import { AccountStore } from "./account_store";
 import { Utxo } from "./utxo";
@@ -13,6 +13,7 @@ export class Account {
   private eventStoreWriter?: EventStoreWriter;
   constructor(
     private contract: ethers.Contract,
+    public signer: ethers.Signer,
     private encryptor: PasswordEncryptor
   ) {}
 
@@ -20,24 +21,12 @@ export class Account {
     !!this.keypair && !!this.encryptor && !!this.eventStoreWriter;
   }
 
-  async loginWithEthersSigner(signer: ethers.Signer) {
-    const keypair = await Keypair.fromSigner(signer);
-    this.keypair = keypair;
-    this.eventStoreWriter = new EventStoreWriter(
-      this.contract,
-      keypair,
-      this.encryptor
-    );
-    await this.eventStoreWriter.start();
-  }
-
-  async loginFromLocalCache() {
-    // load keypair with encryptor
+  async login() {
     const state = new AccountStore(this.encryptor);
-    const keypair = await state.getKeypair();
-    if (!keypair) {
-      throw new Error("NO_CREDENTIALS_FOUND");
-    }
+    const keypair =
+      (await state.getKeypair()) ?? (await Keypair.fromSigner(this.signer));
+
+    this.keypair = keypair;
     this.eventStoreWriter = new EventStoreWriter(
       this.contract,
       keypair,
@@ -82,11 +71,19 @@ export class Account {
     return await this.getProver().shield(amount, asset);
   }
 
-  async proveUnshield(amount: BigNumberish, recipient: string, asset: BigNumberish = 0) {
+  async proveUnshield(
+    amount: BigNumberish,
+    recipient: string,
+    asset: BigNumberish = 0
+  ) {
     return await this.getProver().unshield(amount, recipient, asset);
   }
 
-  async proveTransfer(amount: BigNumberish, toPubkey: string, asset: BigNumberish = 0) {
+  async proveTransfer(
+    amount: BigNumberish,
+    toPubkey: string,
+    asset: BigNumberish = 0
+  ) {
     return await this.getProver().transfer(amount, toPubkey, asset);
   }
 
@@ -96,17 +93,17 @@ export class Account {
     return this.prover;
   }
 
+  destroy() {
+    this.getEventStoreWriter().stop();
+  }
+
   static async create(
     contract: ethers.Contract,
+    signer: ethers.Signer,
     password: string
   ): Promise<Account> {
     // Ensure password length > 16
     const encryptor = PasswordEncryptor.fromPassword(password);
-    return new Account(contract, encryptor);
+    return new Account(contract, signer, encryptor);
   }
-}
-
-type WithStateManager = { eventStoreWriter: EventStoreWriter };
-function ensureStatemanager(value: any): value is WithStateManager {
-  return !!value.eventStoreWriter;
 }

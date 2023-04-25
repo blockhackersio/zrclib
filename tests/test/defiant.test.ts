@@ -1,23 +1,24 @@
 // Need this or ethers fails in node
 
-import { ethers } from "hardhat";
+import { ethers, network } from "hardhat";
 import { Account } from "@zrclib/sdk";
 import {
-  DefiantDeposit,
   DefiantDepositProxy__factory,
   DefiantDeposit__factory,
+  DefiantPool,
   DefiantPool__factory,
   DefiantWithdrawalProxy__factory,
   DefiantWithdrawal__factory,
   MockErc20__factory,
+  MockErc20,
   Verifier__factory,
-  SwapExecutor__factory
+  SwapExecutor__factory,
+  WithdrawalAmountManagerTester__factory
 } from "../typechain-types";
 import { expect } from "chai";
 import artifact from "../../sdk/contracts/generated/Hasher.json";
 import { sleep, tend, time } from "../utils";
-import { BigNumberish, Signer } from "ethers";
-import { MockErc20 } from "../typechain-types/contracts/mocks/MockErc20.sol";
+import { BigNumber, BigNumberish, Signer } from "ethers";
 
 async function deploy() {
   // Prepare signers
@@ -35,18 +36,22 @@ async function deploy() {
   // Deploy the Verifier
   const verifierFactory = new Verifier__factory(deployer);
   const verifier = await verifierFactory.deploy();
+  await verifier.deployed();
 
   // Deploy the Swap Executor
   const swapExecutorFactory = new SwapExecutor__factory(deployer);
   const swapExecutor = await swapExecutorFactory.deploy();
+  await swapExecutor.deployed();
 
   // DefiantPool
   const poolFactory = new DefiantPool__factory(deployer);
   const pool = await poolFactory.deploy(hasher.address, verifier.address, swapExecutor.address);
+  await pool.deployed();
 
   // DefiantDeposit
   const depositFactory = new DefiantDeposit__factory(deployer);
   const depositImpl = await depositFactory.deploy(pool.address, token.address);
+  await depositImpl.deployed();
 
   // DefiantWithdrawal
   const withdrawalFactory = new DefiantWithdrawal__factory(deployer);
@@ -54,6 +59,7 @@ async function deploy() {
     pool.address,
     token.address
   );
+  await withdrawalImpl.deployed();
 
   return { pool, token, depositImpl, withdrawalImpl };
 }
@@ -61,50 +67,53 @@ async function deploy() {
 async function deposit(
   amount: BigNumberish,
   account: Account,
-  signer: Signer,
   token: MockErc20
 ) {
   // Deploy proxy contract
-  const depositProxyFactory = new DefiantDepositProxy__factory(signer);
+  const depositProxyFactory = new DefiantDepositProxy__factory(account.signer);
   const depositProxy = await depositProxyFactory.deploy();
   await depositProxy.deployed();
   console.log(`depositContract: ${depositProxy.address}`);
   const depositContract = DefiantDeposit__factory.connect(
     depositProxy.address,
-    signer
+    account.signer
   );
 
   // Approve token spend
-  let tx = await token.connect(signer).approve(depositContract.address, amount);
+  let tx = await token
+    .connect(account.signer)
+    .approve(depositContract.address, amount);
   await tx.wait();
 
   // Create proof
   const proof = await account.proveShield(amount);
 
   // Submit transaction
+  console.log("Submitting to deposit contract");
   tx = await depositContract.deposit(proof);
   await tx.wait();
 
   console.log("Deposited to contract");
 }
 
-async function withdrawal(
-  amount: BigNumberish,
-  account: Account,
-  signer: Signer
-) {
+async function withdrawal(amount: BigNumberish, account: Account) {
   // Deploy proxy contract
-  const withdrawalProxyFactory = new DefiantWithdrawalProxy__factory(signer);
+  const withdrawalProxyFactory = new DefiantWithdrawalProxy__factory(
+    account.signer
+  );
   const withdrawalProxy = await withdrawalProxyFactory.deploy();
   await withdrawalProxy.deployed();
   console.log(`withdrawalContract.address: ${withdrawalProxy.address}`);
   const withdrawalContract = DefiantWithdrawal__factory.connect(
     withdrawalProxy.address,
-    signer
+    account.signer
   );
 
   // Create proof
-  const proof = await account.proveUnshield(amount, await signer.getAddress());
+  const proof = await account.proveUnshield(
+    amount,
+    await account.signer.getAddress()
+  );
 
   // Submit transaction
   let tx = await withdrawalContract.withdraw(proof);
@@ -112,6 +121,46 @@ async function withdrawal(
 
   console.log("Withdrawaled from contract");
 }
+
+async function transfer(
+  pool: DefiantPool,
+  amount: BigNumberish,
+  sender: Account,
+  recipient: Account
+) {
+  // Create proof
+  const proof = await sender.proveTransfer(
+    amount,
+    recipient.getKeypair().address(),
+    0
+  );
+
+  // Submit transaction
+  let tx = await pool.transact(proof);
+  await tx.wait();
+  console.log("Transacted");
+}
+
+it("WithdrawalAmountManager", async () => {
+  // Using other deployer to prevent deterministic contract
+  // addresses from not matching proxies
+  const [, deployer, a, b, c] = await ethers.getSigners();
+
+  const factory = new WithdrawalAmountManagerTester__factory(deployer);
+  const contract = await factory.deploy();
+  await contract.deployed();
+
+  let tx = await contract.addDeposit(a.address, 100);
+  await tx.wait();
+  tx = await contract.addDeposit(b.address, 100);
+  await tx.wait();
+  const [arr, len] = await contract.getWithdrawalAmounts(150);
+  const [one, two] = arr.slice(0, len);
+  expect([one, two]).to.eql([
+    [a.address, BigNumber.from(100)],
+    [b.address, BigNumber.from(50)],
+  ]);
+});
 
 it("should deposit", async () => {
   // Setup
@@ -122,41 +171,71 @@ it("should deposit", async () => {
   const { token, pool } = await deploy();
   let tx = await token.mint(aliceEth.address, 100_000000);
   await tx.wait();
+  tx = await token.mint(charlieEth.address, 100_000000);
+  await tx.wait();
   tend(t);
 
-  t = time("Setup account");
-  const alice = await Account.create(pool, "password123");
-  await alice.loginWithEthersSigner(aliceEth);
-  const bob = await Account.create(pool, "password123");
-  await bob.loginWithEthersSigner(bobEth);
+  t = time("Setup account and login");
+  const alice = await Account.create(pool, aliceEth, "password123");
+  await alice.login();
+  const bob = await Account.create(pool, bobEth, "password123");
+  await bob.login();
+  const charlie = await Account.create(pool, charlieEth, "password123");
+  await charlie.login();
   tend(t);
 
   // Deposit
-  t = time("deposit");
-  await deposit(100_000000, alice, aliceEth, token);
+  t = time("alice deposit");
+  await deposit(100_000000, alice, token);
   tend(t);
 
-  await sleep(10_000);
+  t = time("charlie deposit");
+  await deposit(100_000000, charlie, token);
+  tend(t);
+
+  await sleep(15_000);
 
   // Check balances
   t = time("get balances");
   let alicePrivateBal = await alice.getBalance();
   expect(alicePrivateBal.toNumber()).to.eq(100_000000);
+  let charliePrivateBal = await charlie.getBalance();
+  expect(charliePrivateBal.toNumber()).to.eq(100_000000);
   let alicePublicBal = await token.balanceOf(aliceEth.address);
   expect(alicePublicBal.toNumber()).to.eq(0);
   tend(t);
 
+  // Transfer
+  t = time("transfer");
+  await transfer(pool, 75_000000, alice, bob);
+  await transfer(pool, 75_000000, charlie, bob);
+  await sleep(10_000);
+  tend(t);
+
+  t = time("get balances");
+  alicePrivateBal = await alice.getBalance();
+  expect(alicePrivateBal.toNumber()).to.eq(25_000000);
+  charliePrivateBal = await charlie.getBalance();
+  expect(charliePrivateBal.toNumber()).to.eq(25_000000);
+  let bobPrivateBal = await bob.getBalance();
+  expect(bobPrivateBal.toNumber()).to.eq(150_000000);
+  tend(t);
+
   // Withdraw
   t = time("withdraw");
-  await withdrawal(100_000000, alice, aliceEth);
+  await withdrawal(150_000000, bob);
   await sleep(10_000);
   tend(t);
 
   // Check balances
   t = time("get balances");
-  alicePrivateBal = await alice.getBalance();
-  expect(alicePrivateBal.toNumber()).to.eq(0);
-  alicePublicBal = await token.balanceOf(aliceEth.address);
-  expect(alicePublicBal.toNumber()).to.eq(100_000000);
+  bobPrivateBal = await bob.getBalance();
+  expect(bobPrivateBal.toNumber()).to.eq(0);
+  let bobPublicBal = await token.balanceOf(bobEth.address);
+  expect(bobPublicBal.toNumber()).to.eq(150_000000);
   tend(t);
+
+  alice.destroy();
+  bob.destroy();
+  charlie.destroy();
 });
