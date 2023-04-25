@@ -1,6 +1,6 @@
 import { EventStoreWriter } from "./event_store_writer";
 import { Keypair } from "./keypair";
-import { BigNumberish, ethers } from "ethers";
+import { BigNumber, BigNumberish, ethers } from "ethers";
 import { PasswordEncryptor } from "./password_encryptor";
 import { AccountStore } from "./account_store";
 import { Utxo } from "./utxo";
@@ -67,24 +67,51 @@ export class Account {
     return new Utxo({ asset, amount, keypair: this.getKeypair() });
   }
 
-  async proveShield(amount: BigNumberish, asset: BigNumberish = 0) {
-    return await this.getProver().shield(amount, asset);
+  async proveShield(
+    amount: BigNumberish, 
+    asset: BigNumberish = 0,
+    swapParams = {
+      tokenOut: BigNumber.from(0),
+      amountOutMin: BigNumber.from(0),
+      swapRecipient: BigNumber.from(0),
+      swapRouter: BigNumber.from(0),
+      swapData: BigNumber.from(0),
+      transactData: BigNumber.from(0),
+    }
+  ) {
+    return await this.getProver().shield(amount, asset, swapParams);
   }
 
   async proveUnshield(
     amount: BigNumberish,
     recipient: string,
-    asset: BigNumberish = 0
+    asset: BigNumberish = 0,
+    swapParams = {
+      tokenOut: BigNumber.from(0),
+      amountOutMin: BigNumber.from(0),
+      swapRecipient: BigNumber.from(0),
+      swapRouter: BigNumber.from(0),
+      swapData: BigNumber.from(0),
+      transactData: BigNumber.from(0),
+    }
   ) {
-    return await this.getProver().unshield(amount, recipient, asset);
+    return await this.getProver().unshield(amount, recipient, asset, swapParams);
   }
 
   async proveTransfer(
     amount: BigNumberish,
     toPubkey: string,
-    asset: BigNumberish = 0
+    asset: BigNumberish = 0,
+    swapParams = {
+      tokenOut: BigNumber.from(0),
+      amountOutMin: BigNumber.from(0),
+      swapRecipient: BigNumber.from(0),
+      swapRouter: BigNumber.from(0),
+      swapData: BigNumber.from(0),
+      transactData: BigNumber.from(0),
+    }
   ) {
-    return await this.getProver().transfer(amount, toPubkey, asset);
+    return await this.getProver().transfer(amount, toPubkey, asset, swapParams);
   }
 
   private getProver() {
