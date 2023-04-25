@@ -22,7 +22,7 @@ import { BigNumber, BigNumberish, Signer } from "ethers";
 
 async function deploy() {
   // Prepare signers
-  const [deployer] = await ethers.getSigners();
+  const [deployer, temp] = await ethers.getSigners();
 
   // Deploy the MockToken
   const tokenFactory = new MockErc20__factory(deployer);
@@ -39,7 +39,7 @@ async function deploy() {
   await verifier.deployed();
 
   // Deploy the Swap Executor
-  const swapExecutorFactory = new SwapExecutor__factory(deployer);
+  const swapExecutorFactory = new SwapExecutor__factory(temp);
   const swapExecutor = await swapExecutorFactory.deploy();
   await swapExecutor.deployed();
 
