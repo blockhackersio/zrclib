@@ -26,7 +26,6 @@ export function Profile({ address }: { address: `0x${string}` | undefined }) {
     <ShieldedTabs
       public={
         <>
-          {" "}
           <Horizontal>
             <div className="text-2xl mb-4">My Account</div>
           </Horizontal>

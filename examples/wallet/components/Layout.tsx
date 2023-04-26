@@ -17,7 +17,7 @@ export function PageLayout(p: {
   };
 
   return (
-    <div>
+    <div className="min-h-screen">
       <Header
         title={p.title}
         subtitle={p.subtitle}
