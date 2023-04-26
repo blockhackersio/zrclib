@@ -66,7 +66,7 @@ export class AccountStore {
 
   async getUtxosUpTo(amount: BigNumberish, asset: BigNumberish): Promise<Utxo[]> {
     const allUnspent = await this.getUnspentUtxos();
-    const unspent = allUnspent[asset.toString()];
+    const unspent = allUnspent[BigNumber.from(asset).toString()];
     const results: Utxo[] = [];
     let total = BigNumber.from(0);
     for (const note of unspent) {
@@ -82,7 +82,7 @@ export class AccountStore {
 
   async getBalance(asset: BigNumberish): Promise<BigNumber> {
     const allUnspent = await this.getUnspentUtxos();
-    const unspent = allUnspent[asset.toString()];
+    const unspent = allUnspent[BigNumber.from(asset).toString()];
     if (!unspent) return BigNumber.from(0);
 
     return unspent.reduce((acc: BigNumber, utxo: Utxo) => {
