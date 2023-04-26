@@ -1,47 +1,35 @@
 import { Modal } from "flowbite-react";
-import { ReactNode, FC } from "react";
+import { createContext, ReactNode, FC, useContext } from "react";
 
 export type LayoutProps = {
   header?: ReactNode;
-  children: ReactNode;
+  body?: ReactNode;
+  children?: ReactNode;
   footer?: ReactNode;
 };
-
-export type DialogContentProps = {
-  Layout?: FC<LayoutProps>;
-};
-
-export type DialogContent = FC<DialogContentProps>;
-
-function isComponent(value: any): value is FC {
-  return typeof value === "function";
-}
-
-function getElement(value: FC | ReactNode | undefined): ReactNode {
-  if (!value) return null;
-
-  if (isComponent(value)) {
-    const Value = value;
-    return <Value />;
-  }
-
-  return value;
-}
 
 export function ModalLayout(p: LayoutProps) {
   return (
     <>
       {p.header && <Modal.Header>{p.header}</Modal.Header>}
-      <Modal.Body>{getElement(p.children)}</Modal.Body>
+      <Modal.Body>{p.body ?? p.children}</Modal.Body>
       {p.footer && <Modal.Footer>{p.footer}</Modal.Footer>}
     </>
   );
 }
 
+export const DialogLayoutContext = createContext<FC<LayoutProps>>(ModalLayout);
+
+export function useLayoutTemplate() {
+  return useContext(DialogLayoutContext);
+}
+
 export function Dialog(p: { content?: ReactNode; onClose: () => void }) {
   return (
     <Modal show={!!p.content} onClose={p.onClose}>
-      {p.content}
+      <DialogLayoutContext.Provider value={ModalLayout}>
+        {p.content}
+      </DialogLayoutContext.Provider>
     </Modal>
   );
 }

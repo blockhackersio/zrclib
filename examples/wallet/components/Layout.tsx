@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import Header from "./Header";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Dialog, DialogContent } from "@/ui/Dialog";
+import { Dialog } from "@/ui/Dialog";
 import { useRouter } from "next/router";
 
 export function PageLayout(p: {
@@ -15,6 +15,7 @@ export function PageLayout(p: {
   const onClose = () => {
     router.push("/");
   };
+
   return (
     <div>
       <Header

@@ -8,6 +8,7 @@ import { alchemyProvider } from "wagmi/providers/alchemy";
 import { mainnet, localhost } from "wagmi/chains";
 import { Flowbite } from "flowbite-react";
 import { theme } from "../styles/theme";
+import { ShieldedProvider } from "@/components/ShieldedMode";
 const { chains, provider } = configureChains(
   [mainnet, { ...localhost, id: 31337 }],
   [alchemyProvider({ apiKey: process.env.ALCHEMY_ID! }), publicProvider()]
@@ -19,7 +20,7 @@ const { connectors } = getDefaultWallets({
 });
 
 const wagmiClient = createClient({
-  autoConnect: true,
+  autoConnect: false,
   connectors,
   provider,
 });
@@ -29,7 +30,9 @@ export default function App({ Component, pageProps }: AppProps) {
     <Flowbite theme={{ theme }}>
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider chains={chains}>
-          <Component {...pageProps} />
+          <ShieldedProvider>
+            <Component {...pageProps} />
+          </ShieldedProvider>
         </RainbowKitProvider>
       </WagmiConfig>
     </Flowbite>

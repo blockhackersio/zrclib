@@ -1,5 +1,5 @@
 import { useAccount, useDisconnect } from "wagmi";
-import { Profile } from "@/ui/Profile";
+import { Profile } from "./Profile";
 import { Vertical } from "@/ui/Vertical";
 
 export function BaseStack() {

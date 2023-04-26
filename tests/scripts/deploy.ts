@@ -1,6 +1,10 @@
 import { ethers } from "hardhat";
 import artifact from "@zrclib/sdk/contracts/generated/Hasher.json";
-import { Verifier__factory, ZRC20__factory } from "../typechain-types";
+import {
+  SwapExecutor__factory,
+  Verifier__factory,
+  ZRC20__factory,
+} from "../typechain-types";
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -14,9 +18,17 @@ async function main() {
   const verifierFactory = new Verifier__factory(deployer);
   const verifier = await verifierFactory.deploy();
 
+  // Deploy the Swap Executor
+  const swapExecutorFactory = new SwapExecutor__factory(deployer);
+  const swapExecutor = await swapExecutorFactory.deploy();
+
   // Deploy the ZRC20 passing in the hasher and verifier
   const zrc20Factory = new ZRC20__factory(deployer);
-  const contract = await zrc20Factory.deploy(hasher.address, verifier.address);
+  const contract = await zrc20Factory.deploy(
+    hasher.address,
+    verifier.address,
+    swapExecutor.address
+  );
 
   return { contract };
 }

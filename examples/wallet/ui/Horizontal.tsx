@@ -8,14 +8,19 @@ export function Horizontal({
   children: ReactNode;
   gap?: boolean;
   right?: boolean;
+  className?: string;
 }) {
   return (
     <div
-      className={classNames("flex flex-row w-full", {
-        "gap-4": gap,
-        "justify-center": !right,
-        "justify-end": right,
-      })}
+      className={classNames(
+        "flex flex-row w-full",
+        {
+          "gap-4": gap,
+          "justify-center": !right,
+          "justify-end": right,
+        },
+        p.className
+      )}
       {...p}
     />
   );
