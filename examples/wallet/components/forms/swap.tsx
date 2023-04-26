@@ -1,10 +1,10 @@
 import { Button } from "@/ui/Button";
-import { useLayoutTemplate } from "@/ui/Dialog";
 import { Horizontal } from "@/ui/Horizontal";
 import { Spinner } from "flowbite-react";
 import { FormDataInput, FormProcessor } from "./index";
 import { useForm } from "react-hook-form";
 import { Vertical } from "@/ui/Vertical";
+import { useLayoutTemplate } from "@/ui/LayoutProvider";
 
 export type SwapData = {
   fromAmount: string;

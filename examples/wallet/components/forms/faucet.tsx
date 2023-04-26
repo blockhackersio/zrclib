@@ -1,10 +1,10 @@
 import { Button } from "@/ui/Button";
-import { useLayoutTemplate } from "@/ui/Dialog";
 import { Horizontal } from "@/ui/Horizontal";
 import { Spinner } from "flowbite-react";
 import { FormDataInput, FormProcessor } from "./index";
 import { useForm } from "react-hook-form";
 import { availableTokens } from "@/config/constants";
+import { useLayoutTemplate } from "@/ui/LayoutProvider";
 
 export type FaucetData = { amount: string; currency: string };
 

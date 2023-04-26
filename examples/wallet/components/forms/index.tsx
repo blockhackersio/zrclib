@@ -1,7 +1,15 @@
-import React, { ReactNode } from "react";
-import { FieldValues, Path, UseFormRegister, useForm } from "react-hook-form";
+import React, { FormEventHandler, ReactNode } from "react";
+import {
+  FieldValues,
+  Path,
+  SubmitHandler,
+  UseFormRegister,
+  useForm,
+} from "react-hook-form";
 import { Alert, Label, Select, TextInput } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
+import { Button } from "@/ui/Button";
+import { Horizontal } from "@/ui/Horizontal";
 type FieldDescriptor<T extends string | number | symbol> =
   | {
       label?: string;
@@ -34,6 +42,19 @@ type FieldDescriptor<T extends string | number | symbol> =
       label: string;
       type: "combination";
       fields: FieldDescriptor<T>[];
+    }
+  | {
+      label: string;
+      type: "submit";
+    }
+  | {
+      label?: string;
+      name: T;
+      type: "password";
+      submit?: boolean;
+      submitText?: string;
+      required?: boolean | string;
+      pattern?: { value: RegExp; message: string };
     };
 
 export type FormDataInput<T> = {
@@ -60,6 +81,27 @@ function renderField<T extends FieldValues>(
               pattern: field.pattern,
             })}
           />
+          {controller.formState.errors[field.name] && (
+            <Alert color="failure" icon={HiInformationCircle} role="alert">{`${
+              controller.formState.errors[field.name]?.message
+            }`}</Alert>
+          )}
+        </FieldWrapper>
+      );
+    case "password":
+      return (
+        <FieldWrapper key={index}>
+          {field.label && <Label htmlFor={field.name} value={field.label} />}
+          <Horizontal gap>
+            <TextInput
+              type="password"
+              {...controller.register(field.name, {
+                required: field.required,
+                pattern: field.pattern,
+              })}
+            />
+            {field.submit && <Button type="submit">{field.submitText}</Button>}
+          </Horizontal>
           {controller.formState.errors[field.name] && (
             <Alert color="failure" icon={HiInformationCircle} role="alert">{`${
               controller.formState.errors[field.name]?.message
@@ -131,25 +173,28 @@ function renderField<T extends FieldValues>(
           </div>
         </FieldWrapper>
       );
+    case "submit":
+      return (
+        <FieldWrapper>
+          <Button type="submit">{field.label}</Button>
+        </FieldWrapper>
+      );
     default:
       return null;
   }
 }
 
 export function FormProcessor<T extends FieldValues>({
-  formData,
   controller,
+  formData,
+  onSubmit = () => {},
 }: {
+  onSubmit?: (data: T) => void;
   formData: FormDataInput<T>;
   controller: ReturnType<typeof useForm<T>>;
 }) {
   return (
-    <form
-      onSubmit={(evt) => {
-        evt.stopPropagation();
-        evt.preventDefault();
-      }}
-    >
+    <form onSubmit={controller.handleSubmit(onSubmit)}>
       <div className="flex flex-col ">
         {formData.fields.map((field, index) =>
           renderField(controller, field, index)
