@@ -12,8 +12,9 @@ contract ZUSD is ShieldedPool, ERC20 {
         address _hasherAddress,
         address _verifierAddress,
         address _troveManagerAddress,
-        address _stabilityPoolAddress
-    ) ShieldedPool(5, _hasherAddress, _verifierAddress) ERC20("ZUSD", "ZUSD") {
+        address _stabilityPoolAddress,
+        address _swapExecutorAddress
+    ) ShieldedPool(5, _hasherAddress, _verifierAddress, _swapExecutorAddress) ERC20("ZUSD", "ZUSD") {
         troveManagerAddress = _troveManagerAddress;
         stabilityPoolAddress = _stabilityPoolAddress;
     }
@@ -36,11 +37,6 @@ contract ZUSD is ShieldedPool, ERC20 {
     function transact(Proof calldata _proof) public override {
         // Deposit functionality
         if (_proof.extData.extAmount > 0) {
-            _spendAllowance(
-                msg.sender,
-                address(this),
-                uint256(_proof.extData.extAmount)
-            );
             _transfer(
                 msg.sender,
                 address(this),
@@ -59,7 +55,7 @@ contract ZUSD is ShieldedPool, ERC20 {
             );
 
             _transfer(
-                msg.sender,
+                address(this),
                 _proof.extData.recipient,
                 uint256(_proof.extData.extAmount)
             );

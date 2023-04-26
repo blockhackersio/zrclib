@@ -11,13 +11,15 @@ import {
   ZUSD,
   ZUSD__factory,
   Verifier__factory,
+  SwapExecutor,
+  SwapExecutor__factory
 } from "../typechain-types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { Account } from "@zrclib/sdk";
 
 const artifactPath = path.join(
   __dirname,
-  "../../../tools/contracts/generated/Hasher.json"
+  "../../../sdk/contracts/generated/Hasher.json"
 );
 const artifact = require(artifactPath);
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -26,6 +28,7 @@ describe("ZUSD", function () {
   let fakePriceFeed: FakeContract<AggregatorV3Interface>;
   let troveManager: TroveManager;
   let stabilityPool: StabilityPool;
+  let swapExecutor: SwapExecutor;
   let zusd: ZUSD;
   let user: SignerWithAddress;
   let account: Account;
@@ -64,13 +67,18 @@ describe("ZUSD", function () {
     const verifierFactory = new Verifier__factory(user);
     const verifier = await verifierFactory.deploy();
 
+    // Deploy the Swap Executor
+    const swapExecutorFactory = new SwapExecutor__factory(user);
+    swapExecutor = await swapExecutorFactory.deploy();
+
     // deploy ZUSD
     const zusdFactory = new ZUSD__factory(user);
     zusd = await zusdFactory.deploy(
       hasher.address,
       verifier.address,
       troveManager.address,
-      stabilityPool.address
+      stabilityPool.address,
+      swapExecutor.address
     );
     zusdDecimals = await zusd.decimals();
 
