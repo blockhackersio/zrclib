@@ -23,7 +23,7 @@ contract MultiAssetShieldedPool is ShieldedPool {
         }
 
         // Proof determines whether we add to or remove from pool
-        _transact(_proof);
+        super.transact(_proof);
 
         // Withdrawal functionality
         if (_proof.extData.extAmount < 0) {
@@ -38,5 +38,11 @@ contract MultiAssetShieldedPool is ShieldedPool {
                 uint256(-_proof.extData.extAmount)
             );
         }
+    }
+
+    function transactAndSwap(Proof calldata _proof) public override {
+        IERC20 token = IERC20(_proof.proofArguments.publicAsset);
+        token.transferFrom(msg.sender, address(this), uint(_proof.extData.extAmount));
+        super.transactAndSwap(_proof);
     }
 }
