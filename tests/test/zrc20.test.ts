@@ -39,7 +39,7 @@ async function deployZrc() {
   return { contract };
 }
 
-it.skip("Test zrc20 transfer", async function () {
+it("Test zrc20 transfer", async function () {
   const TEN = 10 * 1_000_000;
   const FIVE = 5 * 1_000_000;
 

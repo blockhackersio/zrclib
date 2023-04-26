@@ -2,7 +2,11 @@
 
 import { ethers } from "hardhat";
 import { Account } from "../../sdk/src";
-import { Verifier__factory, ZRC1155__factory, SwapExecutor__factory } from "../typechain-types";
+import {
+  Verifier__factory,
+  ZRC1155__factory,
+  SwapExecutor__factory,
+} from "../typechain-types";
 import { expect } from "chai";
 import artifact from "../../sdk/contracts/generated/Hasher.json";
 import { sleep, tend, time } from "../utils";
@@ -35,7 +39,7 @@ async function deployZrc() {
   return { contract };
 }
 
-it.skip("Test zrc1155 transfer", async function () {
+it("Test zrc1155 transfer", async function () {
   const TEN = 10 * 1_000_000;
   const FIVE = 5 * 1_000_000;
 
