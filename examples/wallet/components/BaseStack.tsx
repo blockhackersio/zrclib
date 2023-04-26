@@ -6,7 +6,7 @@ export function BaseStack() {
   const { address, isConnected } = useAccount();
 
   return (
-    <div className="text-center w-full p-20">
+    <div className="text-center w-full p-4">
       {!isConnected ? (
         <Vertical>
           <div className="text-lg mb-4">Connect your Wallet!</div>
