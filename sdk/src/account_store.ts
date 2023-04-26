@@ -52,13 +52,13 @@ export class AccountStore {
   async getUnspentUtxos() {
     const all = await this.utxoStore.getAll();
     // filter by asset type
-    const unspent: Record<number, Utxo[]> = {};
+    const unspent: Record<string, Utxo[]> = {};
     for (const utxo of all) {
       if (!(await this.isSpent(utxo))) {
-        if (!unspent[utxo.asset.toNumber()]) {
-          unspent[utxo.asset.toNumber()] = [];
+        if (!unspent[utxo.asset.toString()]) {
+          unspent[utxo.asset.toString()] = [];
         }
-        unspent[utxo.asset.toNumber()].push(utxo);
+        unspent[utxo.asset.toString()].push(utxo);
       }
     }
     return unspent;
@@ -66,8 +66,7 @@ export class AccountStore {
 
   async getUtxosUpTo(amount: BigNumberish, asset: BigNumberish): Promise<Utxo[]> {
     const allUnspent = await this.getUnspentUtxos();
-    if (typeof asset !== 'number') throw new Error("MUST_BE_NUMBER");
-    const unspent = allUnspent[asset];
+    const unspent = allUnspent[asset.toString()];
     const results: Utxo[] = [];
     let total = BigNumber.from(0);
     for (const note of unspent) {
@@ -83,8 +82,7 @@ export class AccountStore {
 
   async getBalance(asset: BigNumberish): Promise<BigNumber> {
     const allUnspent = await this.getUnspentUtxos();
-    if (typeof asset !== 'number') throw new Error("MUST_BE_NUMBER");
-    const unspent = allUnspent[asset];
+    const unspent = allUnspent[asset.toString()];
     if (!unspent) return BigNumber.from(0);
 
     return unspent.reduce((acc: BigNumber, utxo: Utxo) => {
