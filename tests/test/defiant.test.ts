@@ -26,7 +26,7 @@ async function deploy() {
 
   // Deploy the MockToken
   const tokenFactory = new MockErc20__factory(deployer);
-  const token = await tokenFactory.deploy();
+  const token = await tokenFactory.deploy("Fake Ether", "ETH");
 
   // Deploy the poseidon hasher
   const { abi, bytecode } = artifact;
