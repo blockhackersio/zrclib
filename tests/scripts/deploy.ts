@@ -3,7 +3,7 @@ import artifact from "@zrclib/sdk/contracts/generated/Hasher.json";
 import {
   SwapExecutor__factory,
   Verifier__factory,
-  ZRC1155__factory,
+  ZRC20__factory,
 } from "../typechain-types";
 
 async function main() {
@@ -22,9 +22,9 @@ async function main() {
   const swapExecutorFactory = new SwapExecutor__factory(deployer);
   const swapExecutor = await swapExecutorFactory.deploy();
 
-  // Deploy the ZRC1155 passing in the hasher and verifier
-  const zrc1155Factory = new ZRC1155__factory(deployer);
-  const contract = await zrc1155Factory.deploy(
+  // Deploy the ZRC20 passing in the hasher and verifier
+  const zrc20Factory = new ZRC20__factory(deployer);
+  const contract = await zrc20Factory.deploy(
     hasher.address,
     verifier.address,
     swapExecutor.address
