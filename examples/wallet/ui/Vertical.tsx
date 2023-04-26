@@ -6,7 +6,7 @@ export function Vertical({
   center = false,
   ...p
 }: {
-  className: string;
+  className?: string;
   children: ReactNode;
   gap?: boolean;
   center?: boolean;
