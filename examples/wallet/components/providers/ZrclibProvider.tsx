@@ -21,7 +21,7 @@ type ZrcApi = {
   address: `0x${string}` | undefined;
   isConnected: boolean;
   login(password: string): Promise<void>;
-  setAsset(asset: string): void;
+  setAsset(asset?: string): void;
 };
 
 const defaultLib: ZrcApi = {
