@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import * as Faucet from "@/components/forms/faucet";
 import { useAccount } from "wagmi";
 import { useZrclib } from "@/components/providers/ZrclibProvider";
+import { fromNumberInput } from "@/utils";
 
 type PageId = "edit" | "inflight" | "success" | "fail";
 
@@ -20,7 +21,7 @@ export default function Home() {
       setPageId("inflight");
       // Trigger mint
       try {
-        await zrclib.faucet(data.amount);
+        await zrclib.faucet(fromNumberInput(data.amount));
       } catch (err) {
         console.log(err);
         setPageId("fail");

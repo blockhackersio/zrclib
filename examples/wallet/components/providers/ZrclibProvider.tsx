@@ -1,5 +1,4 @@
 import {
-  ContractType,
   Tokens,
   getContract,
   getTokenFromAddress,
@@ -15,12 +14,8 @@ import {
 } from "react";
 import { useAccount } from "wagmi";
 import { BigNumber, Signer } from "ethers";
-import { Token } from "typescript";
-import { DECIMALS } from "@/config/constants";
-import {
-  MockErc20,
-  MultiAssetShieldedPool,
-} from "@/../../tests/typechain-types";
+import { MockErc20 } from "@/../../tests/typechain-types";
+import { FormattedProof } from "@zrclib/sdk/src/types";
 const zrclib = ZrclibAccount.getInstance();
 
 type ZrcApi = {
@@ -32,8 +27,13 @@ type ZrcApi = {
   address: `0x${string}` | undefined;
   isConnected: boolean;
   login(password: string): Promise<void>;
-  faucet(amount: string): Promise<void>;
+  faucet(amount: BigNumber): Promise<void>;
+  approve(amount: BigNumber): Promise<void>;
+  proveShield(amount: BigNumber): Promise<FormattedProof>;
+  proveUnshield(amount: BigNumber, recipient: string): Promise<FormattedProof>;
+  proveTransfer(amount: BigNumber, toPubKey: string): Promise<FormattedProof>;
   setAsset(asset?: string): void;
+  send(proof: FormattedProof): Promise<void>;
 };
 
 const defaultLib: ZrcApi = {
@@ -46,7 +46,20 @@ const defaultLib: ZrcApi = {
   isConnected: false,
   setAsset() {},
   async login() {},
+  async proveShield() {
+    throw new Error("not ready");
+  },
+  async proveTransfer() {
+    throw new Error("not ready");
+  },
   async faucet() {},
+  async approve() {},
+  async proveUnshield() {
+    throw new Error("not ready");
+  },
+  async send() {
+    throw new Error("not ready");
+  },
 };
 
 export const ZrclibContext = createContext<ZrcApi>(defaultLib);
@@ -90,7 +103,9 @@ export function ZrclibProvider(p: { children: ReactNode }) {
   );
 
   const faucet = useCallback(
-    async (amount: string) => {
+    async (amount: BigNumber) => {
+      console.log(`faucet: ${amount}`);
+
       if (!connector) return;
       if (typeof asset === "undefined") return;
       if (typeof chainId === "undefined") return;
@@ -99,12 +114,93 @@ export function ZrclibProvider(p: { children: ReactNode }) {
       const type = getTokenFromAddress(asset, chainId) as Tokens;
       const contract = getContract(type, chainId, signer) as MockErc20;
 
-      await contract.mint(
-        await signer.getAddress(),
-        BigNumber.from(amount).mul(DECIMALS)
-      );
+      const tx = await contract.mint(await signer.getAddress(), amount);
+      await tx.wait();
     },
     [asset, chainId, connector]
+  );
+
+  const send = useCallback(
+    async (proof: FormattedProof) => {
+      console.log(`proveShield: ${JSON.stringify(proof)}`);
+
+      if (!connector) return;
+      if (typeof asset === "undefined") return;
+      if (typeof chainId === "undefined") return;
+
+      const signer: Signer = await connector.getSigner();
+      const contract = getContract("MASP", chainId, signer);
+
+      const tx = await contract.transact(proof);
+      await tx.wait();
+    },
+    [asset, chainId, connector]
+  );
+
+  const proveShield = useCallback(
+    async (amount: BigNumber) => {
+      console.log(`proveShield: ${amount}`);
+
+      if (!connector) throw new Error("");
+      if (typeof asset === "undefined") throw new Error("");
+
+      const proof = await zrclib.proveShield(amount, BigNumber.from(asset));
+      return proof;
+    },
+    [asset, connector]
+  );
+
+  const proveUnshield = useCallback(
+    async (amount: BigNumber, recipient: string) => {
+      console.log(`proveUnshield: ${amount}`);
+
+      if (!connector) throw new Error("");
+      if (typeof asset === "undefined") throw new Error("");
+
+      const proof = await zrclib.proveUnshield(
+        amount,
+        recipient,
+        BigNumber.from(asset)
+      );
+      return proof;
+    },
+    [asset, connector]
+  );
+
+  const proveTransfer = useCallback(
+    async (amount: BigNumber, toPubKey: string) => {
+      console.log(`proveTransfer: ${amount}`);
+
+      if (!connector) throw new Error("");
+      if (typeof asset === "undefined") throw new Error("");
+
+      const proof = await zrclib.proveTransfer(
+        amount,
+        toPubKey,
+        BigNumber.from(asset)
+      );
+      return proof;
+    },
+    [asset, connector]
+  );
+
+  const approve = useCallback(
+    async (amount: BigNumber) => {
+      console.log(`approve: ${amount}`);
+      if (!connector) throw new Error("connector now found");
+      if (typeof asset === "undefined") throw new Error("asset not found");
+      if (typeof chainId === "undefined") throw new Error("chainid not found");
+
+      const signer: Signer = await connector.getSigner();
+      const type = getTokenFromAddress(asset, chainId) as Tokens;
+
+      const spender = getContract("MASP", chainId, signer);
+      const contract = getContract(type, chainId, signer) as MockErc20;
+
+      const tx = await contract.approve(spender.address, amount);
+      await tx.wait();
+    },
+    [chainId, asset, connector]
   );
 
   const api = useMemo(() => {
@@ -119,6 +215,11 @@ export function ZrclibProvider(p: { children: ReactNode }) {
       setAsset,
       login,
       faucet,
+      proveShield,
+      proveUnshield,
+      proveTransfer,
+      send,
+      approve,
     };
   }, [
     block,
@@ -131,6 +232,11 @@ export function ZrclibProvider(p: { children: ReactNode }) {
     isConnected,
     login,
     faucet,
+    proveShield,
+    proveUnshield,
+    proveTransfer,
+    send,
+    approve,
   ]);
   return (
     <ZrclibContext.Provider value={api}>{p.children}</ZrclibContext.Provider>
