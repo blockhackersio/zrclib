@@ -8,7 +8,6 @@ import {
 } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
-import { alchemyProvider } from "wagmi/providers/alchemy";
 import { mainnet, localhost } from "wagmi/chains";
 import { Flowbite } from "flowbite-react";
 import { theme } from "../styles/theme";
@@ -16,10 +15,10 @@ import { ShieldedProvider } from "@/components/ShieldedMode";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { LayoutContext, PlainLayout } from "@/ui/LayoutProvider";
-import { ShieldedPoolSdkProvider } from "@/components/providers/ShieldedPoolSdkProvider";
+import { ZrclibProvider } from "@/components/providers/ZrclibProvider";
 const { chains, provider } = configureChains(
   [mainnet, { ...localhost, id: 31337 }],
-  [alchemyProvider({ apiKey: process.env.ALCHEMY_ID! }), publicProvider()]
+  [publicProvider()]
 );
 
 const { connectors } = getDefaultWallets({
@@ -52,9 +51,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <Flowbite theme={{ theme }}>
           <ShieldedProvider>
             <LayoutContext.Provider value={PlainLayout}>
-              <ShieldedPoolSdkProvider>
+              <ZrclibProvider>
                 <Component {...pageProps} />
-              </ShieldedPoolSdkProvider>
+              </ZrclibProvider>
             </LayoutContext.Provider>
           </ShieldedProvider>
         </Flowbite>

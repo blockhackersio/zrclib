@@ -1,9 +1,8 @@
-import { useAccount, useDisconnect } from "wagmi";
 import { Profile } from "./Profile";
 import { Vertical } from "@/ui/Vertical";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import * as Login from "@/components/forms/login";
-import { useShieldedPoolSdk } from "./providers/ShieldedPoolSdkProvider";
+import { useZrclib } from "./providers/ZrclibProvider";
 
 function ConnectPage() {
   return (
@@ -14,10 +13,6 @@ function ConnectPage() {
       </div>
     </Vertical>
   );
-}
-
-function ProfilePage({ address }: { address: `0x${string}` | undefined }) {
-  return <Profile address={address} />;
 }
 
 function LayoutHolder(p: { children: ReactNode }) {
@@ -35,9 +30,8 @@ function LoginPage(p: { onLoginSuccess?: (password: string) => void }) {
 }
 
 export function HomePanel() {
-  const { address, isConnected } = useAccount();
-
-  const sdk = useShieldedPoolSdk();
+  const { isConnected, loggedIn, login, balances, chainId, address } =
+    useZrclib();
 
   if (!isConnected) {
     return (
@@ -47,17 +41,17 @@ export function HomePanel() {
     );
   }
 
-  if (!sdk.isLoggedIn) {
+  if (!loggedIn) {
     return (
       <LayoutHolder>
-        <LoginPage onLoginSuccess={sdk.login} />
+        <LoginPage onLoginSuccess={login} />
       </LayoutHolder>
     );
   }
 
   return (
     <LayoutHolder>
-      <ProfilePage address={address} />
+      <Profile address={address} balances={balances} chainId={chainId} />
     </LayoutHolder>
   );
 }

@@ -7,7 +7,7 @@
     "build": "turbo run build --force --no-daemon",
     "test": "pnpm build && turbo run test --force --no-daemon",
     "clean": "turbo run clean --force --no-daemon",
-    "wallet": "concurrently -r \"turbo run --scope @zrclib/tests dev\" \"turbo run --scope @zrclib/wallet dev\""
+    "wallet": "concurrently -r \"turbo run --force --scope @zrclib/tests dev\" \"turbo run --scope @zrclib/wallet dev\""
   },
   "keywords": [],
   "author": "",

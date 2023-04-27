@@ -7,7 +7,7 @@
     "test": "hardhat test",
     "build": "hardhat compile",
     "clean": "./scripts/clean.sh",
-    "dev": "concurrently -r \"hardhat node\" \"sleep 5 && hardhat run --network localhost scripts/deploy.ts\""
+    "dev": "concurrently -r \"hardhat node\" \"sleep 5 && hardhat run --network localhost scripts/deploy.swap.ts\""
   },
   "keywords": [],
   "author": "",

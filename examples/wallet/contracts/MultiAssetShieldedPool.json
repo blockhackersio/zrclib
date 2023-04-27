@@ -1,0 +1,578 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "MultiAssetShieldedPool",
+  "sourceName": "contracts/MultiAssetShieldedPool.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_hasherAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_verifier",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_swapExecutor",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "commitment",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "encryptedOutput",
+          "type": "bytes"
+        }
+      ],
+      "name": "NewCommitment",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "nullifier",
+          "type": "bytes32"
+        }
+      ],
+      "name": "NewNullifier",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "FIELD_SIZE",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MAX_EXT_AMOUNT",
+      "outputs": [
+        {
+          "internalType": "int256",
+          "name": "",
+          "type": "int256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ROOT_HISTORY_SIZE",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ZERO_VALUE",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "currentRootIndex",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "filledSubtrees",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getLastRoot",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_left",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_right",
+          "type": "bytes32"
+        }
+      ],
+      "name": "hashLeftRight",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "hasher",
+      "outputs": [
+        {
+          "internalType": "contract IHasher",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_root",
+          "type": "bytes32"
+        }
+      ],
+      "name": "isKnownRoot",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_nullifierHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "isSpent",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "levels",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextIndex",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "nullifierHashes",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "roots",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "swapExecutor",
+      "outputs": [
+        {
+          "internalType": "contract SwapExecutor",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "bytes",
+                  "name": "proof",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "root",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32[2]",
+                  "name": "inputNullifiers",
+                  "type": "bytes32[2]"
+                },
+                {
+                  "internalType": "bytes32[2]",
+                  "name": "outputCommitments",
+                  "type": "bytes32[2]"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "publicAmount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "publicAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "extDataHash",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct ShieldedPool.ProofArguments",
+              "name": "proofArguments",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "recipient",
+                  "type": "address"
+                },
+                {
+                  "internalType": "int256",
+                  "name": "extAmount",
+                  "type": "int256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "encryptedOutput1",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "encryptedOutput2",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "address",
+                  "name": "tokenOut",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amountOutMin",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "swapRecipient",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "swapRouter",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "swapData",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "transactData",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct ShieldedPool.ExtData",
+              "name": "extData",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct ShieldedPool.Proof",
+          "name": "_proof",
+          "type": "tuple"
+        }
+      ],
+      "name": "transact",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "bytes",
+                  "name": "proof",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "root",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32[2]",
+                  "name": "inputNullifiers",
+                  "type": "bytes32[2]"
+                },
+                {
+                  "internalType": "bytes32[2]",
+                  "name": "outputCommitments",
+                  "type": "bytes32[2]"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "publicAmount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "publicAsset",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "extDataHash",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct ShieldedPool.ProofArguments",
+              "name": "proofArguments",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "recipient",
+                  "type": "address"
+                },
+                {
+                  "internalType": "int256",
+                  "name": "extAmount",
+                  "type": "int256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "encryptedOutput1",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "encryptedOutput2",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "address",
+                  "name": "tokenOut",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amountOutMin",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "swapRecipient",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "swapRouter",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "swapData",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "transactData",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct ShieldedPool.ExtData",
+              "name": "extData",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct ShieldedPool.Proof",
+          "name": "_proof",
+          "type": "tuple"
+        }
+      ],
+      "name": "transactAndSwap",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "verifier",
+      "outputs": [
+        {
+          "internalType": "contract TransactionVerifier",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "i",
+          "type": "uint256"
+        }
+      ],
+      "name": "zeros",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

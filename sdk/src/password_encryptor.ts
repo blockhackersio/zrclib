@@ -78,13 +78,17 @@ export async function decrypt(
   }
 }
 
+function strencode(input: string): Uint8Array {
+  return isBrowser
+    ? new TextEncoder().encode(input)
+    : new Uint8Array(Buffer.from(input, "utf-8"));
+}
+
 export async function generateKeyFromPassword(
   password: string,
   iterations: number = 10000
 ): Promise<CryptoKey> {
-  const passwordBuffer = isBrowser
-    ? new TextEncoder().encode(password)
-    : Buffer.from(password, "utf-8");
+  const passwordBuffer = strencode(password);
 
   const importAlgorithm = {
     name: "PBKDF2",
@@ -100,7 +104,9 @@ export async function generateKeyFromPassword(
 
   const deriveAlgorithm = {
     name: "PBKDF2",
-    salt: "I am determined",
+    salt: strencode(
+      "I am determined to be half a password" + password.slice(0, 5)
+    ),
     iterations,
     hash: "SHA-256",
   };

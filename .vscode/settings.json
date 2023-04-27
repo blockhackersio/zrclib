@@ -1,4 +1,5 @@
 {
   "solidity.packageDefaultDependenciesDirectory": "./tests/node_modules",
-  "solidity.compileUsingRemoteVersion": "latest"
+  "solidity.compileUsingRemoteVersion": "latest",
+  "vue.features.codeActions.enable": false
 }

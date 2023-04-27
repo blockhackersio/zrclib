@@ -13,6 +13,7 @@ export class Account {
   private keypair?: Keypair;
   private prover?: ShieldedPoolProver;
   private eventStoreWriter?: EventStoreWriter;
+  public unsubscribeBlocks: () => void = () => {};
   constructor(
     private contract: ethers.Contract,
     public signer: ethers.Signer,
@@ -25,17 +26,20 @@ export class Account {
   }
 
   async login() {
-    const state = new AccountStore(this.encryptor);
-    const keypair =
-      (await state.getKeypair()) ?? (await Keypair.fromSigner(this.signer));
-
-    this.keypair = keypair;
-    this.eventStoreWriter = new EventStoreWriter(
-      this.contract,
-      keypair,
-      this.encryptor
-    );
-    await this.eventStoreWriter.start();
+    try {
+      const state = new AccountStore(this.encryptor);
+      const keypair =
+        (await state.getKeypair()) ?? (await Keypair.fromSigner(this.signer));
+      this.keypair = keypair;
+      this.eventStoreWriter = new EventStoreWriter(
+        this.contract,
+        keypair,
+        this.encryptor
+      );
+      await this.eventStoreWriter.start();
+    } catch (err) {
+      throw new Error("LOGIN_FAILURE");
+    }
   }
 
   private getEventStoreWriter() {
@@ -45,6 +49,15 @@ export class Account {
 
   private getStore() {
     return this.getEventStoreWriter().store();
+  }
+
+  onBlock(handler: (blocknumber: number) => void) {
+    if (!this.signer.provider) throw new Error("NO_PROVIDER");
+    const provider = this.signer.provider;
+    provider.on("block", handler);
+    this.unsubscribeBlocks = () => {
+      provider.off("block", handler);
+    };
   }
 
   getKeypair() {
@@ -129,6 +142,7 @@ export class Account {
   }
 
   destroy() {
+    this.unsubscribeBlocks();
     this.getEventStoreWriter().stop();
   }
 
