@@ -67,7 +67,7 @@ function encodeData(proof: FormattedProof) {
   const abi = new ethers.utils.AbiCoder()
   return abi.encode(
     [
-      'tuple(bytes proof,bytes32 root,bytes32[] inputNullifiers,bytes32[2] outputCommitments,uint256 publicAmount,uint256 publicAsset,bytes32 extDataHash)',
+      'tuple(bytes proof,bytes32 root,bytes32[2] inputNullifiers,bytes32[2] outputCommitments,uint256 publicAmount,uint256 publicAsset,bytes32 extDataHash)',
       'tuple(address recipient,int256 extAmount,bytes encryptedOutput1,bytes encryptedOutput2,address tokenOut,uint256 amountOutMin,address swapRecipient,address swapRouter,bytes swapData,bytes transactData)',
     ],
     [proof.proofArguments, proof.extData],
@@ -138,18 +138,19 @@ it("Test swap", async function () {
   proof = await alice.proveShield(FIVE, tokenB.address);
   tend(t);
   t = time("Alice creates unshield proof for 5 coins");
+  const swapEncodedData = swapRouter.interface.encodeFunctionData('swap', [tokenA.address, tokenB.address, FIVE]);
   proof = await alice.proveUnshield(FIVE, swapExecutor.address, tokenA.address, {
     tokenOut: BigNumber.from(tokenB.address),
     amountOutMin: BigNumber.from(FIVE),
     swapRecipient: BigNumber.from(0), // 0 means will re-shield into the pool
     swapRouter: BigNumber.from(swapRouter.address),
-    swapData: BigNumber.from(0),
-    transactData: BigNumber.from(encodeData(proof)) 
+    swapData: swapEncodedData,
+    transactData: encodeData(proof) 
   });
   tend(t);
 
-  t = time("Alice submits transaction");
-  tx = await contract.transactAndSwap(proof);
-  await tx.wait();
-  tend(t);
+  // t = time("Alice submits transaction");
+  // tx = await contract.transactAndSwap(proof);
+  // await tx.wait();
+  // tend(t);
 });

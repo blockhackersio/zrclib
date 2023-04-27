@@ -13,6 +13,6 @@ contract MockSwapRouter {
         require(tokenOut.balanceOf(address(this)) >= amount, "SwapRouter: Insufficient liquidity");
 
         tokenIn.transferFrom(msg.sender, address(this), amount);
-        tokenOut.transferFrom(address(this), msg.sender, amount);
+        tokenOut.transfer(msg.sender, amount);
     }
 }
