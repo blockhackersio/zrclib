@@ -17,6 +17,7 @@ This code is unaudited.
 - [ ] Deposit via proof of deposit (Requires TX proving in Zero Knolwedge - possibly with Nova / Halo)
 - [ ] Withdrawal via threshold network
 - [ ] Refactor and redesign of API
+- [ ] CLI creation
 
 ### Prerequisites
 
