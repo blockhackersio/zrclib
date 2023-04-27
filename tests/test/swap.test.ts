@@ -67,7 +67,7 @@ function encodeData(proof: FormattedProof) {
   const abi = new ethers.utils.AbiCoder()
   return abi.encode(
     [
-      'tuple(bytes proof,bytes32 root,bytes32[2] inputNullifiers,bytes32[2] outputCommitments,uint256 publicAmount,uint256 publicAsset,bytes32 extDataHash)',
+      'tuple(bytes proof,bytes32 root,bytes32[2] inputNullifiers,bytes32[2] outputCommitments,uint256 publicAmount,address publicAsset,bytes32 extDataHash)',
       'tuple(address recipient,int256 extAmount,bytes encryptedOutput1,bytes encryptedOutput2,address tokenOut,uint256 amountOutMin,address swapRecipient,address swapRouter,bytes swapData,bytes transactData)',
     ],
     [proof.proofArguments, proof.extData],
@@ -149,8 +149,8 @@ it("Test swap", async function () {
   });
   tend(t);
 
-  // t = time("Alice submits transaction");
-  // tx = await contract.transactAndSwap(proof);
-  // await tx.wait();
-  // tend(t);
+  t = time("Alice submits transaction");
+  tx = await contract.transactAndSwap(proof);
+  await tx.wait();
+  tend(t);
 });
