@@ -68,7 +68,7 @@ export class Account {
   }
 
   async proveShield(
-    amount: BigNumberish, 
+    amount: BigNumberish,
     asset: BigNumberish = 0,
     swapParams = {
       tokenOut: BigNumber.from(0),
@@ -95,7 +95,12 @@ export class Account {
       transactData: BigNumber.from(0),
     }
   ) {
-    return await this.getProver().unshield(amount, recipient, asset, swapParams);
+    return await this.getProver().unshield(
+      amount,
+      recipient,
+      asset,
+      swapParams
+    );
   }
 
   async proveTransfer(

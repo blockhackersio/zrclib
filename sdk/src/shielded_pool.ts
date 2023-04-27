@@ -2,7 +2,7 @@ import { BigNumber, BigNumberish } from "ethers";
 import { prepareTransaction } from "./prepare_transaction";
 import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
-import { Account } from "./shielded_account";
+import { Account } from "./account";
 import { ensurePoseidon } from "./poseidon";
 import { FormattedProof } from "./types";
 
