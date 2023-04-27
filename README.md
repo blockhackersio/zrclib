@@ -13,9 +13,9 @@ This code is unaudited.
 - [x] ZRC-20 (Token & Payment)
 - [x] ZRC-1155 (Payment / Swap / NFTS / Airdrops)
 - [x] Defi Swaps
+- [x] Defiant Pools Prototype (Zero Knowledge Deposit Addresses pt I)
+- [ ] Deposit via proof of deposit (Requires TX proving in Zero Knolwedge - possibly with Nova / Halo)
 - [ ] Refactor and redesign of API
-- [ ] Implement Defiant Pools
-- [ ] Add Zero Knowledge Deposit Addresses 
 
 ### Prerequisites
 
