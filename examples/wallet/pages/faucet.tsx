@@ -1,5 +1,5 @@
 import { PageLayout } from "@/components/Layout";
-import { BaseStack } from "@/components/BaseStack";
+import { HomePanel } from "@/components/HomePanel";
 import { ReactNode, useCallback, useState } from "react";
 import { useRouter } from "next/router";
 import * as Faucet from "@/components/forms/faucet";
@@ -35,7 +35,7 @@ export default function Home() {
 
   return (
     <PageLayout dialogContent={address && dialog} title="coinshield">
-      <BaseStack />
+      <HomePanel />
     </PageLayout>
   );
 }

@@ -7,7 +7,7 @@ import MerkleTree from "fixed-merkle-tree";
 import { Utxo } from "./utxo";
 import { Element } from "fixed-merkle-tree";
 import { FormattedProof, ProofArguments } from "./types";
-import { generateProof } from "./generate_proof";
+import { GenerateProofFn, generateProof } from "./generate_proof";
 
 export type ProofParams = {
   asset: BigNumber;
@@ -22,6 +22,7 @@ export type ProofParams = {
   swapRouter: BigNumber;
   swapData: BigNumber;
   transactData: BigNumber;
+  proofGen?: GenerateProofFn;
 };
 
 type ProofArgs = {
@@ -65,6 +66,7 @@ export async function getProof({
   swapRouter,
   swapData,
   transactData,
+  proofGen = generateProof,
 }: ProofParams): Promise<FormattedProof> {
   inputs = shuffle(inputs);
   outputs = shuffle(outputs);
@@ -148,7 +150,7 @@ export async function getProof({
   };
   const istring = stringifyBigInts(input);
 
-  const proof = await generateProof(istring);
+  const proof = await proofGen(istring);
 
   const args: ZrcProof["args"] = {
     proof,

@@ -4,6 +4,7 @@ import { Vertical } from "@/ui/Vertical";
 import { ReactNode, useState } from "react";
 import * as Login from "@/components/forms/login";
 import { useShieldedPoolSdk } from "./providers/ShieldedPoolSdkProvider";
+
 function ConnectPage() {
   return (
     <Vertical className="h-full p-20">
@@ -33,7 +34,7 @@ function LoginPage(p: { onLoginSuccess?: (password: string) => void }) {
   return <Login.Edit next={next} />;
 }
 
-export function BaseStack() {
+export function HomePanel() {
   const { address, isConnected } = useAccount();
 
   const sdk = useShieldedPoolSdk();
