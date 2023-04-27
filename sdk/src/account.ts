@@ -5,7 +5,7 @@ import { PasswordEncryptor } from "./password_encryptor";
 import { AccountStore } from "./account_store";
 import { Utxo } from "./utxo";
 import { ShieldedPoolProver } from "./shielded_pool";
-import { buildMerkleTree } from "./buildMerkleTree";
+import { buildMerkleTree } from "./merkle_tree";
 
 export class Account {
   private keypair?: Keypair;
