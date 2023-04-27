@@ -138,9 +138,9 @@ it("Test swap", async function () {
   proof = await alice.proveShield(FIVE, tokenB.address);
   tend(t);
   t = time("Alice creates unshield proof for 5 coins");
-  proof = await alice.proveUnshield(TEN, aliceEth.address, tokenA.address, {
+  proof = await alice.proveUnshield(FIVE, swapExecutor.address, tokenA.address, {
     tokenOut: BigNumber.from(tokenB.address),
-    amountOutMin: BigNumber.from(TEN),
+    amountOutMin: BigNumber.from(FIVE),
     swapRecipient: BigNumber.from(0), // 0 means will re-shield into the pool
     swapRouter: BigNumber.from(swapRouter.address),
     swapData: BigNumber.from(0),
@@ -148,8 +148,8 @@ it("Test swap", async function () {
   });
   tend(t);
 
-  // t = time("Alice submits transaction");
-  // tx = await contract.transactAndSwap(proof);
-  // await tx.wait();
-  // tend(t);
+  t = time("Alice submits transaction");
+  tx = await contract.transactAndSwap(proof);
+  await tx.wait();
+  tend(t);
 });
