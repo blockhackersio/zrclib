@@ -13,6 +13,9 @@ This code is unaudited.
 - [x] ZRC-20 (Token & Payment)
 - [x] ZRC-1155 (Payment / Swap / NFTS / Airdrops)
 - [x] Defi Swaps
+- [ ] Refactor and redesign of API
+- [ ] Implement Defiant Pools
+- [ ] Add Zero Knowledge Deposit Addresses 
 
 ### Prerequisites
 
