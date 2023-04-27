@@ -4,6 +4,8 @@
 
 To bring zero knowledge privacy primitives to all web3 developers.
 
+## Disclaimer
+
 This code is unaudited.
 
 ## Roadmap
