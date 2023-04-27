@@ -4,7 +4,6 @@ import { FIELD_SIZE } from "./constants";
 import { fieldToObject, fieldToString } from "./poseidon";
 import MerkleTree from "fixed-merkle-tree";
 
-// XXX: NODE dependency remove!!
 import { Utxo } from "./utxo";
 import { Element } from "fixed-merkle-tree";
 import { FormattedProof, ProofArguments } from "./types";

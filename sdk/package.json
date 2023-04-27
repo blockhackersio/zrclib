@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "types": "src/index.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "**/*.sol",
     "dist"
@@ -43,6 +43,6 @@
     "rollup": "^3.20.4",
     "ts-jest": "^29.1.0",
     "tslib": "^2.5.0",
-    "typescript": "5.1.0-dev.20230413"
+    "typescript": "5.0.4"
   }
 }
