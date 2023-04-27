@@ -10,9 +10,9 @@ This code is unaudited.
 
 ## Roadmap
 
-- [ ] ZRC-20 (Token & Payment)
-- [ ] Stable Coin Example
-- [ ] ZRC-1155 (Payment / Swap / NFTS / Airdrops)
+- [x] ZRC-20 (Token & Payment)
+- [x] ZRC-1155 (Payment / Swap / NFTS / Airdrops)
+- [x] Defi Swaps
 
 ### Prerequisites
 
