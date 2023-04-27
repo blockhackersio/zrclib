@@ -1,4 +1,3 @@
-import { Button, IconButton } from "@/ui/Button";
 import { BigNumber } from "ethers";
 import { Horizontal } from "@/ui/Horizontal";
 import {
@@ -15,7 +14,6 @@ import { AccountBalances } from "@/services/zrclib";
 import { ReactNode, useCallback } from "react";
 import { Vertical } from "@/ui/Vertical";
 import { getTokenFromAddress } from "@/contracts/get_contract";
-import Link from "next/link";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { BigText } from "@/ui/BigText";
 import { formatAmount } from "@/utils";
