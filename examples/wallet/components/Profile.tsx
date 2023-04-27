@@ -142,13 +142,14 @@ function ProfileLayout({
                 label={"Shield"}
               />
             )}
-
-            <WalletActionButton
-              href="/swap"
-              title="Swap Funds"
-              icon={MdSwapHorizontalCircle}
-              label="Swap"
-            />
+            {isPrivate && (
+              <WalletActionButton
+                href="/swap"
+                title="Swap Funds"
+                icon={MdSwapHorizontalCircle}
+                label="Swap"
+              />
+            )}
           </Horizontal>
           <Spacer space="large" />
         </>
