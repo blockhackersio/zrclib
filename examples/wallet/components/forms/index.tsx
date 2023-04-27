@@ -1,11 +1,5 @@
-import React, { FormEventHandler, ReactNode } from "react";
-import {
-  FieldValues,
-  Path,
-  SubmitHandler,
-  UseFormRegister,
-  useForm,
-} from "react-hook-form";
+import React, { ReactNode } from "react";
+import { FieldValues, Path, useForm } from "react-hook-form";
 import { Alert, Label, Select, TextInput } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import { Button } from "@/ui/Button";
@@ -16,6 +10,7 @@ type FieldDescriptor<T extends string | number | symbol> =
       name: T;
       type: "textfield";
       required?: boolean | string;
+      right?: string;
       pattern?: { value: RegExp; message: string };
     }
   | {
@@ -23,6 +18,7 @@ type FieldDescriptor<T extends string | number | symbol> =
       name: T;
       type: "numericfield";
       required?: boolean | string;
+      right?: string;
     }
   | {
       label?: string;
@@ -74,13 +70,16 @@ function renderField<T extends FieldValues>(
       return (
         <FieldWrapper key={index}>
           {field.label && <Label htmlFor={field.name} value={field.label} />}
-          <TextInput
-            type="text"
-            {...controller.register(field.name, {
-              required: field.required,
-              pattern: field.pattern,
-            })}
-          />
+          <div className="flex flex-row">
+            <TextInput
+              type="text"
+              {...controller.register(field.name, {
+                required: field.required,
+                pattern: field.pattern,
+              })}
+            />
+            {field.right && <div className="pt-2">{field.right}</div>}
+          </div>
           {controller.formState.errors[field.name] && (
             <Alert color="failure" icon={HiInformationCircle} role="alert">{`${
               controller.formState.errors[field.name]?.message
@@ -113,12 +112,16 @@ function renderField<T extends FieldValues>(
       return (
         <FieldWrapper key={index}>
           {field.label && <Label htmlFor={field.name} value={field.label} />}
-          <TextInput
-            type="number"
-            {...controller.register(field.name, {
-              required: field.required,
-            })}
-          />
+          <div className="flex flex-row gap-4">
+            <TextInput
+              className="flex-1"
+              type="number"
+              {...controller.register(field.name, {
+                required: field.required,
+              })}
+            />
+            {field.right && <div className="pt-2">{field.right}</div>}
+          </div>
           {controller.formState.errors[field.name]?.message && (
             <Alert color="failure" icon={HiInformationCircle} role="alert">{`${
               controller.formState.errors[field.name]?.message

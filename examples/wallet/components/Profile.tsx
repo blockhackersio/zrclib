@@ -18,6 +18,7 @@ import { getTokenFromAddress } from "@/contracts/get_contract";
 import Link from "next/link";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { BigText } from "@/ui/BigText";
+import { formatAmount } from "@/utils";
 
 export function NormalizedSunglasses(p: IconBaseProps) {
   return (
@@ -60,7 +61,7 @@ function AssetRow({
       key={address}
     >
       <div>
-        {balance.toString()} {token}
+        {formatAmount(balance)} {token}
       </div>
       <div>
         <AiOutlineRight />
@@ -102,7 +103,7 @@ function ProfileLayout({
       {asset && (
         <>
           <BigText>
-            {balances.get(asset)?.toString() ?? 0} {token}
+            {formatAmount(balances.get(asset) ?? 0)} {token}
           </BigText>
         </>
       )}

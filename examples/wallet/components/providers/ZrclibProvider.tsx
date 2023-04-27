@@ -1,4 +1,9 @@
-import { getContract } from "@/contracts/get_contract";
+import {
+  ContractType,
+  Tokens,
+  getContract,
+  getTokenFromAddress,
+} from "@/contracts/get_contract";
 import { AccountBalances, ZrclibAccount } from "@/services/zrclib";
 import {
   ReactNode,
@@ -9,7 +14,13 @@ import {
   useState,
 } from "react";
 import { useAccount } from "wagmi";
-import { Signer } from "ethers";
+import { BigNumber, Signer } from "ethers";
+import { Token } from "typescript";
+import { DECIMALS } from "@/config/constants";
+import {
+  MockErc20,
+  MultiAssetShieldedPool,
+} from "@/../../tests/typechain-types";
 const zrclib = ZrclibAccount.getInstance();
 
 type ZrcApi = {
@@ -21,6 +32,7 @@ type ZrcApi = {
   address: `0x${string}` | undefined;
   isConnected: boolean;
   login(password: string): Promise<void>;
+  faucet(amount: string): Promise<void>;
   setAsset(asset?: string): void;
 };
 
@@ -34,6 +46,7 @@ const defaultLib: ZrcApi = {
   isConnected: false,
   setAsset() {},
   async login() {},
+  async faucet() {},
 };
 
 export const ZrclibContext = createContext<ZrcApi>(defaultLib);
@@ -76,6 +89,24 @@ export function ZrclibProvider(p: { children: ReactNode }) {
     [connector]
   );
 
+  const faucet = useCallback(
+    async (amount: string) => {
+      if (!connector) return;
+      if (typeof asset === "undefined") return;
+      if (typeof chainId === "undefined") return;
+
+      const signer: Signer = await connector.getSigner();
+      const type = getTokenFromAddress(asset, chainId) as Tokens;
+      const contract = getContract(type, chainId, signer) as MockErc20;
+
+      await contract.mint(
+        await signer.getAddress(),
+        BigNumber.from(amount).mul(DECIMALS)
+      );
+    },
+    [asset, chainId, connector]
+  );
+
   const api = useMemo(() => {
     return {
       block,
@@ -87,6 +118,7 @@ export function ZrclibProvider(p: { children: ReactNode }) {
       asset,
       setAsset,
       login,
+      faucet,
     };
   }, [
     block,
@@ -98,6 +130,7 @@ export function ZrclibProvider(p: { children: ReactNode }) {
     address,
     isConnected,
     login,
+    faucet,
   ]);
   return (
     <ZrclibContext.Provider value={api}>{p.children}</ZrclibContext.Provider>

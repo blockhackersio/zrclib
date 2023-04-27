@@ -3,46 +3,40 @@ import { Horizontal } from "@/ui/Horizontal";
 import { Spinner } from "flowbite-react";
 import { FormDataInput, FormProcessor } from "./index";
 import { useForm } from "react-hook-form";
-import { availableTokens } from "@/config/constants";
 import { useLayoutTemplate } from "@/ui/LayoutProvider";
+import { useZrclib } from "../providers/ZrclibProvider";
+import { getTokenFromAddress } from "@/contracts/get_contract";
 
 export type FaucetData = { amount: string; currency: string };
-
-const form: FormDataInput<FaucetData> = {
-  title: "Please select the amount of tokens you require",
-  fields: [
-    {
-      type: "combination",
-      label: "Token Amount",
-      fields: [
-        {
-          name: "amount",
-          type: "numericfield",
-        },
-        {
-          type: "dropdown",
-          name: "currency",
-          options: availableTokens.map((token) => ({
-            label: token,
-            value: token,
-          })),
-        },
-      ],
-    },
-  ],
-};
 
 export function Edit(p: {
   next: (data: FaucetData) => void;
   back: () => void;
 }) {
   const Layout = useLayoutTemplate();
-
+  const { asset, chainId } = useZrclib();
   const controller = useForm<FaucetData>({
     defaultValues: {
       amount: "10",
     },
   });
+  const token = asset && getTokenFromAddress(asset, chainId);
+  const form: FormDataInput<FaucetData> = {
+    title: `Please select the amount of ${token} you require`,
+    fields: [
+      {
+        type: "combination",
+        label: `${token} Amount`,
+        fields: [
+          {
+            name: "amount",
+            type: "numericfield",
+            right: token,
+          },
+        ],
+      },
+    ],
+  };
 
   return (
     <Layout

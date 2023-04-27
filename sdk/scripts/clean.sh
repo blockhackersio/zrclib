@@ -1,3 +1,3 @@
 #!/bin/bash
 
-rm -rf compiled contracts/transaction_verifier.sol
+rm -rf compiled contracts/generated dist

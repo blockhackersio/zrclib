@@ -1,8 +1,7 @@
-import { Contract, Signer, ethers, providers } from "ethers";
-import MASP_JSON from "./MultiAssetShieldedPool.json";
-import ERC20_JSON from "./MockErc20.json";
+import { Contract, Signer } from "ethers";
 import addresses from "./addresses.json";
-
+import ERC20_JSON from "./MockErc20.json";
+import MASP_JSON from "./MultiAssetShieldedPool.json";
 export type Tokens = "LUSD" | "DAI";
 export type ContractType = "MASP" | Tokens;
 export type ChainName = keyof typeof addresses;
@@ -26,17 +25,17 @@ export function getContract(
 
   switch (type) {
     case "MASP": {
-      const { abi } = MASP_JSON;
+      const abi = MASP_JSON.abi;
       const address = addresses[chainName].MASP;
       return new Contract(address, abi, provider);
     }
     case "LUSD": {
-      const { abi } = ERC20_JSON;
+      const abi = ERC20_JSON.abi;
       const address = addresses[chainName].LUSD;
       return new Contract(address, abi, provider);
     }
     case "DAI": {
-      const { abi } = ERC20_JSON;
+      const abi = ERC20_JSON.abi;
       const address = addresses[chainName].DAI;
       return new Contract(address, abi, provider);
     }

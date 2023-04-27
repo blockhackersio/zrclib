@@ -4,23 +4,32 @@ import { ReactNode, useCallback, useState } from "react";
 import { useRouter } from "next/router";
 import * as Faucet from "@/components/forms/faucet";
 import { useAccount } from "wagmi";
+import { useZrclib } from "@/components/providers/ZrclibProvider";
 
 type PageId = "edit" | "inflight" | "success" | "fail";
 
 export default function Home() {
+  const zrclib = useZrclib();
   const [pageId, setPageId] = useState<PageId>("edit");
   const [data, setData] = useState<Faucet.FaucetData>();
   const { address } = useAccount();
-
   const router = useRouter();
-  const submit = useCallback((data: Faucet.FaucetData) => {
-    setData(data);
-    setPageId("inflight");
-    // Trigger mint
-    setTimeout(() => {
+  const submit = useCallback(
+    async (data: Faucet.FaucetData) => {
+      setData(data);
+      setPageId("inflight");
+      // Trigger mint
+      try {
+        await zrclib.faucet(data.amount);
+      } catch (err) {
+        console.log(err);
+        setPageId("fail");
+        return;
+      }
       setPageId("success");
-    }, 5000);
-  }, []);
+    },
+    [zrclib]
+  );
 
   const close = () => router.push("/");
 

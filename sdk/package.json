@@ -12,6 +12,7 @@
   "scripts": {
     "build": "./scripts/build.sh",
     "postinstall": "./scripts/install.sh",
+    "clean": "./scripts/clean.sh",
     "test": "jest"
   },
   "keywords": [],
