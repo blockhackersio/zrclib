@@ -19,7 +19,7 @@ import Link from "next/link";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { BigText } from "@/ui/BigText";
 import { formatAmount } from "@/utils";
-
+import { FaSadCry } from "react-icons/fa";
 export function NormalizedSunglasses(p: IconBaseProps) {
   return (
     <div className={`h-${p.size} w-${p.size} p-[2px]`}>
@@ -71,6 +71,7 @@ function AssetRow({
 }
 
 function ProfileLayout({
+  isPrivate,
   address,
   title,
   balances,
@@ -78,6 +79,7 @@ function ProfileLayout({
   asset,
   setAsset,
 }: {
+  isPrivate: boolean;
   title: ReactNode;
   address: `0x${string}` | undefined;
   balances: Map<string, BigNumber>;
@@ -111,24 +113,36 @@ function ProfileLayout({
       {asset && (
         <>
           <Horizontal gap>
-            <WalletActionButton
-              href="/faucet"
-              title="Get Funds"
-              icon={MdAddCircle}
-              label="Faucet"
-            />
+            {!isPrivate && (
+              <WalletActionButton
+                href="/faucet"
+                title="Get Funds"
+                icon={MdAddCircle}
+                label="Faucet"
+              />
+            )}
             <WalletActionButton
               href="/send"
               title="Send Funds"
               icon={MdArrowCircleRight}
               label="Send"
             />
-            <WalletActionButton
-              href="/shield"
-              title="Shield Funds"
-              icon={NormalizedSunglasses}
-              label="Shield"
-            />
+            {isPrivate ? (
+              <WalletActionButton
+                href="/unshield"
+                title="Unshield Funds"
+                icon={FaSadCry}
+                label={"Unshield"}
+              />
+            ) : (
+              <WalletActionButton
+                href="/shield"
+                title="Shield Funds"
+                icon={NormalizedSunglasses}
+                label={"Shield"}
+              />
+            )}
+
             <WalletActionButton
               href="/swap"
               title="Swap Funds"
@@ -178,6 +192,7 @@ export function Profile({
     <ShieldedTabs
       public={
         <ProfileLayout
+          isPrivate={false}
           asset={asset}
           title={"Public Account"}
           chainId={chainId}
@@ -188,6 +203,7 @@ export function Profile({
       }
       private={
         <ProfileLayout
+          isPrivate={true}
           asset={asset}
           title={"Private Account"}
           chainId={chainId}
