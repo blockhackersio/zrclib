@@ -4,6 +4,8 @@
 
 To bring zero knowledge privacy primitives to all web3 developers.
 
+This code is unaudited.
+
 ## Roadmap
 
 - [ ] ZRC-20 (Token & Payment)
