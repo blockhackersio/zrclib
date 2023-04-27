@@ -123,7 +123,7 @@ export class ShieldedPoolProver {
 
     const change = new Utxo({
       asset: BigNumber.from(asset),
-      amount: BigNumber.from(amount).sub(inputsTotal),
+      amount: BigNumber.from(inputsTotal).sub(amount),
     });
 
     const outputs = [change];

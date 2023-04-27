@@ -136,18 +136,17 @@ it("Test swap", async function () {
   /// WITHDRAW, SWAP and RESHIELD
   t = time("Alice creates reshield proof for 5 coins");
   proof = await alice.proveShield(FIVE, tokenB.address);
-  console.log("Reshield Proof: ", proof);
   tend(t);
-  // t = time("Alice creates unshield proof for 5 coins");
-  // proof = await alice.proveUnshield(FIVE, aliceEth.address, tokenA.address, {
-  //   tokenOut: BigNumber.from(tokenB.address),
-  //   amountOutMin: BigNumber.from(FIVE),
-  //   swapRecipient: BigNumber.from(0), // 0 means will re-shield into the pool
-  //   swapRouter: BigNumber.from(swapRouter.address),
-  //   swapData: BigNumber.from(0),
-  //   transactData: BigNumber.from(encodeData(proof)) 
-  // });
-  // tend(t);
+  t = time("Alice creates unshield proof for 5 coins");
+  proof = await alice.proveUnshield(TEN, aliceEth.address, tokenA.address, {
+    tokenOut: BigNumber.from(tokenB.address),
+    amountOutMin: BigNumber.from(TEN),
+    swapRecipient: BigNumber.from(0), // 0 means will re-shield into the pool
+    swapRouter: BigNumber.from(swapRouter.address),
+    swapData: BigNumber.from(0),
+    transactData: BigNumber.from(encodeData(proof)) 
+  });
+  tend(t);
 
   // t = time("Alice submits transaction");
   // tx = await contract.transactAndSwap(proof);
