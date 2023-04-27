@@ -1,6 +1,7 @@
 // Need this or ethers fails in node
 
 import { ethers } from "hardhat";
+import { BigNumber } from "ethers";
 import { Account } from "@zrclib/sdk";
 import {
   MockErc20__factory,
@@ -11,6 +12,7 @@ import {
 } from "../typechain-types";
 import { expect } from "chai";
 import artifact from "@zrclib/sdk/contracts/generated/Hasher.json";
+import { FormattedProof } from "@zrclib/sdk/src/types";
 import { sleep, tend, time } from "../utils";
 
 async function deploySwapRouter() {
@@ -58,14 +60,25 @@ async function deployMultiAssetShieldedPool() {
     swapExecutor.address
   );
 
-  return { contract };
+  return { contract, swapExecutor };
+}
+
+function encodeData(proof: FormattedProof) {
+  const abi = new ethers.utils.AbiCoder()
+  return abi.encode(
+    [
+      'tuple(bytes proof,bytes32 root,bytes32[] inputNullifiers,bytes32[2] outputCommitments,uint256 publicAmount,uint256 publicAsset,bytes32 extDataHash)',
+      'tuple(address recipient,int256 extAmount,bytes encryptedOutput1,bytes encryptedOutput2,address tokenOut,uint256 amountOutMin,address swapRecipient,address swapRouter,bytes swapData,bytes transactData)',
+    ],
+    [proof.proofArguments, proof.extData],
+  )
 }
 
 it("Test swap", async function () {
   const TEN = 10 * 1_000_000;
   const FIVE = 5 * 1_000_000;
 
-  let { contract } = await deployMultiAssetShieldedPool();
+  let { contract, swapExecutor } = await deployMultiAssetShieldedPool();
   let tokenA = await deployERC20Token("LUSD", "LUSD");
   let tokenB = await deployERC20Token("DAI", "DAI");
   let swapRouter = await deploySwapRouter();
@@ -121,5 +134,23 @@ it("Test swap", async function () {
   tend(t);
 
   /// WITHDRAW, SWAP and RESHIELD
+  t = time("Alice creates reshield proof for 5 coins");
+  proof = await alice.proveShield(FIVE, tokenB.address);
+  console.log("Reshield Proof: ", proof);
+  tend(t);
+  // t = time("Alice creates unshield proof for 5 coins");
+  // proof = await alice.proveUnshield(FIVE, aliceEth.address, tokenA.address, {
+  //   tokenOut: BigNumber.from(tokenB.address),
+  //   amountOutMin: BigNumber.from(FIVE),
+  //   swapRecipient: BigNumber.from(0), // 0 means will re-shield into the pool
+  //   swapRouter: BigNumber.from(swapRouter.address),
+  //   swapData: BigNumber.from(0),
+  //   transactData: BigNumber.from(encodeData(proof)) 
+  // });
+  // tend(t);
 
+  // t = time("Alice submits transaction");
+  // tx = await contract.transactAndSwap(proof);
+  // await tx.wait();
+  // tend(t);
 });

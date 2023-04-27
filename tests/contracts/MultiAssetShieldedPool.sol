@@ -41,8 +41,19 @@ contract MultiAssetShieldedPool is ShieldedPool {
     }
 
     function transactAndSwap(Proof calldata _proof) public override {
-        IERC20 token = IERC20(_proof.proofArguments.publicAsset);
-        token.transferFrom(msg.sender, address(this), uint(_proof.extData.extAmount));
+        // Withdrawal functionality (transfer to swap executor)
+        if (_proof.extData.extAmount < 0) {
+            require(
+                _proof.extData.recipient != address(0),
+                "Can't withdraw to zero address"
+            );
+
+            IERC20 token = IERC20(_proof.proofArguments.publicAsset);
+            token.transfer(
+                _proof.extData.recipient,
+                uint256(-_proof.extData.extAmount)
+            );
+        }
         super.transactAndSwap(_proof);
     }
 }
