@@ -4,6 +4,7 @@ import { Utxo } from "./utxo";
 import { getProof } from "./get_proof";
 import { MerkleTree } from "fixed-merkle-tree";
 import { FormattedProof, SwapParams } from "./types";
+import { GenerateProofFn, generateProof } from "./generate_proof";
 
 export const MERKLE_TREE_HEIGHT = 5;
 
@@ -21,6 +22,7 @@ export async function prepareTransaction({
     transactData: BigNumber.from(0),
   },
   tree,
+  proofGen = generateProof,
 }: {
   asset?: BigNumber;
   inputs?: Utxo[];
@@ -28,6 +30,7 @@ export async function prepareTransaction({
   recipient?: string | 0;
   swapParams?: SwapParams;
   tree: MerkleTree;
+  proofGen?: GenerateProofFn;
 }): Promise<FormattedProof> {
   while (inputs.length < 2) {
     const keypair = await Keypair.generate();
@@ -43,14 +46,21 @@ export async function prepareTransaction({
     .sub(inputs.reduce((sum, x) => sum.add(x.amount), BigNumber.from(0)));
 
   // typecasting
-  let { tokenOut, amountOutMin, swapRecipient, swapRouter, swapData, transactData } = swapParams;
+  let {
+    tokenOut,
+    amountOutMin,
+    swapRecipient,
+    swapRouter,
+    swapData,
+    transactData,
+  } = swapParams;
   tokenOut = BigNumber.from(tokenOut);
   amountOutMin = BigNumber.from(amountOutMin);
   swapRecipient = BigNumber.from(swapRecipient);
   swapRouter = BigNumber.from(swapRouter);
   swapData = BigNumber.from(swapData);
   transactData = BigNumber.from(transactData);
-  
+
   const zrcProof = await getProof({
     asset,
     inputs,
@@ -63,7 +73,8 @@ export async function prepareTransaction({
     swapRecipient,
     swapRouter,
     swapData,
-    transactData
+    transactData,
+    proofGen,
   });
 
   return zrcProof;

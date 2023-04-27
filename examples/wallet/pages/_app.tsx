@@ -47,9 +47,9 @@ export default function App({ Component, pageProps }: AppProps) {
     prefetched = true;
   }, [router]);
   return (
-    <Flowbite theme={{ theme }}>
-      <WagmiConfig client={wagmiClient}>
-        <RainbowKitProvider theme={midnightTheme()} chains={chains}>
+    <WagmiConfig client={wagmiClient}>
+      <RainbowKitProvider theme={midnightTheme()} chains={chains}>
+        <Flowbite theme={{ theme }}>
           <ShieldedProvider>
             <LayoutContext.Provider value={PlainLayout}>
               <ShieldedPoolSdkProvider>
@@ -57,8 +57,8 @@ export default function App({ Component, pageProps }: AppProps) {
               </ShieldedPoolSdkProvider>
             </LayoutContext.Provider>
           </ShieldedProvider>
-        </RainbowKitProvider>
-      </WagmiConfig>
-    </Flowbite>
+        </Flowbite>
+      </RainbowKitProvider>
+    </WagmiConfig>
   );
 }

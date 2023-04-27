@@ -2,14 +2,12 @@ import { BigNumber } from "ethers";
 import { getExtDataHash, shuffle, stringifyBigInts, toFixedHex } from "./utils";
 import { FIELD_SIZE } from "./constants";
 import { fieldToObject, fieldToString } from "./poseidon";
-import { plonk } from "snarkjs";
 import MerkleTree from "fixed-merkle-tree";
 
-// XXX: NODE dependency remove!!
-import * as path from "path";
 import { Utxo } from "./utxo";
 import { Element } from "fixed-merkle-tree";
 import { FormattedProof, ProofArguments } from "./types";
+import { GenerateProofFn, generateProof } from "./generate_proof";
 
 export type ProofParams = {
   asset: BigNumber;
@@ -24,20 +22,8 @@ export type ProofParams = {
   swapRouter: BigNumber;
   swapData: BigNumber;
   transactData: BigNumber;
+  proofGen?: GenerateProofFn;
 };
-
-async function generateProof(inputs: object) {
-  const { proof } = await plonk.fullProve(
-    inputs,
-    // XXX: need to handle this path based on implementation
-    path.resolve(__dirname, `../compiled/transaction_js/transaction.wasm`),
-    path.resolve(__dirname, `../compiled/transaction.zkey`)
-  );
-  const calldata = await plonk.exportSolidityCallData(proof, []);
-  const [proofString] = calldata.split(",");
-
-  return proofString as string;
-}
 
 type ProofArgs = {
   proof: string;
@@ -79,7 +65,8 @@ export async function getProof({
   swapRecipient,
   swapRouter,
   swapData,
-  transactData
+  transactData,
+  proofGen = generateProof,
 }: ProofParams): Promise<FormattedProof> {
   inputs = shuffle(inputs);
   outputs = shuffle(outputs);
@@ -163,7 +150,7 @@ export async function getProof({
   };
   const istring = stringifyBigInts(input);
 
-  const proof = await generateProof(istring);
+  const proof = await proofGen(istring);
 
   const args: ZrcProof["args"] = {
     proof,

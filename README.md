@@ -4,11 +4,20 @@
 
 To bring zero knowledge privacy primitives to all web3 developers.
 
+## Disclaimer
+
+This code is unaudited.
+
 ## Roadmap
 
-- [ ] ZRC-20 (Token & Payment)
-- [ ] Stable Coin Example
-- [ ] ZRC-1155 (Payment / Swap / NFTS / Airdrops)
+- [x] ZRC-20 (Token & Payment)
+- [x] ZRC-1155 (Payment / Swap / NFTS / Airdrops)
+- [x] Defi Swaps
+- [x] Defiant Pools Prototype (Zero Knowledge Deposit Addresses pt I)
+- [ ] Deposit via proof of deposit (Requires TX proving in Zero Knolwedge - possibly with Nova / Halo)
+- [ ] Withdrawal via threshold network
+- [ ] Refactor and redesign of API
+- [ ] CLI creation
 
 ### Prerequisites
 
