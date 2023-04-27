@@ -12,13 +12,59 @@ import { IconBaseProps } from "react-icons";
 import { BsFillEmojiSunglassesFill } from "react-icons/bs";
 import { ShieldedTabs } from "./ShieldedMode";
 import { AccountBalances } from "@/services/zrclib";
-import { ReactNode } from "react";
+import { ReactNode, useCallback } from "react";
 import { Vertical } from "@/ui/Vertical";
 import { getTokenFromAddress } from "@/contracts/get_contract";
+import Link from "next/link";
+import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+import { BigText } from "@/ui/BigText";
+
 export function NormalizedSunglasses(p: IconBaseProps) {
   return (
     <div className={`h-${p.size} w-${p.size} p-[2px]`}>
       <BsFillEmojiSunglassesFill size={Number(p.size) - 4} />
+    </div>
+  );
+}
+
+function BackButton({ onClick }: { onClick: () => void }) {
+  return (
+    <div className="cursor-pointer flex flex-row" onClick={onClick}>
+      <div className="flex flex-row align-middle justify-items-center">
+        <AiOutlineLeft className="mt-1" />
+        <div>Back</div>
+      </div>
+    </div>
+  );
+}
+
+function AssetRow({
+  setAsset,
+  balance,
+  address,
+  token,
+}: {
+  token: string;
+  setAsset?: (asset: string) => void;
+  balance: BigNumber;
+  address: string;
+}) {
+  const handleSetAsset = useCallback(() => {
+    setAsset && setAsset(address);
+  }, [address, setAsset]);
+
+  return (
+    <div
+      onClick={handleSetAsset}
+      className="cursor-pointer flex flex-row w-full px-2 py-4 border-b-2 justify-between"
+      key={address}
+    >
+      <div>
+        {balance.toString()} {token}
+      </div>
+      <div>
+        <AiOutlineRight />
+      </div>
     </div>
   );
 }
@@ -28,60 +74,88 @@ function ProfileLayout({
   title,
   balances,
   chainId,
+  asset,
+  setAsset,
 }: {
   title: ReactNode;
   address: `0x${string}` | undefined;
   balances: Map<string, BigNumber>;
   chainId: number;
+  asset: string | undefined;
+  setAsset?: (asset?: string) => void;
 }) {
   const entries = Array.from(balances.entries());
+  const handleBackClicked = useCallback(() => {
+    setAsset && setAsset();
+  }, [setAsset]);
+
+  const token = asset && getTokenFromAddress(asset, chainId);
 
   return (
     <div>
+      {asset && <BackButton onClick={handleBackClicked} />}
       <Horizontal>
         <div className="text-2xl mb-4">{title}</div>
       </Horizontal>
       <div>{address}</div>
       <Spacer space={"small"} />
-      {/* <BigText>0 ETH</BigText>
-      <LittleText>$0.00 USD</LittleText> */}
+      {asset && (
+        <>
+          <BigText>
+            {balances.get(asset)?.toString() ?? 0} {token}
+          </BigText>
+        </>
+      )}
       <Spacer space={"medium"} />
-      <Horizontal gap>
-        <WalletActionButton
-          href="/faucet"
-          title="Get Funds"
-          icon={MdAddCircle}
-          label="Faucet"
-        />
-        <WalletActionButton
-          href="/send"
-          title="Send Funds"
-          icon={MdArrowCircleRight}
-          label="Send"
-        />
-        <WalletActionButton
-          href="/shield"
-          title="Shield Funds"
-          icon={NormalizedSunglasses}
-          label="Shield"
-        />
-        <WalletActionButton
-          href="/swap"
-          title="Swap Funds"
-          icon={MdSwapHorizontalCircle}
-          label="Swap"
-        />
-      </Horizontal>
-      <Vertical>
-        {entries.map(([address, balance]) => {
-          getTokenFromAddress(address, chainId);
-          return (
-            <div key={address}>
-              {address}:{balance.toString()}
-            </div>
-          );
-        })}
-      </Vertical>
+      {asset && (
+        <>
+          <Horizontal gap>
+            <WalletActionButton
+              href="/faucet"
+              title="Get Funds"
+              icon={MdAddCircle}
+              label="Faucet"
+            />
+            <WalletActionButton
+              href="/send"
+              title="Send Funds"
+              icon={MdArrowCircleRight}
+              label="Send"
+            />
+            <WalletActionButton
+              href="/shield"
+              title="Shield Funds"
+              icon={NormalizedSunglasses}
+              label="Shield"
+            />
+            <WalletActionButton
+              href="/swap"
+              title="Swap Funds"
+              icon={MdSwapHorizontalCircle}
+              label="Swap"
+            />
+          </Horizontal>
+          <Spacer space="large" />
+        </>
+      )}
+
+      {!asset && (
+        <Vertical className="border-t-2">
+          {entries.map(([address, balance]) => {
+            const token = getTokenFromAddress(address, chainId);
+            if (!token) return;
+            return (
+              <AssetRow
+                address={address}
+                balance={balance}
+                setAsset={setAsset}
+                token={token}
+                key={token}
+              />
+            );
+          })}
+        </Vertical>
+      )}
     </div>
   );
 }
@@ -90,27 +164,35 @@ export function Profile({
   address,
   balances,
   chainId,
+  asset,
+  setAsset,
 }: {
   address: `0x${string}` | undefined;
   balances: AccountBalances;
   chainId: number;
+  asset: string | undefined;
+  setAsset: (asset?: string) => void;
 }) {
   return (
     <ShieldedTabs
       public={
         <ProfileLayout
-          title={"Account"}
+          asset={asset}
+          title={"Public Account"}
           chainId={chainId}
           address={address}
           balances={balances.publicBalances}
+          setAsset={setAsset}
         />
       }
       private={
         <ProfileLayout
+          asset={asset}
           title={"Private Account"}
           chainId={chainId}
           address={address}
           balances={balances.privateBalances}
+          setAsset={setAsset}
         />
       }
     ></ShieldedTabs>

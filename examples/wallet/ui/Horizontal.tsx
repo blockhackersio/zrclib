@@ -12,15 +12,11 @@ export function Horizontal({
 }) {
   return (
     <div
-      className={classNames(
-        "flex flex-row w-full",
-        {
-          "gap-4": gap,
-          "justify-center": !right,
-          "justify-end": right,
-        },
-        p.className
-      )}
+      className={classNames("flex flex-row w-full", p.className, {
+        "gap-4": gap,
+        "justify-center": !right,
+        "justify-end": right,
+      })}
       {...p}
     />
   );

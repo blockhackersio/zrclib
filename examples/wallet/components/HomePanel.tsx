@@ -30,8 +30,16 @@ function LoginPage(p: { onLoginSuccess?: (password: string) => void }) {
 }
 
 export function HomePanel() {
-  const { isConnected, loggedIn, login, balances, chainId, address } =
-    useZrclib();
+  const {
+    setAsset,
+    asset,
+    isConnected,
+    loggedIn,
+    login,
+    balances,
+    chainId,
+    address,
+  } = useZrclib();
 
   if (!isConnected) {
     return (
@@ -51,7 +59,13 @@ export function HomePanel() {
 
   return (
     <LayoutHolder>
-      <Profile address={address} balances={balances} chainId={chainId} />
+      <Profile
+        asset={asset}
+        setAsset={setAsset}
+        address={address}
+        balances={balances}
+        chainId={chainId}
+      />
     </LayoutHolder>
   );
 }
