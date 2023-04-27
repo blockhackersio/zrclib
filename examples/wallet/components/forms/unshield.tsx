@@ -8,18 +8,18 @@ import { useLayoutTemplate } from "@/ui/LayoutProvider";
 import { useZrclib } from "../providers/ZrclibProvider";
 import { getTokenFromAddress } from "@/contracts/get_contract";
 
-export type ShieldData = { amount: string; currency: string };
+export type UnshieldData = { amount: string; currency: string };
 
 export function Edit(p: {
-  next: (data: ShieldData) => void;
+  next: (data: UnshieldData) => void;
   back: () => void;
 }) {
   const { asset, chainId } = useZrclib();
 
   const token = asset && getTokenFromAddress(asset, chainId);
 
-  const form: FormDataInput<ShieldData> = {
-    title: "Shield Tokens",
+  const form: FormDataInput<UnshieldData> = {
+    title: "Unshield Tokens",
     fields: [
       {
         type: "combination",
@@ -36,7 +36,7 @@ export function Edit(p: {
   };
   const Layout = useLayoutTemplate();
 
-  const controller = useForm<ShieldData>({
+  const controller = useForm<UnshieldData>({
     defaultValues: {
       amount: "10",
     },
@@ -46,7 +46,7 @@ export function Edit(p: {
     <Layout
       header={form.title}
       body={
-        <FormProcessor<ShieldData> controller={controller} formData={form} />
+        <FormProcessor<UnshieldData> controller={controller} formData={form} />
       }
       footer={
         <Horizontal right gap>
@@ -54,7 +54,7 @@ export function Edit(p: {
             Cancel
           </Button>
           <Button onClick={controller.handleSubmit(p.next)}>
-            Shield Tokens
+            Unshield Tokens
           </Button>
         </Horizontal>
       }
@@ -66,7 +66,7 @@ export function Success({ next }: { next: () => void }) {
   const Layout = useLayoutTemplate();
   return (
     <Layout
-      header="Funds have been shielded"
+      header="Funds have been unshielded"
       body={<div>Your should see funds in your wallet</div>}
       footer={
         <Horizontal gap>
@@ -77,10 +77,10 @@ export function Success({ next }: { next: () => void }) {
   );
 }
 
-export function Proving({ data }: { data: ShieldData }) {
+export function Proving({ data }: { data: UnshieldData }) {
   const Layout = useLayoutTemplate();
   return (
-    <Layout header={`Shielding funds (2/3): Proving`}>
+    <Layout header={`Unshielding funds (1/2): Proving`}>
       <Horizontal>
         <Vertical center>
           <div className="text-md mb-3">
@@ -98,30 +98,10 @@ export function Proving({ data }: { data: ShieldData }) {
   );
 }
 
-export function Approval({ data }: { data: ShieldData }) {
+export function Inflight({ data }: { data: UnshieldData }) {
   const Layout = useLayoutTemplate();
   return (
-    <Layout header={`Shielding funds (1/3): Approve Spend`}>
-      <Horizontal>
-        <Vertical center>
-          <div className="text-md mb-3">
-            <div className="text-center">
-              Please allow the pool to spend your tokens
-            </div>
-          </div>
-          <Horizontal>
-            <Spinner size="xl" />
-          </Horizontal>
-        </Vertical>
-      </Horizontal>
-    </Layout>
-  );
-}
-
-export function Inflight({ data }: { data: ShieldData }) {
-  const Layout = useLayoutTemplate();
-  return (
-    <Layout header={`Shielding funds (3/3): Sending Transaction`}>
+    <Layout header={`Unshielding funds (2/2): Sending Transaction`}>
       <Horizontal>
         <Vertical center>
           <div className="text-md mb-3">

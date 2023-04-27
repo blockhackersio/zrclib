@@ -30,7 +30,7 @@ type ZrcApi = {
   faucet(amount: BigNumber): Promise<void>;
   approve(amount: BigNumber): Promise<void>;
   proveShield(amount: BigNumber): Promise<FormattedProof>;
-  proveUnshield(amount: BigNumber, recipient: string): Promise<FormattedProof>;
+  proveUnshield(amount: BigNumber): Promise<FormattedProof>;
   proveTransfer(amount: BigNumber, toPubKey: string): Promise<FormattedProof>;
   setAsset(asset?: string): void;
   send(proof: FormattedProof): Promise<void>;
@@ -151,15 +151,15 @@ export function ZrclibProvider(p: { children: ReactNode }) {
   );
 
   const proveUnshield = useCallback(
-    async (amount: BigNumber, recipient: string) => {
+    async (amount: BigNumber) => {
       console.log(`proveUnshield: ${amount}`);
 
       if (!connector) throw new Error("");
       if (typeof asset === "undefined") throw new Error("");
-
+      const signer: Signer = await connector.getSigner();
       const proof = await zrclib.proveUnshield(
         amount,
-        recipient,
+        await signer.getAddress(),
         BigNumber.from(asset)
       );
       return proof;
