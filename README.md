@@ -15,6 +15,7 @@ This code is unaudited.
 - [x] Defi Swaps
 - [x] Defiant Pools Prototype (Zero Knowledge Deposit Addresses pt I)
 - [ ] Deposit via proof of deposit (Requires TX proving in Zero Knolwedge - possibly with Nova / Halo)
+- [ ] Withdrawal via threshold network
 - [ ] Refactor and redesign of API
 
 ### Prerequisites
