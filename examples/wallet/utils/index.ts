@@ -14,3 +14,26 @@ export function fromNumberInput(amount: number | string) {
     .mul(DECIMALS)
     .div(1_000000000);
 }
+
+export async function tryUntilPasses<T>(promFn: () => Promise<T>): Promise<T> {
+  let done = false;
+  let t: T;
+  let attempts = 0;
+  while (!done) {
+    console.log("trying...");
+    try {
+      t = await promFn();
+      done = true;
+    } catch (err) {
+      attempts++;
+      console.log("nope didnt work trying again...");
+      if (attempts < 3) {
+        continue;
+      } else {
+        throw new Error("I couldn't do it");
+      }
+    }
+  }
+  // @ts-ignore-line
+  return t;
+}

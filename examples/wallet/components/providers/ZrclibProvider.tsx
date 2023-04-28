@@ -18,6 +18,7 @@ import { useAccount } from "wagmi";
 import { BigNumber, Signer, ethers } from "ethers";
 import { MockErc20 } from "@/../../tests/typechain-types";
 import { FormattedProof } from "@zrclib/sdk/src/types";
+import { tryUntilPasses } from "@/utils";
 const zrclib = ZrclibAccount.getInstance();
 
 type ZrcApi = {
@@ -232,17 +233,24 @@ export function ZrclibProvider(p: { children: ReactNode }) {
 
       const swapExecutor = getContract("SWAPEXEC", chainId, signer);
       const swapRouter = getContract("SWAPROUTER", chainId, signer);
+
+      async function encodeSwapData() {
+        return swapRouter.interface.encodeFunctionData("swap", [
+          tokenAAddress,
+          tokenBAddress,
+          amountIn,
+        ]);
+      }
+
       const swapParams = {
         tokenOut: BigNumber.from(tokenBAddress),
         amountOutMin: amountOutMin,
         swapRecipient: BigNumber.from(0), // 0 means will re-shield into the pool
         swapRouter: BigNumber.from(swapRouter.address),
-        swapData: swapRouter.interface.encodeFunctionData("swap", [
-          tokenAAddress,
-          tokenBAddress,
-          amountIn,
-        ]),
-        transactData: encodeData(reshieldProof),
+        swapData: await tryUntilPasses(encodeSwapData),
+        transactData: await tryUntilPasses(async () =>
+          encodeData(reshieldProof)
+        ),
       };
       const proof = await zrclib.proveUnshield(
         amountIn,
