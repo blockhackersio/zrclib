@@ -95,6 +95,7 @@ export class Account {
       transactData: BigNumber.from(0),
     }
   ) {
+    console.log("proveShield", JSON.stringify({ amount, asset, swapParams }));
     return await this.getProver().shield(amount, asset, swapParams);
   }
 
@@ -111,6 +112,10 @@ export class Account {
       transactData: BigNumber.from(0),
     }
   ) {
+    console.log(
+      "proveUnshield",
+      JSON.stringify({ amount, recipient, asset, swapParams })
+    );
     return await this.getProver().unshield(
       amount,
       recipient,
