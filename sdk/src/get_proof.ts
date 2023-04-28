@@ -187,8 +187,8 @@ async function formatArguments(zrcProof: ZrcProof): Promise<FormattedProof> {
   const proofArguments: ProofArguments = {
     proof,
     root: toFixedHex(root),
-    inputNullifiers: inputNullifiers.map(toFixedHex) as [string, string],
-    outputCommitments: outputCommitments.map(toFixedHex) as [string, string],
+    inputNullifiers: inputNullifiers.map((n) => toFixedHex(n)) as [string, string],
+    outputCommitments: outputCommitments.map((n) => toFixedHex(n)) as [string, string],
     publicAmount: BigNumber.from(publicAmount),
     publicAsset: toFixedHex(publicAsset.toString(), 20),
     extDataHash: toFixedHex(extDataHash),
