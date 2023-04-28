@@ -136,7 +136,7 @@ importers:
         specifier: 13.3.1
         version: 13.3.1(eslint@8.39.0)(typescript@5.0.4)
       ethers:
-        specifier: ^5
+        specifier: ^5.7.2
         version: 5.7.2
       flowbite:
         specifier: ^1.6.0
