@@ -1,6 +1,3 @@
-import { Button } from "@/ui/Button";
-import { Horizontal } from "@/ui/Horizontal";
-import { Spinner } from "flowbite-react";
 import { FormDataInput, FormProcessor } from "./index";
 import { useForm } from "react-hook-form";
 import { useLayoutTemplate } from "@/ui/LayoutProvider";
@@ -8,14 +5,14 @@ import { useLayoutTemplate } from "@/ui/LayoutProvider";
 export type LoginData = { password: string };
 
 const form: FormDataInput<LoginData> = {
-  title: "Enter your password to unlock your account!",
+  title: "Select a password with which to lock your data!",
   fields: [
     {
       type: "password",
       name: "password",
       submit: true,
-      submitText: "Unlock",
-      label: "Enter your password",
+      submitText: "Lock",
+      label: "Enter a password",
     },
   ],
 };

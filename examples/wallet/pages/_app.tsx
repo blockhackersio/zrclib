@@ -5,7 +5,9 @@ import {
   getDefaultWallets,
   RainbowKitProvider,
   midnightTheme,
+  connectorsForWallets,
 } from "@rainbow-me/rainbowkit";
+import { injectedWallet, metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import { mainnet, localhost } from "wagmi/chains";
@@ -21,17 +23,18 @@ const { chains, provider } = configureChains(
   [publicProvider()]
 );
 
-const { connectors } = getDefaultWallets({
-  appName: "My RainbowKit App",
-  chains,
-});
+const connectors = connectorsForWallets([
+  {
+    groupName: "Recommended",
+    wallets: [injectedWallet({ chains }), metaMaskWallet({ chains })],
+  },
+]);
 
 const wagmiClient = createClient({
   autoConnect: false,
   connectors,
   provider,
 });
-
 let prefetched = false;
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -47,7 +50,15 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router]);
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider theme={midnightTheme()} chains={chains}>
+      <RainbowKitProvider
+        theme={midnightTheme({
+          accentColor: "#ffffff",
+          accentColorForeground: "#000000",
+          borderRadius: "small",
+          fontStack: "system",
+        })}
+        chains={chains}
+      >
         <Flowbite theme={{ theme }}>
           <ShieldedProvider>
             <LayoutContext.Provider value={PlainLayout}>

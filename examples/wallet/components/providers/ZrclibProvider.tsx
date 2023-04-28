@@ -1,5 +1,7 @@
 import {
   Tokens,
+  getAddress,
+  getChainName,
   getContract,
   getTokenFromAddress,
 } from "@/contracts/get_contract";
@@ -13,7 +15,7 @@ import {
   useState,
 } from "react";
 import { useAccount } from "wagmi";
-import { BigNumber, Signer } from "ethers";
+import { BigNumber, Signer, ethers } from "ethers";
 import { MockErc20 } from "@/../../tests/typechain-types";
 import { FormattedProof } from "@zrclib/sdk/src/types";
 const zrclib = ZrclibAccount.getInstance();
@@ -22,6 +24,7 @@ type ZrcApi = {
   block: number;
   loggedIn: boolean;
   chainId: number;
+  token: string | undefined;
   asset: string | undefined;
   balances: AccountBalances;
   address: `0x${string}` | undefined;
@@ -31,9 +34,21 @@ type ZrcApi = {
   approve(amount: BigNumber): Promise<void>;
   proveShield(amount: BigNumber): Promise<FormattedProof>;
   proveUnshield(amount: BigNumber): Promise<FormattedProof>;
+  proveSwapUnshield(
+    amountIn: BigNumber,
+    amountOutMin: BigNumber,
+    tokenAAddress: string,
+    tokenBAddress: string,
+    reshieldProof: FormattedProof
+  ): Promise<FormattedProof>;
+  proveSwapReshield(
+    amount: BigNumber,
+    tokenBAddress: string
+  ): Promise<FormattedProof>;
   proveTransfer(amount: BigNumber, toPubKey: string): Promise<FormattedProof>;
   setAsset(asset?: string): void;
   send(proof: FormattedProof): Promise<void>;
+  transactAndSwap(proof: FormattedProof): Promise<void>;
 };
 
 const defaultLib: ZrcApi = {
@@ -44,6 +59,7 @@ const defaultLib: ZrcApi = {
   balances: { privateBalances: new Map(), publicBalances: new Map() },
   address: undefined,
   isConnected: false,
+  token: undefined,
   setAsset() {},
   async login() {},
   async proveShield() {
@@ -57,11 +73,29 @@ const defaultLib: ZrcApi = {
   async proveUnshield() {
     throw new Error("not ready");
   },
+  async proveSwapUnshield() {
+    throw new Error("not ready");
+  },
+  async proveSwapReshield() {
+    throw new Error("not ready");
+  },
   async send() {
     throw new Error("not ready");
   },
+  async transactAndSwap() {
+    throw new Error("not ready");
+  },
 };
-
+function encodeData(proof: FormattedProof) {
+  const abi = new ethers.utils.AbiCoder();
+  return abi.encode(
+    [
+      "tuple(bytes proof,bytes32 root,bytes32[2] inputNullifiers,bytes32[2] outputCommitments,uint256 publicAmount,address publicAsset,bytes32 extDataHash)",
+      "tuple(address recipient,int256 extAmount,bytes encryptedOutput1,bytes encryptedOutput2,address tokenOut,uint256 amountOutMin,address swapRecipient,address swapRouter,bytes swapData,bytes transactData)",
+    ],
+    [proof.proofArguments, proof.extData]
+  );
+}
 export const ZrclibContext = createContext<ZrcApi>(defaultLib);
 
 export function ZrclibProvider(p: { children: ReactNode }) {
@@ -73,7 +107,7 @@ export function ZrclibProvider(p: { children: ReactNode }) {
     privateBalances: new Map(),
     publicBalances: new Map(),
   });
-
+  const token = asset ? getTokenFromAddress(asset, chainId) : undefined;
   const { address, isConnected, connector } = useAccount({
     onDisconnect: () => {
       zrclib.logout();
@@ -184,6 +218,76 @@ export function ZrclibProvider(p: { children: ReactNode }) {
     [asset, connector]
   );
 
+  const proveSwapUnshield = useCallback(
+    async (
+      amountIn: BigNumber,
+      amountOutMin: BigNumber,
+      tokenAAddress: string,
+      tokenBAddress: string,
+      reshieldProof: FormattedProof
+    ) => {
+      if (!connector) throw new Error("");
+      if (typeof asset === "undefined") throw new Error("");
+      const signer: Signer = await connector.getSigner();
+
+      const swapExecutor = getContract("SWAPEXEC", chainId, signer);
+      const swapRouter = getContract("SWAPROUTER", chainId, signer);
+      const swapParams = {
+        tokenOut: BigNumber.from(tokenBAddress),
+        amountOutMin: amountOutMin,
+        swapRecipient: BigNumber.from(0), // 0 means will re-shield into the pool
+        swapRouter: BigNumber.from(swapRouter.address),
+        swapData: swapRouter.interface.encodeFunctionData("swap", [
+          tokenAAddress,
+          tokenBAddress,
+          amountIn,
+        ]),
+        transactData: encodeData(reshieldProof),
+      };
+      const proof = await zrclib.proveUnshield(
+        amountIn,
+        swapExecutor.address,
+        tokenAAddress,
+        swapParams
+      );
+      return proof;
+    },
+    [chainId, asset, connector]
+  );
+
+  const proveSwapReshield = useCallback(
+    async (amount: BigNumber, tokenBAddress: string) => {
+      console.log(`proveShield: ${amount}`);
+
+      if (!connector) throw new Error("");
+      if (typeof asset === "undefined") throw new Error("");
+
+      const proof = await zrclib.proveShield(
+        amount,
+        BigNumber.from(tokenBAddress)
+      );
+      return proof;
+    },
+    [asset, connector]
+  );
+
+  const transactAndSwap = useCallback(
+    async (proof: FormattedProof) => {
+      console.log(`proveShield: ${JSON.stringify(proof)}`);
+
+      if (!connector) return;
+      if (typeof asset === "undefined") return;
+      if (typeof chainId === "undefined") return;
+
+      const signer: Signer = await connector.getSigner();
+      const contract = getContract("MASP", chainId, signer);
+
+      const tx = await contract.transactAndSwap(proof);
+      await tx.wait();
+    },
+    [asset, chainId, connector]
+  );
+
   const approve = useCallback(
     async (amount: BigNumber) => {
       console.log(`approve: ${amount}`);
@@ -219,7 +323,11 @@ export function ZrclibProvider(p: { children: ReactNode }) {
       proveUnshield,
       proveTransfer,
       send,
+      token,
       approve,
+      proveSwapUnshield,
+      proveSwapReshield,
+      transactAndSwap,
     };
   }, [
     block,
@@ -231,12 +339,16 @@ export function ZrclibProvider(p: { children: ReactNode }) {
     address,
     isConnected,
     login,
+    token,
     faucet,
     proveShield,
     proveUnshield,
     proveTransfer,
     send,
     approve,
+    proveSwapUnshield,
+    proveSwapReshield,
+    transactAndSwap,
   ]);
   return (
     <ZrclibContext.Provider value={api}>{p.children}</ZrclibContext.Provider>

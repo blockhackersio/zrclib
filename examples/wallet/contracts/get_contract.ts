@@ -2,8 +2,11 @@ import { Contract, Signer } from "ethers";
 import addresses from "./addresses.json";
 import ERC20_JSON from "./MockErc20.json";
 import MASP_JSON from "./MultiAssetShieldedPool.json";
+import SWAPROUTER_JSON from "./MockSwapRouter.json";
+import SWAPEXEC_JSON from "./SwapExecutor.json";
+
 export type Tokens = "LUSD" | "DAI";
-export type ContractType = "MASP" | Tokens;
+export type ContractType = "SWAPROUTER" | "MASP" | "SWAPEXEC" | Tokens;
 export type ChainName = keyof typeof addresses;
 
 const chainLookup: Record<number, ChainName> = {
@@ -16,6 +19,10 @@ export function getChainName(chainId: number) {
   return chainName;
 }
 
+export function getAddress(chainName: ChainName, type: ContractType) {
+  return addresses[chainName][type];
+}
+
 export function getContract(
   type: ContractType,
   chainId: number,
@@ -25,27 +32,46 @@ export function getContract(
 
   switch (type) {
     case "MASP": {
-      const abi = MASP_JSON.abi;
-      const address = addresses[chainName].MASP;
-      return new Contract(address, abi, provider);
+      const address = getAddress(chainName, "MASP");
+      return new Contract(address, MASP_JSON.abi, provider);
+    }
+    case "SWAPEXEC": {
+      const address = getAddress(chainName, "SWAPEXEC");
+      return new Contract(address, SWAPEXEC_JSON.abi, provider);
+    }
+    case "SWAPROUTER": {
+      const address = getAddress(chainName, "SWAPROUTER");
+      return new Contract(address, SWAPROUTER_JSON.abi, provider);
     }
     case "LUSD": {
       const abi = ERC20_JSON.abi;
-      const address = addresses[chainName].LUSD;
+      const address = getAddress(chainName, "LUSD");
       return new Contract(address, abi, provider);
     }
     case "DAI": {
       const abi = ERC20_JSON.abi;
-      const address = addresses[chainName].DAI;
+      const address = getAddress(chainName, "DAI");
       return new Contract(address, abi, provider);
     }
     default:
       throw new Error("UNKNOWN_CONTRACT_TYPE");
   }
 }
+
 export function getTokens(): Tokens[] {
   return ["DAI", "LUSD"];
 }
+
+export function getAssets(chainId: number): `0x${string}`[] {
+  const chainName = getChainName(chainId);
+
+  const tokens = getTokens();
+
+  return tokens.map((token) => {
+    return addresses[chainName][token] as `0x${string}`;
+  });
+}
+
 export function getTokenFromAddress(
   address: string,
   chainId: number

@@ -6,8 +6,39 @@ import { useForm } from "react-hook-form";
 import { Vertical } from "@/ui/Vertical";
 import { validEthAddress } from "@/config/constants";
 import { useLayoutTemplate } from "@/ui/LayoutProvider";
+import { ReactNode, useCallback, useState } from "react";
+import { useRouter } from "next/router";
+
+export type PageId = "edit" | "inflight" | "success" | "fail";
 
 export type SendData = { amount: string; currency: string; address: string };
+
+export function useSend() {
+  const [pageId, setPageId] = useState<PageId>("edit");
+  const [data, setData] = useState<SendData>();
+
+  const router = useRouter();
+  const submit = useCallback((data: SendData) => {
+    setData(data);
+    setPageId("inflight");
+    // Trigger send
+    setTimeout(() => {
+      setPageId("success");
+    }, 5000);
+  }, []);
+
+  const close = () => router.push("/");
+
+  const content: Record<PageId, ReactNode> = {
+    edit: <Edit next={submit} back={close} />,
+    inflight: <Inflight data={data!} />,
+    success: <Success next={close} />,
+    fail: <Error next={close} />,
+  };
+
+  const dialog = content[pageId];
+  return dialog;
+}
 
 const form: FormDataInput<SendData> = {
   title: "Send Token to an address",

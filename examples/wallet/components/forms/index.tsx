@@ -12,6 +12,7 @@ type FieldDescriptor<T extends string | number | symbol> =
       required?: boolean | string;
       right?: string;
       pattern?: { value: RegExp; message: string };
+      validate?: (v: string) => boolean;
     }
   | {
       label?: string;
@@ -19,6 +20,7 @@ type FieldDescriptor<T extends string | number | symbol> =
       type: "numericfield";
       required?: boolean | string;
       right?: string;
+      validate?: (v: string) => boolean;
     }
   | {
       label?: string;
@@ -26,6 +28,7 @@ type FieldDescriptor<T extends string | number | symbol> =
       type: "textarea";
       required?: boolean | string;
       pattern?: { value: RegExp; message: string };
+      validate?: (v: string) => boolean;
     }
   | {
       label?: string;
@@ -38,6 +41,7 @@ type FieldDescriptor<T extends string | number | symbol> =
       label: string;
       type: "combination";
       fields: FieldDescriptor<T>[];
+      flex1?: "left" | "right" | "none";
     }
   | {
       label: string;
@@ -51,6 +55,7 @@ type FieldDescriptor<T extends string | number | symbol> =
       submitText?: string;
       required?: boolean | string;
       pattern?: { value: RegExp; message: string };
+      validate?: (v: string) => boolean;
     };
 
 export type FormDataInput<T> = {
@@ -76,6 +81,7 @@ function renderField<T extends FieldValues>(
               {...controller.register(field.name, {
                 required: field.required,
                 pattern: field.pattern,
+                validate: field.validate,
               })}
             />
             {field.right && <div className="pt-2">{field.right}</div>}
@@ -97,6 +103,7 @@ function renderField<T extends FieldValues>(
               {...controller.register(field.name, {
                 required: field.required,
                 pattern: field.pattern,
+                validate: field.validate,
               })}
             />
             {field.submit && <Button type="submit">{field.submitText}</Button>}
@@ -118,6 +125,7 @@ function renderField<T extends FieldValues>(
               type="number"
               {...controller.register(field.name, {
                 required: field.required,
+                validate: field.validate,
               })}
             />
             {field.right && <div className="pt-2">{field.right}</div>}
@@ -136,6 +144,7 @@ function renderField<T extends FieldValues>(
             {...controller.register(field.name, {
               required: field.required,
               pattern: field.pattern,
+              validate: field.validate,
             })}
             key={index}
           />

@@ -5,8 +5,54 @@ import { FormDataInput, FormProcessor } from "./index";
 import { useForm } from "react-hook-form";
 import { Vertical } from "@/ui/Vertical";
 import { useLayoutTemplate } from "@/ui/LayoutProvider";
-import { useZrclib } from "../providers/ZrclibProvider";
 import { getTokenFromAddress } from "@/contracts/get_contract";
+import { ReactNode, useCallback, useState } from "react";
+import { useRouter } from "next/router";
+import { useZrclib } from "@/components/providers/ZrclibProvider";
+import { fromNumberInput } from "@/utils";
+
+type PageId = "edit" | "proving" | "approval" | "inflight" | "success" | "fail";
+
+export function useShield() {
+  const zrclib = useZrclib();
+  const [pageId, setPageId] = useState<PageId>("edit");
+  const [data, setData] = useState<ShieldData>();
+  console.log({ pageId });
+  const router = useRouter();
+  const submit = useCallback(
+    async (data: ShieldData) => {
+      setData(data);
+      // Trigger send
+      try {
+        setPageId("approval");
+        await zrclib.approve(fromNumberInput(data.amount));
+        setPageId("proving");
+        const proof = await zrclib.proveShield(fromNumberInput(data.amount));
+        setPageId("inflight");
+        await zrclib.send(proof);
+      } catch (err) {
+        console.log(err);
+        setPageId("fail");
+        return;
+      }
+      setPageId("success");
+    },
+    [zrclib]
+  );
+
+  const close = () => router.push("/");
+
+  const content: Record<PageId, ReactNode> = {
+    edit: <Edit next={submit} back={close} />,
+    approval: <Approval data={data!} />,
+    proving: <Proving data={data!} />,
+    inflight: <Inflight data={data!} />,
+    success: <Success next={close} />,
+    fail: <Error next={close} />,
+  };
+
+  return content[pageId];
+}
 
 export type ShieldData = { amount: string; currency: string };
 
@@ -87,6 +133,13 @@ export function Proving({ data }: { data: ShieldData }) {
             <div className="text-center">
               Generating Zero Knowledge Proof...
             </div>
+            <iframe
+              src="https://giphy.com/embed/7J7lzuNFHfvqUd52hF"
+              width="480"
+              height="270"
+              className="giphy-embed"
+              allowFullScreen
+            ></iframe>
             <div>Please wait. This may take some time.</div>
           </div>
           <Horizontal>
