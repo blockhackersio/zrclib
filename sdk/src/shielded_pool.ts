@@ -122,6 +122,7 @@ export class ShieldedPoolProver {
     );
 
     const change = new Utxo({
+      keypair: this.account.getKeypair(),
       asset: BigNumber.from(asset),
       amount: BigNumber.from(inputsTotal).sub(amount),
     });
