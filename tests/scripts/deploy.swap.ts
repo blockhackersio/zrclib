@@ -7,6 +7,7 @@ import {
   Verifier__factory,
 } from "../typechain-types";
 import artifact from "@zrclib/sdk/contracts/generated/Hasher.json";
+import { BigNumber } from "ethers";
 
 async function deploySwapRouter() {
   // Prepare signers
@@ -58,9 +59,19 @@ async function deployMultiAssetShieldedPool() {
 
 async function main() {
   await deployMultiAssetShieldedPool();
-  await deployERC20Token("LUSD", "LUSD");
-  await deployERC20Token("DAI", "DAI");
-  await deploySwapRouter();
+  let tokenA = await deployERC20Token("DAI", "DAI");
+  let tokenB = await deployERC20Token("LUSD", "LUSD");
+  let swapRouter = await deploySwapRouter();
+  // Prepare signers
+  const [deployer] = await ethers.getSigners();
+
+  tokenB = tokenB.connect(deployer);
+  const tx = await tokenB.mint(
+    swapRouter.address,
+    // Ensure heaps of liquidity
+    BigNumber.from(10).mul(1_000000000000000000000000n)
+  );
+  await tx.wait();
 }
 
 main().catch((error) => {

@@ -15,6 +15,7 @@ import { ReactNode, useCallback, useState } from "react";
 import { useRouter } from "next/router";
 import { zrclib } from "@/../../tests/typechain-types";
 import { fromNumberInput } from "@/utils";
+import { FormattedProof } from "@/../../sdk/src/types";
 
 export type SwapData = {
   fromAmount: string;
@@ -52,10 +53,11 @@ export function useSwapFlow() {
       setData(enrichedData);
 
       setPageId("proofreshield");
-      const reshieldProof = await zrclib.proveSwapReshield(
+      let reshieldProof = await zrclib.proveSwapReshield(
         fromNumberInput(toAmount),
         toCurrency
       );
+
       setPageId("proofunshield");
       const proof = await zrclib.proveSwapUnshield(
         fromNumberInput(fromAmount),
@@ -74,8 +76,8 @@ export function useSwapFlow() {
 
   const content: Record<PageId, ReactNode> = {
     edit: <Edit next={submit} back={close} />,
-    proofunshield: <ProvingOne data={data!} />,
-    proofreshield: <ProvingTwo data={data!} />,
+    proofreshield: <ProvingOne data={data!} />,
+    proofunshield: <ProvingTwo data={data!} />,
     inflight: <Inflight data={data!} />,
     success: <Success next={close} />,
     fail: <ErrorPage next={close} />,
@@ -163,7 +165,14 @@ export function ProvingOne({ data }: { data: SwapData }) {
           <div className="text-md mb-3">
             <div className="text-center">
               Generating Zero Knowledge Proof...
-            </div>
+            </div>{" "}
+            <iframe
+              src="https://giphy.com/embed/7J7lzuNFHfvqUd52hF"
+              width="480"
+              height="270"
+              className="giphy-embed"
+              allowFullScreen
+            ></iframe>
             <div>Please wait. This may take some time.</div>
           </div>
           <Horizontal>

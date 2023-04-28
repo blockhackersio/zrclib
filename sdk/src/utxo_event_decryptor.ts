@@ -50,9 +50,15 @@ export class UtxoEventDecryptor {
         index: index.toNumber(),
         encryptedOutput,
       });
-      if (utxo) this.handleUtxo(utxo, event.blockNumber);
+      if (utxo) {
+        console.log(
+          `Received Utxo {${utxo.amount},${utxo.asset},${utxo.blinding},${utxo.keypair.pubkey}}`
+        );
+        this.handleUtxo(utxo, event.blockNumber);
+      }
     };
     const nullifierHandler = async (nullifier: string, event: ethers.Event) => {
+      console.log(`Received Nullifier ${nullifier}`);
       await this.handleNullifier(nullifier, event.blockNumber);
     };
     this.contract.on("NewCommitment", commitmentHandler);
