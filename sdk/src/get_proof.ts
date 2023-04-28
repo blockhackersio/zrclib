@@ -21,7 +21,7 @@ export type ProofParams = {
   swapRecipient: BigNumber;
   swapRouter: BigNumber;
   swapData: BigNumber;
-  transactData: BigNumber;
+  transactData: string;
   proofGen?: GenerateProofFn;
 };
 
@@ -91,7 +91,8 @@ export async function getProof({
       inputMerklePathElements.push(new Array(tree.levels).fill(0));
     }
   }
-
+  console.log("getProof> transactData", transactData);
+  // console.log("getProof> transactData", transactData.toHexString());
   const extData = {
     recipient: toFixedHex(recipient, 20),
     extAmount: toFixedHex(extAmount),
@@ -102,8 +103,9 @@ export async function getProof({
     swapRecipient: toFixedHex(swapRecipient, 20),
     swapRouter: toFixedHex(swapRouter, 20),
     swapData: toFixedHex(swapData),
-    transactData: toFixedHex(transactData),
+    transactData: transactData,
   };
+  console.log("getProof> extData", extData);
 
   // Check if extAmount is not zero
   let publicAsset: BigNumber = BigNumber.from(0); // default to zero

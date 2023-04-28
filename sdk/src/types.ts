@@ -161,5 +161,5 @@ export type SwapParams = {
   swapRecipient?: BigNumberish;
   swapRouter?: BigNumberish;
   swapData?: BigNumberish;
-  transactData?: BigNumberish;
+  transactData?: string;
 }

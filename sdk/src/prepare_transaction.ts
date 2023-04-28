@@ -19,7 +19,7 @@ export async function prepareTransaction({
     swapRecipient: BigNumber.from(0),
     swapRouter: BigNumber.from(0),
     swapData: BigNumber.from(0),
-    transactData: BigNumber.from(0),
+    transactData: "0x00",
   },
   tree,
   proofGen = generateProof,
@@ -59,7 +59,7 @@ export async function prepareTransaction({
   swapRecipient = BigNumber.from(swapRecipient);
   swapRouter = BigNumber.from(swapRouter);
   swapData = BigNumber.from(swapData);
-  transactData = BigNumber.from(transactData);
+  transactData = transactData || "0x00";
 
   const zrcProof = await getProof({
     asset,

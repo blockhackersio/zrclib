@@ -92,7 +92,7 @@ export class Account {
       swapRecipient: BigNumber.from(0),
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
-      transactData: BigNumber.from(0),
+      transactData: "0x00",
     }
   ) {
     console.log("proveShield", JSON.stringify({ amount, asset, swapParams }));
@@ -109,7 +109,7 @@ export class Account {
       swapRecipient: BigNumber.from(0),
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
-      transactData: BigNumber.from(0),
+      transactData: "0x00",
     }
   ) {
     console.log(
@@ -134,7 +134,7 @@ export class Account {
       swapRecipient: BigNumber.from(0),
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
-      transactData: BigNumber.from(0),
+      transactData: "0x00",
     }
   ) {
     return await this.getProver().transfer(amount, toPubkey, asset, swapParams);

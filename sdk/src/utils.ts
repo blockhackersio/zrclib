@@ -51,7 +51,7 @@ function getExtDataHash({
         swapRecipient: toFixedHex(swapRecipient, 20),
         swapRouter: toFixedHex(swapRouter, 20),
         swapData: toFixedHex(swapData),
-        transactData: toFixedHex(transactData),
+        transactData: transactData,
       },
     ]
   );

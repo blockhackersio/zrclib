@@ -88,14 +88,17 @@ const defaultLib: ZrcApi = {
   },
 };
 function encodeData(proof: FormattedProof) {
+  console.log("proof: ", proof);
   const abi = new ethers.utils.AbiCoder();
-  return abi.encode(
+  const encoded = abi.encode(
     [
       "tuple(bytes proof,bytes32 root,bytes32[2] inputNullifiers,bytes32[2] outputCommitments,uint256 publicAmount,address publicAsset,bytes32 extDataHash)",
       "tuple(address recipient,int256 extAmount,bytes encryptedOutput1,bytes encryptedOutput2,address tokenOut,uint256 amountOutMin,address swapRecipient,address swapRouter,bytes swapData,bytes transactData)",
     ],
     [proof.proofArguments, proof.extData]
   );
+  console.log("encoded: ", encoded);
+  return encoded;
 }
 export const ZrclibContext = createContext<ZrcApi>(defaultLib);
 
@@ -252,12 +255,14 @@ export function ZrclibProvider(p: { children: ReactNode }) {
           encodeData(reshieldProof)
         ),
       };
+      console.log("swapParams: ", swapParams);
       const proof = await zrclib.proveUnshield(
         amountIn,
         swapExecutor.address,
         tokenAAddress,
         swapParams
       );
+      console.log("proof: ", proof);
       return proof;
     },
     [chainId, asset, connector]

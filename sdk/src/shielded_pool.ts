@@ -25,7 +25,7 @@ export class ShieldedPoolProver {
       swapRecipient: BigNumber.from(0),
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
-      transactData: BigNumber.from(0),
+      transactData: "0x00",
     }
   ): Promise<FormattedProof> {
     await ensurePoseidon();
@@ -59,7 +59,7 @@ export class ShieldedPoolProver {
       swapRecipient: BigNumber.from(0),
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
-      transactData: BigNumber.from(0),
+      transactData: "0x00",
     }
   ): Promise<FormattedProof> {
     await ensurePoseidon();
@@ -110,7 +110,7 @@ export class ShieldedPoolProver {
       swapRecipient: BigNumber.from(0),
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
-      transactData: BigNumber.from(0),
+      transactData: "0x00",
     }
   ): Promise<FormattedProof> {
     await ensurePoseidon();
