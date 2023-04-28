@@ -35,7 +35,7 @@ export class UtxoEventDecryptor {
 
   constructor(private contract: ethers.Contract, private keypair: Keypair) {}
 
-  public start(lastBlock = 0 /* will use this later */) {
+  public async start(lastBlock = 0 /* will use this later */) {
     this._isStarted = true;
 
     const commitmentHandler = (
@@ -44,6 +44,7 @@ export class UtxoEventDecryptor {
       encryptedOutput: string,
       event: ethers.Event
     ) => {
+      console.log("=== commitmentHandler ===");
       const utxo = attemptUtxoDecryption(this.keypair, {
         type: "NewCommitment",
         commitment,
@@ -52,15 +53,44 @@ export class UtxoEventDecryptor {
       });
       if (utxo) {
         console.log(
-          `Received Utxo {${utxo.amount},${utxo.asset},${utxo.blinding},${utxo.keypair.pubkey}}`
+          `Received Utxo {amount:${utxo.amount},asset:${utxo.asset},pubkey:${utxo.keypair.pubkey},${utxo.blinding}}`
         );
         this.handleUtxo(utxo, event.blockNumber);
       }
     };
     const nullifierHandler = async (nullifier: string, event: ethers.Event) => {
+      console.log("=== nullifierHandler ===");
+
       console.log(`Received Nullifier ${nullifier}`);
       await this.handleNullifier(nullifier, event.blockNumber);
     };
+
+    const nullifierFilter = this.contract.filters.NewNullifier();
+    const nullifierEvents = await this.contract.queryFilter(nullifierFilter, 0);
+    const commitmentFilter = this.contract.filters.NewCommitment();
+    const commitmentEvents = await this.contract.queryFilter(
+      commitmentFilter,
+      0
+    );
+
+    for (let event of nullifierEvents) {
+      // @ts-ignore-line
+      await nullifierHandler(event.args.nullifier, event.blockNumber);
+    }
+
+    for (let event of commitmentEvents) {
+      commitmentHandler(
+        // @ts-ignore-line
+        event.args.commitment,
+        // @ts-ignore-line
+        event.args.index,
+        // @ts-ignore-line
+        event.args.encryptedOutput,
+        // @ts-ignore-line
+        event
+      );
+    }
+
     this.contract.on("NewCommitment", commitmentHandler);
     this.contract.on("NewNullifier", nullifierHandler);
 
@@ -71,9 +101,11 @@ export class UtxoEventDecryptor {
   }
 
   public onUtxo(handler: UtxoHandler) {
+    console.log("onUtxo registering handler ");
     this.handleUtxo = handler;
   }
   public onNullifier(handler: NullifierHandler) {
+    console.log("onNullifier registering handler ");
     this.handleNullifier = handler;
   }
 

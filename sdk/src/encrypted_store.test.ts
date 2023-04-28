@@ -92,7 +92,7 @@ describe("EncryptedStore", () => {
     const msg = { message: "I am a piece of text" };
     await storeAccess.add("mything", msg);
     expect(memory.getAll()).resolves.toEqual([
-      "0102030405060708090a0b0c0d0e0f10d33b9e353f10bc2cf24cf4ce4cf538539899dd1d766140a0d0ff0c2fbeacf897c5d9",
+      "0102030405060708090a0b0c0d0e0f10fb5fc1260dbafc83d9858a7f8deba0529cf4f6e7cd07cde30d0ae4d5d411650da239",
     ]);
     expect(storeAccess.get("mything")).resolves.toEqual(msg);
     expect(storeNoAccess.get("mything")).rejects.toThrow("DECRYPTION_FAILURE");

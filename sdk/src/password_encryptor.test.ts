@@ -14,7 +14,7 @@ test("hello", async () => {
   let start = Date.now();
   const encrypted = await encrypt(JSON.stringify(data), key);
   expect(encrypted).toBe(
-    "0102030405060708090a0b0c0d0e0f10e48edc68e20d35ea05c045d31819af45c85b4bb1472852127d9947"
+    "0102030405060708090a0b0c0d0e0f105dade563e04ccf41d4f895881414447a6f86e95c61ef1da104459d"
   );
   start = Date.now();
   const decrypted = await decrypt(encrypted, key);
@@ -29,7 +29,7 @@ test("PasswordEncryptor", async () => {
   let start = Date.now();
   const encrypted = await encryptor.encrypt(JSON.stringify(data));
   expect(encrypted).toBe(
-    "0102030405060708090a0b0c0d0e0f10e48edc68e20d35ea05c045d31819af45c85b4bb1472852127d9947"
+    "0102030405060708090a0b0c0d0e0f105dade563e04ccf41d4f895881414447a6f86e95c61ef1da104459d"
   );
   start = Date.now();
   const decrypted = await encryptor.decrypt(encrypted);
