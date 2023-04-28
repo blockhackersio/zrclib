@@ -64,16 +64,16 @@ async function deployMultiAssetShieldedPool() {
 }
 
 function encodeData(proof: FormattedProof) {
-  const abi = new ethers.utils.AbiCoder()
+  const abi = new ethers.utils.AbiCoder();
   const encoded = abi.encode(
     [
-      'tuple(bytes proof,bytes32 root,bytes32[2] inputNullifiers,bytes32[2] outputCommitments,uint256 publicAmount,address publicAsset,bytes32 extDataHash)',
-      'tuple(address recipient,int256 extAmount,bytes encryptedOutput1,bytes encryptedOutput2,address tokenOut,uint256 amountOutMin,address swapRecipient,address swapRouter,bytes swapData,bytes transactData)',
+      "tuple(bytes proof,bytes32 root,bytes32[2] inputNullifiers,bytes32[2] outputCommitments,uint256 publicAmount,address publicAsset,bytes32 extDataHash)",
+      "tuple(address recipient,int256 extAmount,bytes encryptedOutput1,bytes encryptedOutput2,address tokenOut,uint256 amountOutMin,address swapRecipient,address swapRouter,bytes swapData,bytes transactData)",
     ],
-    [proof.proofArguments, proof.extData],
-  )
-  console.log("encodeData> encoded: ", encoded)
-  return encoded
+    [proof.proofArguments, proof.extData]
+  );
+  console.log("encodeData> encoded: ", encoded);
+  return encoded;
 }
 
 it("Test swap", async function () {
@@ -140,21 +140,45 @@ it("Test swap", async function () {
   proof = await alice.proveShield(FIVE, tokenB.address);
   tend(t);
   t = time("Alice creates unshield proof for 5 coins");
-  const swapEncodedData = swapRouter.interface.encodeFunctionData('swap', [tokenA.address, tokenB.address, FIVE]);
-  console.log("swap.test> transactData: ", proof.extData.transactData.toString())
-  proof = await alice.proveUnshield(FIVE, swapExecutor.address, tokenA.address, {
-    tokenOut: BigNumber.from(tokenB.address),
-    amountOutMin: BigNumber.from(FIVE),
-    swapRecipient: BigNumber.from(0), // 0 means will re-shield into the pool
-    swapRouter: BigNumber.from(swapRouter.address),
-    swapData: swapEncodedData,
-    transactData: encodeData(proof) 
-  });
+  const swapEncodedData = swapRouter.interface.encodeFunctionData("swap", [
+    tokenA.address,
+    tokenB.address,
+    FIVE,
+  ]);
+  console.log(
+    "swap.test> transactData: ",
+    proof.extData.transactData.toString()
+  );
+  proof = await alice.proveUnshield(
+    FIVE,
+    swapExecutor.address,
+    tokenA.address,
+    {
+      tokenOut: BigNumber.from(tokenB.address),
+      amountOutMin: BigNumber.from(FIVE),
+      swapRecipient: BigNumber.from(0), // 0 means will re-shield into the pool
+      swapRouter: BigNumber.from(swapRouter.address),
+      swapData: swapEncodedData,
+      transactData: encodeData(proof),
+    }
+  );
   tend(t);
-  console.log("swap.test> proof: ", proof)
+  console.log("swap.test> proof: ", proof);
 
   t = time("Alice submits transaction");
   tx = await contract.transactAndSwap(proof);
   await tx.wait();
+  tend(t);
+
+  await sleep(10_000); // Waiting for sync
+
+  t = time("Check Alice's private balance is 5");
+  privateBalance = await alice.getBalance(tokenA.address);
+  expect(privateBalance).to.eq(FIVE); // Transfer to the darkside worked! :)
+  tend(t);
+
+  t = time("Check Alice's private balance is 5");
+  privateBalance = await alice.getBalance(tokenB.address);
+  expect(privateBalance).to.eq(FIVE); // Transfer to the darkside worked! :)
   tend(t);
 });

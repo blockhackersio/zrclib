@@ -65,11 +65,19 @@ async function main() {
   // Prepare signers
   const [deployer] = await ethers.getSigners();
 
-  tokenB = tokenB.connect(deployer);
-  const tx = await tokenB.mint(
+  tokenA = tokenA.connect(deployer);
+  let tx = await tokenA.mint(
     swapRouter.address,
     // Ensure heaps of liquidity
-    BigNumber.from(10).mul(1_000000000000000000000000n)
+    BigNumber.from(1000).mul(1_000000000000000000000000n)
+  );
+  await tx.wait();
+
+  tokenB = tokenB.connect(deployer);
+  tx = await tokenB.mint(
+    swapRouter.address,
+    // Ensure heaps of liquidity
+    BigNumber.from(1000).mul(1_000000000000000000000000n)
   );
   await tx.wait();
 }

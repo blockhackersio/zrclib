@@ -17,7 +17,7 @@ export function useShield() {
   const zrclib = useZrclib();
   const [pageId, setPageId] = useState<PageId>("edit");
   const [data, setData] = useState<ShieldData>();
-  console.log({ pageId });
+  console.log({ pageId, asset: zrclib.asset, token: zrclib.token });
   const router = useRouter();
   const submit = useCallback(
     async (data: ShieldData) => {

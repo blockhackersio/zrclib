@@ -127,15 +127,15 @@ export async function getProof({
 
   let input = {
     root: BigInt(`${tree.root}`),
-    inputNullifier: inputNullifier,
-    outputCommitment: outputCommitment,
+    inputNullifier: inputNullifier.map((n) => toFixedHex(n)),
+    outputCommitment: outputCommitment.map((n) => toFixedHex(n)),
     publicAmount: BigNumber.from(extAmount)
       // .sub(fee)
       .add(FIELD_SIZE)
       .mod(FIELD_SIZE)
       .toString(),
     publicAsset: BigNumber.from(publicAsset).toString(),
-    extDataHash: extDataHash.toBigInt(),
+    extDataHash: toFixedHex(extDataHash),
     asset: BigNumber.from(asset).toString(),
 
     // data for 2 transaction inputs
