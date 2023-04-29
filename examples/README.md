@@ -4,3 +4,4 @@ This directory contains of code examples of private DeFi primitives that can be 
 
 Current list of examples (to be expanded): 
 - Private stablecoin
+- Wallet that support multi asset shielded pool
