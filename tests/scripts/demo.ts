@@ -58,9 +58,14 @@ async function deployMultiAssetShieldedPool() {
   
 async function main() {
     let { contract, swapExecutor } = await deployMultiAssetShieldedPool();
-    let tokenA = await deployERC20Token("LUSD", "LUSD");
-    let tokenB = await deployERC20Token("DAI", "DAI");
+    let tokenA = await deployERC20Token("DAI", "DAI");
+    let tokenB = await deployERC20Token("LUSD", "LUSD");
     let swapRouter = await deploySwapRouter();
+    
+    // set up liquidity in swap router
+    await tokenA.mint(swapRouter.address, ethers.utils.parseEther("10000"));
+    await tokenB.mint(swapRouter.address, ethers.utils.parseEther("10000"));
+
     console.log("MultiAssetShieldedPool deployed to:", contract.address);
     console.log("SwapExecutor deployed to:", swapExecutor.address);
     console.log("SwapRouter deployed to:", swapRouter.address);

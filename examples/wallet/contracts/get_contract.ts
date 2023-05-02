@@ -12,6 +12,7 @@ export type ChainName = keyof typeof addresses;
 const chainLookup: Record<number, ChainName> = {
   1: "mainnet",
   31337: "localnet",
+  5001: "mantle",
 };
 
 export function getChainName(chainId: number) {

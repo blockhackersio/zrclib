@@ -11,6 +11,7 @@ import { injectedWallet, metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import { mainnet, localhost } from "wagmi/chains";
+import { mantle } from "../components/providers/MantleTestnet";
 import { Flowbite } from "flowbite-react";
 import { theme } from "../styles/theme";
 import { ShieldedProvider } from "@/components/ShieldedMode";
@@ -19,7 +20,7 @@ import { useRouter } from "next/router";
 import { LayoutContext, PlainLayout } from "@/ui/LayoutProvider";
 import { ZrclibProvider } from "@/components/providers/ZrclibProvider";
 const { chains, provider } = configureChains(
-  [mainnet, { ...localhost, id: 31337 }],
+  [mainnet, mantle, { ...localhost, id: 31337 }],
   [publicProvider()]
 );
 
