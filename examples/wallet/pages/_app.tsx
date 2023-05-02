@@ -20,7 +20,7 @@ import { useRouter } from "next/router";
 import { LayoutContext, PlainLayout } from "@/ui/LayoutProvider";
 import { ZrclibProvider } from "@/components/providers/ZrclibProvider";
 const { chains, provider } = configureChains(
-  [mainnet, mantle, { ...localhost, id: 31337 }],
+  [mainnet, { ...mantle, iconUrl: '/mantle.jpg'}, { ...localhost, id: 31337 }],
   [publicProvider()]
 );
 
