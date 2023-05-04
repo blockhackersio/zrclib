@@ -35,5 +35,8 @@
     "typescript": "5.0.4",
     "wagmi": "^0.12.12",
     "webpack-virtual-modules": "^0.5.0"
+  },
+  "devDependencies": {
+    "@zrclib/tests": "workspace:*"
   }
 }
