@@ -1,9 +1,9 @@
 import { Account, GenerateProofFn, generateProof } from "@zrclib/sdk";
 import { BigNumber, BigNumberish, Contract, Signer } from "ethers";
 import { getProver } from "./get_prover";
-import { SwapParams } from "@/../../sdk/src/types";
+import { SwapParams } from "@zrclib/sdk/src/types";
 import { Tokens, getContract, getTokens } from "@/contracts/get_contract";
-import type { MockErc20 } from "@/../../tests/typechain-types";
+import type { MockErc20 } from "@zrclib/tests/typechain-types";
 export type AccountBalances = {
   // address -> balance
   privateBalances: Map<string, BigNumber>;
