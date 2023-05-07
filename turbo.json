@@ -13,11 +13,9 @@
         "pot/**"
       ]
     },
-    "dev": {
-      "dependsOn": ["build"]
-    },
+    "dev": {},
     "test": {
-      "dependsOn": ["build"]
+      "dependsOn": ["^test"]
     },
     "clean": {
       "dependsOn": ["^clean"]

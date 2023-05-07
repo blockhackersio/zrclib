@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "turbo run build --force --no-daemon",
-    "test": "pnpm build && turbo run test --force --no-daemon",
-    "clean": "turbo run clean --force --no-daemon",
-    "wallet": "concurrently -r \"turbo run --force --scope @zrclib/tests dev\" \"turbo run --scope @zrclib/wallet dev\""
+    "build": "turbo run build --no-daemon",
+    "test": "pnpm build && turbo run test --no-daemon",
+    "clean": "turbo run clean --no-daemon",
+    "wallet": "pnpm build && concurrently -r \"turbo run --force --scope @zrclib/tests dev\" \"turbo run --force --scope @zrclib/wallet dev\""
   },
   "keywords": [],
   "author": "",
