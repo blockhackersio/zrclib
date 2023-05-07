@@ -1,7 +1,9 @@
 #!/bin/bash
 if [ -z "$SKIP_CIRCOM" ]; then
-  ./scripts/compile_circuit.sh transaction
-  node ./scripts/process_output.js
+  ./scripts/plonk_compile_circuit.sh transaction
+  node ./scripts/plonk_process_output.js
+  # ./scripts/g16_compile_circuit.sh transaction
+  # node ./scripts/g16_process_output.js
   node ./scripts/generate_hasher_contract.js
 fi
 pnpm tsc

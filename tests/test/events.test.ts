@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { Utxo } from "@zrclib/sdk/src/utxo";
 import { BigNumber } from "ethers";
 
-it.skip("UtxoEventDecryptor", async () => {
+it("UtxoEventDecryptor", async () => {
   const [deployer] = await ethers.getSigners();
 
   const factory = new EventMock__factory(deployer);
@@ -41,6 +41,7 @@ it.skip("UtxoEventDecryptor", async () => {
     "0x0000000000000000000000000000000000000000000000000000000012345678",
     "0x0000000000000000000000000000000000000000000000000000000087654321",
   ]);
+  decryptor.stop();
 });
 
 it("gets events before started", async () => {
@@ -76,6 +77,8 @@ it("gets events before started", async () => {
     "0x0000000000000000000000000000000000000000000000000000000012345678",
     "0x0000000000000000000000000000000000000000000000000000000087654321",
   ]);
+
+  decryptor.stop();
 });
 
 it("gets comitment before started", async () => {
@@ -122,4 +125,6 @@ it("gets comitment before started", async () => {
     BigNumber.from(10),
     BigNumber.from(20),
   ]);
+
+  decryptor.stop();
 });

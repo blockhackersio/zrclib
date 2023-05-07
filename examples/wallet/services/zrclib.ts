@@ -1,4 +1,4 @@
-import { Account, GenerateProofFn, generateProof } from "@zrclib/sdk";
+import { Account, GenerateProofFn, generatePlonkProof } from "@zrclib/sdk";
 import { BigNumber, BigNumberish, Contract, Signer } from "ethers";
 import { getProver } from "./get_prover";
 import { SwapParams } from "@zrclib/sdk/src/types";
@@ -14,7 +14,7 @@ export type AccountBalances = {
 
 export class ZrclibAccount {
   private account?: Account;
-  constructor(private generateProofFn: GenerateProofFn = generateProof) {}
+  constructor(private generateProofFn: GenerateProofFn = generatePlonkProof) {}
 
   async createAndLogin(contract: Contract, signer: Signer, password: string) {
     const account = await Account.create(

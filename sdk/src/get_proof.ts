@@ -7,7 +7,7 @@ import MerkleTree from "fixed-merkle-tree";
 import { Utxo } from "./utxo";
 import { Element } from "fixed-merkle-tree";
 import { FormattedProof, ProofArguments } from "./types";
-import { GenerateProofFn, generateProof } from "./generate_proof";
+import { GenerateProofFn, generatePlonkProof } from "./generate_proof";
 
 export type ProofParams = {
   asset: BigNumber;
@@ -66,7 +66,7 @@ export async function getProof({
   swapRouter,
   swapData,
   transactData,
-  proofGen = generateProof,
+  proofGen = generatePlonkProof,
 }: ProofParams): Promise<FormattedProof> {
   inputs = shuffle(inputs);
   outputs = shuffle(outputs);
@@ -187,8 +187,14 @@ async function formatArguments(zrcProof: ZrcProof): Promise<FormattedProof> {
   const proofArguments: ProofArguments = {
     proof,
     root: toFixedHex(root),
-    inputNullifiers: inputNullifiers.map((n) => toFixedHex(n)) as [string, string],
-    outputCommitments: outputCommitments.map((n) => toFixedHex(n)) as [string, string],
+    inputNullifiers: inputNullifiers.map((n) => toFixedHex(n)) as [
+      string,
+      string
+    ],
+    outputCommitments: outputCommitments.map((n) => toFixedHex(n)) as [
+      string,
+      string
+    ],
     publicAmount: BigNumber.from(publicAmount),
     publicAsset: toFixedHex(publicAsset.toString(), 20),
     extDataHash: toFixedHex(extDataHash),

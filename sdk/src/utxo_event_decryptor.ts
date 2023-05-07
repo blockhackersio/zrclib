@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { NewCommitment } from "./types";
 import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
-
+import { poseidonHash } from "./poseidon";
 [
   "event NewCommitment(bytes32 indexed commitment, uint256 indexed index, bytes indexed encryptedOutput)",
   "event NewNullifier(bytes32 indexed nullifier)",
@@ -27,11 +27,16 @@ type NullifierHandler = (
   blockheight: number
 ) => void | Promise<void>;
 
+function hashEvent(event: ethers.Event) {
+  return JSON.stringify([event.args, event.eventSignature]);
+}
+
 export class UtxoEventDecryptor {
   private _isStarted: boolean = false;
   private unsubscribe: UnsubscribeFn = () => {};
   private handleUtxo: UtxoHandler = () => {};
   private handleNullifier: NullifierHandler = () => {};
+  private cache: Set<string> = new Set();
 
   constructor(private contract: ethers.Contract, private keypair: Keypair) {}
 
@@ -44,25 +49,41 @@ export class UtxoEventDecryptor {
       encryptedOutput: string,
       event: ethers.Event
     ) => {
-      console.log("=== commitmentHandler ===");
+      // skip if event has already been processed
+      if (this.cache.has(hashEvent(event))) return;
+
       const utxo = attemptUtxoDecryption(this.keypair, {
         type: "NewCommitment",
         commitment,
         index: index.toNumber(),
         encryptedOutput,
       });
+
       if (utxo) {
         console.log(
           `Received Utxo {amount:${utxo.amount},asset:${utxo.asset},pubkey:${utxo.keypair.pubkey},${utxo.blinding}}`
         );
         this.handleUtxo(utxo, event.blockNumber);
       }
+
+      // add event to cache
+      this.cache.add(hashEvent(event));
     };
     const nullifierHandler = async (nullifier: string, event: ethers.Event) => {
-      console.log("=== nullifierHandler ===");
+      // skip if event has already been processed
+      if (this.cache.has(hashEvent(event))) return;
+
+      console.log(
+        "=== nullifierHandler " +
+          JSON.stringify([event.args, event.eventSignature]) +
+          " ==="
+      );
 
       console.log(`Received Nullifier ${nullifier}`);
       await this.handleNullifier(nullifier, event.blockNumber);
+
+      // add event to cache
+      this.cache.add(hashEvent(event));
     };
 
     const nullifierFilter = this.contract.filters.NewNullifier();
@@ -74,11 +95,19 @@ export class UtxoEventDecryptor {
     );
 
     for (let event of nullifierEvents) {
+      console.log(
+        // @ts-ignore-line
+        "Processing historical nullifierEvent: " + event.args.nullifier
+      );
       // @ts-ignore-line
-      await nullifierHandler(event.args.nullifier, event.blockNumber);
+      await nullifierHandler(event.args.nullifier, event);
     }
 
     for (let event of commitmentEvents) {
+      console.log(
+        // @ts-ignore-line
+        "Processing historical commitmentEvent: " + event.args.commitment
+      );
       commitmentHandler(
         // @ts-ignore-line
         event.args.commitment,
@@ -90,6 +119,8 @@ export class UtxoEventDecryptor {
         event
       );
     }
+
+    console.log("starting listeners");
 
     this.contract.on("NewCommitment", commitmentHandler);
     this.contract.on("NewNullifier", nullifierHandler);
