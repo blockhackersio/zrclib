@@ -18,7 +18,8 @@ This code is unaudited and under construction. This is experimental software and
 - [ ] Implement encrypted store in indexDB
 - [ ] Test that utxo store recovers from partial hydration
 
-## Future goals 
+## Future goals
+
 - [ ] Deposit via proof of deposit (Requires TX proving in Zero Knowledge - possibly with Nova / Halo)
 - [ ] Withdrawal via threshold network
 - [ ] Refactor and redesign of API
@@ -53,7 +54,13 @@ pnpm build
 - Build circuit artifacts
 - Bundle all keys encoded to json files
 
-###
+### Run wallet example
+
+```
+pnpm wallet
+```
+
+- run the wallet application
 
 ## API
 
@@ -87,4 +94,3 @@ const unshieldProof = await account.proveUnshield(5e17, receiver);
 // call `transferFrom` to return 0.5 of your ERC-20 tokens to your public account
 await token.withdraw(unshieldProof);
 ```
-

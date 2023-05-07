@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+// The following might only be required for noir:
 const { O_TRUNC, O_CREAT, O_RDWR, O_EXCL, O_RDONLY } = require("constants");
 const VirtualModulesPlugin = require("webpack-virtual-modules");
 const constants = `
