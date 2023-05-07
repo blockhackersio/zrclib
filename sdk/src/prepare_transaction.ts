@@ -4,7 +4,7 @@ import { Utxo } from "./utxo";
 import { getProof } from "./get_proof";
 import { MerkleTree } from "fixed-merkle-tree";
 import { FormattedProof, SwapParams } from "./types";
-import { GenerateProofFn, generatePlonkProof } from "./generate_proof";
+import { GenerateProofFn, generateGroth16Proof } from "./generate_proof";
 
 export const MERKLE_TREE_HEIGHT = 5;
 
@@ -22,7 +22,7 @@ export async function prepareTransaction({
     transactData: "0x00",
   },
   tree,
-  proofGen = generatePlonkProof,
+  proofGen = generateGroth16Proof,
 }: {
   asset?: BigNumber;
   inputs?: Utxo[];

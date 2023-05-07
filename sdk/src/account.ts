@@ -6,7 +6,7 @@ import { AccountStore } from "./account_store";
 import { Utxo } from "./utxo";
 import { ShieldedPoolProver } from "./shielded_pool";
 import { buildMerkleTree } from "./merkle_tree";
-import { GenerateProofFn, generatePlonkProof } from "./generate_proof";
+import { GenerateProofFn, generateGroth16Proof } from "./generate_proof";
 import { SwapParams } from "./types";
 
 export class Account {
@@ -18,7 +18,7 @@ export class Account {
     private contract: ethers.Contract,
     public signer: ethers.Signer,
     private encryptor: PasswordEncryptor,
-    private proofGen: GenerateProofFn = generatePlonkProof
+    private proofGen: GenerateProofFn = generateGroth16Proof
   ) {}
 
   public isLoggedIn() {
@@ -155,7 +155,7 @@ export class Account {
     contract: ethers.Contract,
     signer: ethers.Signer,
     password: string,
-    proofGen: GenerateProofFn = generatePlonkProof
+    proofGen: GenerateProofFn = generateGroth16Proof
   ): Promise<Account> {
     // Ensure password length > 16
     const encryptor = PasswordEncryptor.fromPassword(password);

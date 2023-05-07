@@ -3,7 +3,10 @@ const { transformFile } = require("./_transform_file");
 const FILE_TANSFORMS = [
   {
     filename: "./contracts/generated/TransactionVerifier.sol",
-    edits: [[`contract Verifier`, `contract TransactionVerifier`]],
+    edits: [
+      [`contract Verifier`, `contract TransactionVerifier`],
+      [`pragma solidity ^0.6.11;`, `pragma solidity ^0.8.0;`],
+    ],
   },
 ];
 
