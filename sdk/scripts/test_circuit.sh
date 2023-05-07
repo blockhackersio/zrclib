@@ -6,6 +6,12 @@ capitalize() {
 }
 
 FNAME=$1
+
+if [ -z "$FNAME" ]; then
+  echo "You must provide a circuit name"
+  exit 1
+fi
+
 FNAME_CAPS=$(capitalize $FNAME)
 
 # locations

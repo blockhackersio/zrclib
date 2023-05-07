@@ -13,7 +13,8 @@
     "build": "./scripts/build.sh",
     "postinstall": "./scripts/install.sh",
     "clean": "./scripts/clean.sh",
-    "test": "jest"
+    "test": "jest",
+    "test-circuit": "pnpm build && ./scripts/test_circuit.sh transaction"
   },
   "keywords": [],
   "author": "",

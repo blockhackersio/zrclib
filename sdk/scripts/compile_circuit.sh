@@ -6,17 +6,23 @@ capitalize() {
 }
 
 FNAME=$1
+
+if [ -z "$FNAME" ]; then
+  echo "You must provide a circuit name"
+  exit 1
+fi
+
 FNAME_CAPS=$(capitalize $FNAME)
 
+CIRCUIT=./circuits/$FNAME.circom
 R1CS=./compiled/$FNAME.r1cs
 POT=./pot/pot.ptau
+ZKEY=./compiled/${FNAME}.zkey
+SOL_VERIFIER=./contracts/generated/${FNAME_CAPS}Verifier.sol
 
 mkdir -p ./compiled
 mkdir -p ./contracts/generated
 
-circom ./circuits/$FNAME.circom --r1cs --wasm -o ./compiled
-
-snarkjs plonk setup $R1CS $POT ./compiled/$FNAME.zkey
-
-
-snarkjs zkey export solidityverifier ./compiled/${FNAME}.zkey ./contracts/generated/${FNAME_CAPS}Verifier.sol
+circom $CIRCUIT --r1cs --wasm -o ./compiled
+snarkjs plonk setup $R1CS $POT $ZKEY
+snarkjs zkey export solidityverifier $ZKEY $SOL_VERIFIER
