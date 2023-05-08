@@ -49,7 +49,7 @@ it("UtxoEventDecryptor", async () => {
     "0x0000000000000000000000000000000000000000000000000000000087654321",
   ]);
 
-  decryptor.stop();
+  await decryptor.stop();
 });
 
 it("gets events before started", async () => {
@@ -94,7 +94,7 @@ it("gets events before started", async () => {
     "0x0000000000000000000000000000000000000000000000000000000087654321",
   ]);
 
-  decryptor.stop();
+  await decryptor.stop();
 });
 
 it("allows events that include identical events", async () => {
@@ -137,7 +137,7 @@ it("allows events that include identical events", async () => {
     "0x0000000000000000000000000000000000000000000000000000000012345678",
   ]);
 
-  decryptor.stop();
+  await decryptor.stop();
 });
 
 it("gets comitment before started", async () => {
@@ -194,5 +194,5 @@ it("gets comitment before started", async () => {
     BigNumber.from(20),
   ]);
 
-  decryptor.stop();
+  await decryptor.stop();
 });

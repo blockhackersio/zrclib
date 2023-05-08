@@ -33,8 +33,8 @@ export class EventStoreWriter {
     this.utxoEventDecryptor.start();
   }
 
-  stop() {
-    this.utxoEventDecryptor.stop();
+  async stop() {
+    await this.utxoEventDecryptor.stop();
   }
 
   store() {

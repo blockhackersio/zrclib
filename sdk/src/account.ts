@@ -146,9 +146,9 @@ export class Account {
     return this.prover;
   }
 
-  destroy() {
+  async destroy() {
     this.unsubscribeBlocks();
-    this.getEventStoreWriter().stop();
+    await this.getEventStoreWriter().stop();
   }
 
   static async create(

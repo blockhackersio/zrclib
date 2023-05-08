@@ -3,7 +3,7 @@ import { NewCommitment } from "./types";
 import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
 import { simpleHash } from "fixed-merkle-tree";
-type UnsubscribeFn = () => void;
+type UnsubscribeFn = () => Promise<void>;
 
 function attemptUtxoDecryption(
   keypair: Keypair,
@@ -103,7 +103,7 @@ function isCommitmentEvent(v: any): v is EthersCommitmentEvent {
 
 export class UtxoEventDecryptor {
   private _isStarted: boolean = false;
-  private unsubscribe: UnsubscribeFn = () => {};
+  private unsubscribe: UnsubscribeFn = () => Promise.resolve();
   private handleUtxo: UtxoHandler = () => {};
   private handleNullifier: NullifierHandler = () => {};
   private cache = new Set<string>();
@@ -178,10 +178,13 @@ export class UtxoEventDecryptor {
     this.contract.on("NewCommitment", commitmentHandler);
     this.contract.on("NewNullifier", nullifierHandler);
 
-    this.unsubscribe = () => {
+    this.unsubscribe = async () => {
+      await this.tasks.wait();
+
       this.contract.off("NewCommitment", commitmentHandler);
       this.contract.off("NewNullifier", nullifierHandler);
       this.cache = new Set();
+      this.tasks = new TaskQueue();
     };
   }
 
@@ -212,8 +215,8 @@ export class UtxoEventDecryptor {
     return this.tasks.wait();
   }
 
-  public stop() {
-    if (this._isStarted) this.unsubscribe();
+  public async stop() {
+    if (this._isStarted) return this.unsubscribe();
     this._isStarted = false;
   }
 
