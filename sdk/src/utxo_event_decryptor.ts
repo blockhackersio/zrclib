@@ -110,6 +110,7 @@ export class UtxoEventDecryptor {
     this.unsubscribe = () => {
       this.contract.off("NewCommitment", commitmentHandler);
       this.contract.off("NewNullifier", nullifierHandler);
+      this.cache = new Set();
     };
   }
 
