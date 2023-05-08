@@ -16,7 +16,6 @@ import {
 } from "react";
 import { useAccount } from "wagmi";
 import { BigNumber, Signer, ethers } from "ethers";
-import { MockErc20 } from "@/../../tests/typechain-types";
 import { FormattedProof } from "@zrclib/sdk/src/types";
 import { tryUntilPasses } from "@/utils";
 const zrclib = ZrclibAccount.getInstance();
@@ -150,7 +149,7 @@ export function ZrclibProvider(p: { children: ReactNode }) {
 
       const signer: Signer = await connector.getSigner();
       const type = getTokenFromAddress(asset, chainId) as Tokens;
-      const contract = getContract(type, chainId, signer) as MockErc20;
+      const contract = getContract(type, chainId, signer);
 
       const tx = await contract.mint(await signer.getAddress(), amount);
       await tx.wait();
@@ -312,7 +311,7 @@ export function ZrclibProvider(p: { children: ReactNode }) {
       const type = getTokenFromAddress(asset, chainId) as Tokens;
 
       const spender = getContract("MASP", chainId, signer);
-      const contract = getContract(type, chainId, signer) as MockErc20;
+      const contract = getContract(type, chainId, signer);
 
       const tx = await contract.approve(spender.address, amount);
       await tx.wait();

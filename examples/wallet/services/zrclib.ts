@@ -2,8 +2,7 @@ import { Account, GenerateProofFn, generatePlonkProof } from "@zrclib/sdk";
 import { BigNumber, BigNumberish, Contract, Signer } from "ethers";
 import { getProver } from "./get_prover";
 import { SwapParams } from "@zrclib/sdk/src/types";
-import { Tokens, getContract, getTokens } from "@/contracts/get_contract";
-import type { MockErc20 } from "@zrclib/tests/typechain-types";
+import { getContract, getTokens } from "@/contracts/get_contract";
 export type AccountBalances = {
   // address -> balance
   privateBalances: Map<string, BigNumber>;
@@ -63,7 +62,7 @@ export class ZrclibAccount {
         token,
         await this.account.signer.getChainId(),
         this.account.signer
-      ).connect(signer) as MockErc20;
+      ).connect(signer);
       const publicBal = (await contract.balanceOf(
         await signer.getAddress()
       )) as BigNumber;
