@@ -68,43 +68,8 @@ contract ShieldedPool is MerkleTreeWithHistory {
         pure
         returns (uint[2] memory a, uint[2][2] memory b, uint[2] memory c)
     {
-        require(data.length == 192, "Invalid input length");
-
-        // Define the nested arrays
-        uint[2] memory memoryA;
-        uint[2][2] memory memoryB;
-        uint[2] memory memoryC;
-
-        // Parse the input bytes into the nested arrays
-        uint offset = 32;
-        assembly {
-            // Read the values for a from the input bytes
-            mstore(add(memoryA, 0), mload(add(data, offset)))
-            mstore(add(add(memoryA, 32), 0), mload(add(data, add(offset, 32))))
-            offset := add(offset, 64)
-
-            // Read the values for b from the input bytes
-            let ptr := add(memoryB, 0)
-            for {
-                let i := 0
-            } lt(i, 2) {
-                i := add(i, 1)
-            } {
-                mstore(add(ptr, mul(i, 64)), mload(add(data, offset)))
-                mstore(
-                    add(add(ptr, mul(i, 64)), 32),
-                    mload(add(data, add(offset, 32)))
-                )
-                offset := add(offset, 64)
-            }
-
-            // Read the values for c from the input bytes
-            mstore(add(memoryC, 0), mload(add(data, offset)))
-            mstore(add(add(memoryC, 32), 0), mload(add(data, add(offset, 32))))
-        }
-
-        // Return the values as a tuple
-        return (memoryA, memoryB, memoryC);
+        (a[0], a[1], b[0][0], b[0][1], b[1][0], b[1][1], c[0], c[1]) = abi
+            .decode(data, (uint, uint, uint, uint, uint, uint, uint, uint));
     }
 
     function verifyGroth16Proof(
