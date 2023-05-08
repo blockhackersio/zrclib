@@ -14,7 +14,7 @@ This code is unaudited and under construction. This is experimental software and
 - [x] ZRC-1155 (Payment / Swap / NFTS / Airdrops)
 - [x] Defi Swaps
 - [x] Defiant Pools Prototype (Zero Knowledge Deposit Addresses pt I)
-- [ ] Refactor to groth16
+- [x] Refactor to groth16
 - [ ] Implement encrypted store in indexDB
 - [ ] Test that utxo store recovers from partial hydration
 
