@@ -3,7 +3,6 @@ pragma solidity ^0.8.9;
 
 import {ShieldedPool} from "@zrclib/sdk/contracts/ShieldedPool.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "hardhat/console.sol";
 
 contract MultiAssetShieldedPool is ShieldedPool {
     constructor(
@@ -13,8 +12,6 @@ contract MultiAssetShieldedPool is ShieldedPool {
     ) ShieldedPool(5, _hasherAddress, _verifier, _swapExecutor) {}
 
     function transact(Proof calldata _proof) public override {
-        console.logBytes(_proof.proofArguments.proof);
-
         // Deposit functionality
         if (_proof.extData.extAmount > 0) {
             IERC20 token = IERC20(_proof.proofArguments.publicAsset);
