@@ -23,6 +23,7 @@ const config: HardhatUserConfig = {
   mocha: {
     timeout: 100_000_000, // sets the timeout to 10 seconds
     bail: true,
+    parallel: false,
   },
 };
 

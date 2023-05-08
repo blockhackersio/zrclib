@@ -13,7 +13,7 @@ import {
 import { expect } from "chai";
 import artifact from "@zrclib/sdk/contracts/generated/Hasher.json";
 import { FormattedProof } from "@zrclib/sdk/src/types";
-import { sleep, tend, time } from "../utils";
+import { sleep, tend, time, waitUntil } from "../utils";
 
 async function deploySwapRouter() {
   // Prepare signers
@@ -113,26 +113,28 @@ it("Test swap", async function () {
   tend(t);
 
   t = time("Alice approves ERC20 payment");
-  tx = await tokenA.approve(contract.address, TEN);
-  await tx.wait();
+  await tokenA.approve(contract.address, TEN);
   tend(t);
 
   t = time("Alice submits transaction");
-  tx = await contract.transact(proof);
-  await tx.wait();
+  await contract.transact(proof);
   tend(t);
 
-  await sleep(10_000); // Waiting for sync
+  // await sleep(10_000); // Waiting for sync
 
   /// Check balances
   t = time("Check that Alice's ERC20 balance is 0");
-  publicBalance = await tokenA.balanceOf(aliceEth.address);
-  expect(publicBalance).to.eq(0);
+  await waitUntil(
+    () => tokenA.balanceOf(aliceEth.address),
+    (bal) => bal.eq(0)
+  );
   tend(t);
 
   t = time("Check Alice's private balance is 10");
-  privateBalance = await alice.getBalance(tokenA.address);
-  expect(privateBalance).to.eq(TEN); // Transfer to the darkside worked! :)
+  await waitUntil(
+    () => alice.getBalance(tokenA.address),
+    (bal) => bal.eq(TEN) // Transfer to the darkside worked! :)
+  );
   tend(t);
 
   /// WITHDRAW, SWAP and RESHIELD
@@ -170,15 +172,17 @@ it("Test swap", async function () {
   await tx.wait();
   tend(t);
 
-  await sleep(10_000); // Waiting for sync
-
   t = time("Check Alice's private balance is 5");
-  privateBalance = await alice.getBalance(tokenA.address);
-  expect(privateBalance).to.eq(FIVE); // Transfer to the darkside worked! :)
+  await waitUntil(
+    () => alice.getBalance(tokenA.address),
+    (bal) => bal.eq(FIVE) // Transfer to the darkside worked! :)
+  );
   tend(t);
 
   t = time("Check Alice's private balance is 5");
-  privateBalance = await alice.getBalance(tokenB.address);
-  expect(privateBalance).to.eq(FIVE); // Transfer to the darkside worked! :)
+  await waitUntil(
+    () => alice.getBalance(tokenB.address),
+    (bal) => bal.eq(FIVE) // Transfer to the darkside worked! :)
+  );
   tend(t);
 });

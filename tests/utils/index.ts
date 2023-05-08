@@ -9,3 +9,23 @@ export function time(log: string) {
 export function tend(started: number) {
   console.log(` └─ ${Date.now() - started}ms`);
 }
+
+export async function waitUntil<T>(
+  task: () => Promise<T>,
+  isEqual: (v: T) => boolean,
+  timeout = 30_000
+) {
+  let start = Date.now();
+
+  while (true) {
+    if (start + timeout < Date.now()) {
+      throw new Error("Value was expected to be equal after timeout");
+    }
+    const actual = await task();
+    if (isEqual(actual)) {
+      break;
+    }
+
+    await sleep(500);
+  }
+}

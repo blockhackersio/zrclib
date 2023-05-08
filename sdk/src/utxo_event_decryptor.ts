@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { NewCommitment } from "./types";
 import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
@@ -22,8 +22,83 @@ type NullifierHandler = (
   blockheight: number
 ) => void | Promise<void>;
 
+class ResolvablePromise<T> {
+  private _promise: Promise<T>;
+  private _resolve = (v: T) => {};
+  constructor() {
+    this._promise = this.resetPromise();
+  }
+
+  private resetPromise() {
+    return new Promise<T>((resolve) => {
+      this._resolve = resolve;
+    });
+  }
+  resolve(v: T) {
+    this._resolve(v);
+    this._promise = this.resetPromise();
+  }
+
+  promise() {
+    return this._promise;
+  }
+}
+
+class TaskQueue {
+  public queue: (() => Promise<void>)[] = [];
+  public activePromise: Promise<void> | null = null;
+  private waitForTasks: ResolvablePromise<void> = new ResolvablePromise();
+
+  public add(task: () => Promise<void>): void {
+    console.log("adding task: ", task);
+    this.queue.push(task);
+    this.runTasks();
+  }
+
+  public async wait(): Promise<void> {
+    await this.waitForTasks.promise();
+  }
+
+  private async runTasks(): Promise<void> {
+    if (!this.activePromise) {
+      while (this.queue.length > 0) {
+        const task = this.queue.shift()!;
+        this.activePromise = task().finally(() => {
+          this.activePromise = null;
+          this.runTasks();
+        });
+      }
+
+      // Throw resolution to next tick
+      await new Promise((r) => setTimeout(r, 1000));
+      this.waitForTasks.resolve();
+    }
+  }
+}
+
 function hashEvent(event: ethers.Event) {
   return simpleHash([JSON.stringify(event)]);
+}
+
+type EthersNullifierEvent = ethers.Event & {
+  args: {
+    nullifier: string;
+  };
+};
+
+type EthersCommitmentEvent = ethers.Event & {
+  args: {
+    commitment: string;
+    index: BigNumber;
+    encryptedOutput: string;
+  };
+};
+function isNullifierEvent(v: any): v is EthersNullifierEvent {
+  return typeof v.args.nullifier === "string";
+}
+
+function isCommitmentEvent(v: any): v is EthersCommitmentEvent {
+  return typeof v.args.commitment === "string";
 }
 
 export class UtxoEventDecryptor {
@@ -31,19 +106,21 @@ export class UtxoEventDecryptor {
   private unsubscribe: UnsubscribeFn = () => {};
   private handleUtxo: UtxoHandler = () => {};
   private handleNullifier: NullifierHandler = () => {};
-  private cache: Set<string> = new Set();
+  private cache = new Set<string>();
+  private tasks = new TaskQueue();
 
   constructor(private contract: ethers.Contract, private keypair: Keypair) {}
 
   public async start(lastBlock = 0 /* will use this later */) {
     this._isStarted = true;
 
-    const commitmentHandler = (
+    const commitmentHandler = async (
       commitment: string,
       index: ethers.BigNumber,
       encryptedOutput: string,
       event: ethers.Event
     ) => {
+      console.log("=commitmentHandler=");
       this.runIfUniqueEvent(event, async () => {
         const utxo = attemptUtxoDecryption(this.keypair, {
           type: "NewCommitment",
@@ -61,9 +138,8 @@ export class UtxoEventDecryptor {
       });
     };
     const nullifierHandler = async (nullifier: string, event: ethers.Event) => {
+      console.log("=nullifierHandler=");
       this.runIfUniqueEvent(event, async () => {
-        // console.log("=== nullifierHandler ===");
-        // console.log(`Received Nullifier ${nullifier}`);
         await this.handleNullifier(nullifier, event.blockNumber);
       });
     };
@@ -77,27 +153,22 @@ export class UtxoEventDecryptor {
     );
 
     for (let event of nullifierEvents) {
+      if (!isNullifierEvent(event)) throw new Error("BAD_EVENT_FORMAT");
       console.log(
-        // @ts-ignore-line
         "Processing historical nullifierEvent: " + event.args.nullifier
       );
-      // @ts-ignore-line
       await nullifierHandler(event.args.nullifier, event);
     }
 
     for (let event of commitmentEvents) {
+      if (!isCommitmentEvent(event)) throw new Error("BAD_EVENT_FORMAT");
       console.log(
-        // @ts-ignore-line
         "Processing historical commitmentEvent: " + event.args.commitment
       );
-      commitmentHandler(
-        // @ts-ignore-line
+      await commitmentHandler(
         event.args.commitment,
-        // @ts-ignore-line
         event.args.index,
-        // @ts-ignore-line
         event.args.encryptedOutput,
-        // @ts-ignore-line
         event
       );
     }
@@ -123,7 +194,8 @@ export class UtxoEventDecryptor {
     this.handleNullifier = handler;
   }
 
-  private async runIfUniqueEvent(event: ethers.Event, fn: () => Promise<void>) {
+  private runIfUniqueEvent(event: ethers.Event, task: () => Promise<void>) {
+    console.log("runIfUniqueEvent");
     const hash = hashEvent(event);
     console.log({ hash });
     if (this.cache.has(hash)) {
@@ -132,7 +204,12 @@ export class UtxoEventDecryptor {
     }
     console.log("cache miss running fn");
     this.cache.add(hash);
-    await fn();
+    this.tasks.add(task);
+  }
+
+  waitForAllHandlers() {
+    console.log(this.tasks.queue.length);
+    return this.tasks.wait();
   }
 
   public stop() {

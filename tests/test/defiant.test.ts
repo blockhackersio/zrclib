@@ -13,11 +13,11 @@ import {
   MockErc20,
   Verifier__factory,
   SwapExecutor__factory,
-  WithdrawalAmountManagerTester__factory
+  WithdrawalAmountManagerTester__factory,
 } from "../typechain-types";
 import { expect } from "chai";
 import artifact from "../../sdk/contracts/generated/Hasher.json";
-import { sleep, tend, time } from "../utils";
+import { tend, time, waitUntil } from "../utils";
 import { BigNumber, BigNumberish, Signer } from "ethers";
 
 async function deploy() {
@@ -45,7 +45,11 @@ async function deploy() {
 
   // DefiantPool
   const poolFactory = new DefiantPool__factory(deployer);
-  const pool = await poolFactory.deploy(hasher.address, verifier.address, swapExecutor.address);
+  const pool = await poolFactory.deploy(
+    hasher.address,
+    verifier.address,
+    swapExecutor.address
+  );
   await pool.deployed();
 
   // DefiantDeposit
@@ -193,46 +197,64 @@ it("should deposit", async () => {
   await deposit(100_000000, charlie, token);
   tend(t);
 
-  await sleep(15_000);
-
   // Check balances
   t = time("get balances");
-  let alicePrivateBal = await alice.getBalance();
-  expect(alicePrivateBal.toNumber()).to.eq(100_000000);
-  let charliePrivateBal = await charlie.getBalance();
-  expect(charliePrivateBal.toNumber()).to.eq(100_000000);
-  let alicePublicBal = await token.balanceOf(aliceEth.address);
-  expect(alicePublicBal.toNumber()).to.eq(0);
+  await waitUntil(
+    () => alice.getBalance(),
+    (bal) => bal.eq(100_000000)
+  );
+
+  await waitUntil(
+    () => charlie.getBalance(),
+    (bal) => bal.eq(100_000000)
+  );
+
+  await waitUntil(
+    () => token.balanceOf(aliceEth.address),
+    (bal) => bal.eq(0)
+  );
   tend(t);
 
   // Transfer
   t = time("transfer");
   await transfer(pool, 75_000000, alice, bob);
   await transfer(pool, 75_000000, charlie, bob);
-  await sleep(10_000);
+  // await sleep(10_000);
   tend(t);
 
   t = time("get balances");
-  alicePrivateBal = await alice.getBalance();
-  expect(alicePrivateBal.toNumber()).to.eq(25_000000);
-  charliePrivateBal = await charlie.getBalance();
-  expect(charliePrivateBal.toNumber()).to.eq(25_000000);
-  let bobPrivateBal = await bob.getBalance();
-  expect(bobPrivateBal.toNumber()).to.eq(150_000000);
+  await waitUntil(
+    () => alice.getBalance(),
+    (bal) => bal.eq(25_000000)
+  );
+
+  await waitUntil(
+    () => charlie.getBalance(),
+    (bal) => bal.eq(25_000000)
+  );
+
+  await waitUntil(
+    () => bob.getBalance(),
+    (bal) => bal.eq(150_000000)
+  );
   tend(t);
 
   // Withdraw
   t = time("withdraw");
   await withdrawal(150_000000, bob);
-  await sleep(10_000);
   tend(t);
 
   // Check balances
   t = time("get balances");
-  bobPrivateBal = await bob.getBalance();
-  expect(bobPrivateBal.toNumber()).to.eq(0);
-  let bobPublicBal = await token.balanceOf(bobEth.address);
-  expect(bobPublicBal.toNumber()).to.eq(150_000000);
+  await waitUntil(
+    () => bob.getBalance(),
+    (bal) => bal.eq(0)
+  );
+
+  await waitUntil(
+    () => token.balanceOf(bobEth.address),
+    (bal) => bal.eq(150_000000)
+  );
   tend(t);
 
   alice.destroy();

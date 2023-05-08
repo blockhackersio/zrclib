@@ -9,7 +9,7 @@ import {
 } from "../typechain-types";
 import { expect } from "chai";
 import artifact from "../../sdk/contracts/generated/Hasher.json";
-import { sleep, tend, time } from "../utils";
+import { sleep, tend, time, waitUntil } from "../utils";
 
 async function deployZrc() {
   // Prepare signers
@@ -79,17 +79,19 @@ it("Test zrc1155 transfer", async function () {
   await tx.wait();
   tend(t);
 
-  await sleep(10_000); // Waiting for sync
-
   /// Check balances
   t = time("Check that Alice's ERC20 balance is 0 (A)");
-  publicBalance = await contract.balanceOf(aliceEth.address, tokenA);
-  expect(publicBalance).to.eq(0);
+  await waitUntil(
+    () => contract.balanceOf(aliceEth.address, tokenA),
+    (bal) => bal.eq(0)
+  );
   tend(t);
 
   t = time("Check Alice's private balance is 10 (A)");
-  privateBalance = await alice.getBalance(tokenA);
-  expect(privateBalance).to.eq(TEN); // Transfer to the darkside worked! :)
+  await waitUntil(
+    () => alice.getBalance(tokenA),
+    (bal) => bal.eq(TEN)
+  );
   tend(t);
 
   /// DEPOSIT token B
@@ -102,17 +104,19 @@ it("Test zrc1155 transfer", async function () {
   await tx.wait();
   tend(t);
 
-  await sleep(10_000); // Waiting for sync
-
   /// Check balances
   t = time("Check that Alice's ERC20 balance is 0");
-  publicBalance = await contract.balanceOf(aliceEth.address, tokenB);
-  expect(publicBalance).to.eq(0);
+  await waitUntil(
+    () => contract.balanceOf(aliceEth.address, tokenB),
+    (bal) => bal.eq(0)
+  );
   tend(t);
 
   t = time("Check Alice's private balance is 10 (B)");
-  privateBalance = await alice.getBalance(tokenB);
-  expect(privateBalance).to.eq(TEN); // Transfer to the darkside worked! :)
+  await waitUntil(
+    () => alice.getBalance(tokenB),
+    (bal) => bal.eq(TEN)
+  );
   tend(t);
 
   /// TRANSFER
@@ -128,20 +132,20 @@ it("Test zrc1155 transfer", async function () {
   await tx.wait();
   tend(t);
 
-  await sleep(10_000); // Waiting for sync
-
   // Check private balances
   t = time("Check Alice's private balance is 5 (B)");
-  const alicePrivateBal = await alice.getBalance(tokenB);
+  await waitUntil(
+    () => alice.getBalance(tokenB),
+    (bal) => bal.eq(FIVE)
+  );
   tend(t);
-  expect(alicePrivateBal).to.eq(FIVE);
 
   t = time("Check Bob's private balance is 5 (B)");
-  const bobPrivateBal = await bob.getBalance(tokenB);
+  await waitUntil(
+    () => bob.getBalance(tokenB),
+    (bal) => bal.eq(FIVE)
+  );
   tend(t);
-  expect(bobPrivateBal).to.eq(FIVE);
-
-  publicBalance = await contract.balanceOf(aliceEth.address, tokenB);
 
   /// WITHDRAW
   t = time("Alice creates a proof to unshield 5 (B)");
@@ -153,12 +157,12 @@ it("Test zrc1155 transfer", async function () {
   tx.wait();
   tend(t);
 
-  await sleep(10_000); // Waiting for sync
-
   /// Check balances
   t = time("Check Alice's public balance is 5 (B)");
-  publicBalance = await contract.balanceOf(aliceEth.address, tokenB);
-  expect(publicBalance).to.eq(FIVE);
+  await waitUntil(
+    () => contract.balanceOf(aliceEth.address, tokenB),
+    (bal) => bal.eq(FIVE)
+  );
   tend(t);
 
   alice.destroy();
