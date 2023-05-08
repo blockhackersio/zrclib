@@ -13,8 +13,11 @@ describe("UtxoEventDecryptor", () => {
   let contract: EventMock;
   let kp: Keypair;
 
+  before(async () => {
+    await sleep(10_000);
+  });
+
   beforeEach(async () => {
-    await sleep(2000);
     const [deployer] = await ethers.getSigners();
 
     const factory = new EventMock__factory(deployer);
