@@ -174,13 +174,11 @@ export class UtxoEventDecryptor {
     }
 
     console.log("starting listeners");
-
     this.contract.on("NewCommitment", commitmentHandler);
     this.contract.on("NewNullifier", nullifierHandler);
 
     this.unsubscribe = async () => {
       await this.tasks.wait();
-
       this.contract.off("NewCommitment", commitmentHandler);
       this.contract.off("NewNullifier", nullifierHandler);
       this.cache = new Set();

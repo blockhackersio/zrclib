@@ -14,6 +14,7 @@ import { expect } from "chai";
 import artifact from "@zrclib/sdk/contracts/generated/Hasher.json";
 import { FormattedProof } from "@zrclib/sdk/src/types";
 import { sleep, tend, time, waitUntil } from "../utils";
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 
 async function deploySwapRouter() {
   // Prepare signers
@@ -76,16 +77,23 @@ function encodeData(proof: FormattedProof) {
   return encoded;
 }
 
-it("Test swap", async function () {
-  const TEN = 10 * 1_000_000;
-  const FIVE = 5 * 1_000_000;
-
+async function deployFixtures() {
   let { contract, swapExecutor } = await deployMultiAssetShieldedPool();
   let tokenA = await deployERC20Token("LUSD", "LUSD");
   let tokenB = await deployERC20Token("DAI", "DAI");
   let swapRouter = await deploySwapRouter();
 
+  return { contract, swapExecutor, tokenA, tokenB, swapRouter };
+}
+
+it("Test swap", async function () {
+  const TEN = 10 * 1_000_000;
+  const FIVE = 5 * 1_000_000;
+
   const [deployer, aliceEth, bobEth] = await ethers.getSigners();
+
+  let { contract, swapExecutor, swapRouter, tokenA, tokenB } =
+    await loadFixture(deployFixtures);
 
   // CREATE ACCOUNTS
   const alice = await Account.create(contract, aliceEth, "password123");

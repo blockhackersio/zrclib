@@ -9,6 +9,7 @@ import {
 } from "../typechain-types";
 import artifact from "@zrclib/sdk/contracts/generated/Hasher.json";
 import { tend, time, waitUntil } from "../utils";
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 
 async function deployZrc() {
   // Prepare signers
@@ -42,7 +43,7 @@ it("Test zrc20 transfer", async function () {
   const TEN = 10 * 1_000_000;
   const FIVE = 5 * 1_000_000;
 
-  let { contract } = await deployZrc();
+  let { contract } = await loadFixture(deployZrc);
 
   const [deployer, aliceEth, bobEth] = await ethers.getSigners();
 
@@ -139,8 +140,8 @@ it("Test zrc20 transfer", async function () {
   );
   tend(t);
 
-  alice.destroy();
-  bob.destroy();
+  await alice.destroy();
+  await bob.destroy();
 
   console.log("Ok");
 });
