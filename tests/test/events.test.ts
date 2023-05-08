@@ -14,7 +14,7 @@ describe("UtxoEventDecryptor", () => {
   let kp: Keypair;
 
   beforeEach(async () => {
-    await sleep(1000);
+    await sleep(2000);
     const [deployer] = await ethers.getSigners();
 
     const factory = new EventMock__factory(deployer);
