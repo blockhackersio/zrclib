@@ -81,6 +81,43 @@ it("gets events before started", async () => {
   decryptor.stop();
 });
 
+it("allows events that include identical events", async () => {
+  const [deployer] = await ethers.getSigners();
+
+  const factory = new EventMock__factory(deployer);
+  const contract = await factory.deploy();
+  const kp = await Keypair.generate();
+  const decryptor = new UtxoEventDecryptor(contract, kp);
+
+  let nullifiers: string[] = [];
+  let utxos: Utxo[] = [];
+  decryptor.onNullifier((n) => {
+    nullifiers.push(n);
+  });
+
+  decryptor.onUtxo((n) => {
+    utxos.push(n);
+  });
+
+  // gets events before started
+  let tx;
+  tx = await contract.newNullifier(toFixedHex("0x12345678"));
+  await tx.wait();
+  tx = await contract.newNullifier(toFixedHex("0x12345678"));
+  await tx.wait();
+
+  await sleep(15000);
+  await decryptor.start();
+  await sleep(2000);
+
+  expect(nullifiers).to.eql([
+    "0x0000000000000000000000000000000000000000000000000000000012345678",
+    "0x0000000000000000000000000000000000000000000000000000000012345678",
+  ]);
+
+  decryptor.stop();
+});
+
 it("gets comitment before started", async () => {
   const [deployer] = await ethers.getSigners();
 

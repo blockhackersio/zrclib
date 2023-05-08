@@ -2,12 +2,7 @@ import { ethers } from "ethers";
 import { NewCommitment } from "./types";
 import { Utxo } from "./utxo";
 import { Keypair } from "./keypair";
-import { poseidonHash } from "./poseidon";
-[
-  "event NewCommitment(bytes32 indexed commitment, uint256 indexed index, bytes indexed encryptedOutput)",
-  "event NewNullifier(bytes32 indexed nullifier)",
-];
-
+import { simpleHash } from "fixed-merkle-tree";
 type UnsubscribeFn = () => void;
 
 function attemptUtxoDecryption(
@@ -28,7 +23,7 @@ type NullifierHandler = (
 ) => void | Promise<void>;
 
 function hashEvent(event: ethers.Event) {
-  return JSON.stringify([event.args, event.eventSignature]);
+  return simpleHash([JSON.stringify(event)]);
 }
 
 export class UtxoEventDecryptor {
@@ -49,41 +44,28 @@ export class UtxoEventDecryptor {
       encryptedOutput: string,
       event: ethers.Event
     ) => {
-      // skip if event has already been processed
-      if (this.cache.has(hashEvent(event))) return;
+      this.runIfUniqueEvent(event, async () => {
+        const utxo = attemptUtxoDecryption(this.keypair, {
+          type: "NewCommitment",
+          commitment,
+          index: index.toNumber(),
+          encryptedOutput,
+        });
 
-      const utxo = attemptUtxoDecryption(this.keypair, {
-        type: "NewCommitment",
-        commitment,
-        index: index.toNumber(),
-        encryptedOutput,
+        if (utxo) {
+          console.log(
+            `Received Utxo {amount:${utxo.amount},asset:${utxo.asset},pubkey:${utxo.keypair.pubkey},${utxo.blinding}}`
+          );
+          this.handleUtxo(utxo, event.blockNumber);
+        }
       });
-
-      if (utxo) {
-        console.log(
-          `Received Utxo {amount:${utxo.amount},asset:${utxo.asset},pubkey:${utxo.keypair.pubkey},${utxo.blinding}}`
-        );
-        this.handleUtxo(utxo, event.blockNumber);
-      }
-
-      // add event to cache
-      this.cache.add(hashEvent(event));
     };
     const nullifierHandler = async (nullifier: string, event: ethers.Event) => {
-      // skip if event has already been processed
-      if (this.cache.has(hashEvent(event))) return;
-
-      console.log(
-        "=== nullifierHandler " +
-          JSON.stringify([event.args, event.eventSignature]) +
-          " ==="
-      );
-
-      console.log(`Received Nullifier ${nullifier}`);
-      await this.handleNullifier(nullifier, event.blockNumber);
-
-      // add event to cache
-      this.cache.add(hashEvent(event));
+      this.runIfUniqueEvent(event, async () => {
+        console.log("=== nullifierHandler ===");
+        console.log(`Received Nullifier ${nullifier}`);
+        await this.handleNullifier(nullifier, event.blockNumber);
+      });
     };
 
     const nullifierFilter = this.contract.filters.NewNullifier();
@@ -138,6 +120,18 @@ export class UtxoEventDecryptor {
   public onNullifier(handler: NullifierHandler) {
     console.log("onNullifier registering handler ");
     this.handleNullifier = handler;
+  }
+
+  private async runIfUniqueEvent(event: ethers.Event, fn: () => Promise<void>) {
+    const hash = hashEvent(event);
+    console.log({ hash });
+    if (this.cache.has(hash)) {
+      console.log("Rejecting because event has already been seen");
+      return;
+    }
+    console.log("cache miss running fn");
+    this.cache.add(hash);
+    await fn();
   }
 
   public stop() {
