@@ -13,7 +13,6 @@ import {
 } from "@/contracts/get_contract";
 import { ReactNode, useCallback, useState } from "react";
 import { useRouter } from "next/router";
-import { zrclib } from "@/../../tests/typechain-types";
 import { fromNumberInput } from "@/utils";
 import { FormattedProof } from "@/../../sdk/src/types";
 
