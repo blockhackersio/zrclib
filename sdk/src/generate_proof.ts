@@ -1,6 +1,7 @@
 import { plonk, groth16 } from "snarkjs";
 import { getWasmFileLocation, getZkeyFileLocation } from "./key_locator";
 import { toFixedHex } from "./utils";
+import { AbiCoder } from "ethers/lib/utils";
 
 export async function generatePlonkProof(inputs: object) {
   const wasmLocation = getWasmFileLocation();
@@ -22,17 +23,26 @@ export async function generateGroth16Proof(inputs: object) {
   console.log(JSON.stringify(inputs));
   console.log("/generateGroth16Proof=========");
   const { proof } = await groth16.fullProve(inputs, wasmLocation, zkeyLocation);
-  return (
-    "0x" +
-    toFixedHex(proof.pi_a[0]).slice(2) +
-    toFixedHex(proof.pi_a[1]).slice(2) +
-    toFixedHex(proof.pi_b[0][1]).slice(2) +
-    toFixedHex(proof.pi_b[0][0]).slice(2) +
-    toFixedHex(proof.pi_b[1][1]).slice(2) +
-    toFixedHex(proof.pi_b[1][0]).slice(2) +
-    toFixedHex(proof.pi_c[0]).slice(2) +
-    toFixedHex(proof.pi_c[1]).slice(2)
+  const abi = new AbiCoder();
+
+  const nums = [
+    // from TC
+    toFixedHex(proof.pi_a[0]),
+    toFixedHex(proof.pi_a[1]),
+    toFixedHex(proof.pi_b[0][1]), // NOTE ENDIAN DIFFERENCES!
+    toFixedHex(proof.pi_b[0][0]),
+    toFixedHex(proof.pi_b[1][1]),
+    toFixedHex(proof.pi_b[1][0]),
+    toFixedHex(proof.pi_c[0]),
+    toFixedHex(proof.pi_c[1]),
+  ];
+
+  const p = abi.encode(
+    ["uint", "uint", "uint", "uint", "uint", "uint", "uint", "uint"],
+    nums
   );
+  console.log({ p, nums });
+  return p;
 }
 
 export type GenerateProofFn = (inputs: object) => Promise<string>;

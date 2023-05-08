@@ -7,7 +7,7 @@ import MerkleTree from "fixed-merkle-tree";
 import { Utxo } from "./utxo";
 import { Element } from "fixed-merkle-tree";
 import { FormattedProof, ProofArguments } from "./types";
-import { GenerateProofFn, generatePlonkProof } from "./generate_proof";
+import { GenerateProofFn, generateGroth16Proof } from "./generate_proof";
 
 export type ProofParams = {
   asset: BigNumber;
@@ -66,7 +66,7 @@ export async function getProof({
   swapRouter,
   swapData,
   transactData,
-  proofGen = generatePlonkProof,
+  proofGen = generateGroth16Proof,
 }: ProofParams): Promise<FormattedProof> {
   inputs = shuffle(inputs);
   outputs = shuffle(outputs);

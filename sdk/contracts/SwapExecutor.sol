@@ -33,7 +33,10 @@ contract SwapExecutor {
 
         // The transfer can also be done in the swap router directly, but we do it here because we want to enable re-shield feature later.
         uint256 amountOut = IERC20(_tokenOut).balanceOf(address(this));
-        require(amountOut >= _amountOutMin, "SwapExecutor: received less than expected");
+        require(
+            amountOut >= _amountOutMin,
+            "SwapExecutor: received less than expected"
+        );
 
         // if _swapRecipient is zero, we should re-shield the token.
         // if _swapRecipient is not zero, we should transfer the token to _swapRecipient.
@@ -41,15 +44,20 @@ contract SwapExecutor {
             console.log("Breakpoint2");
             // re-shield token
             // user should generate proof in advance
-            (ShieldedPool.ProofArguments memory _args, ShieldedPool.ExtData memory _extData) = abi.decode(
-                _transactData,
-                (ShieldedPool.ProofArguments, ShieldedPool.ExtData)
-            );
+            (
+                ShieldedPool.ProofArguments memory _args,
+                ShieldedPool.ExtData memory _extData
+            ) = abi.decode(
+                    _transactData,
+                    (ShieldedPool.ProofArguments, ShieldedPool.ExtData)
+                );
             console.log("Breakpoint3");
             IERC20(_tokenOut).safeApprove(msg.sender, 0);
             IERC20(_tokenOut).safeApprove(msg.sender, _amountOutMin);
             console.log("Breakpoint4");
-            ShieldedPool(msg.sender).transact(ShieldedPool.Proof(_args, _extData));
+            ShieldedPool(msg.sender).transact(
+                ShieldedPool.Proof(_args, _extData)
+            );
             console.log("Breakpoint5");
             // TODO: there would be some changes in the swap, we transfer it to tx.origin to reward relayer.
         } else {

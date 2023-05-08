@@ -4,7 +4,8 @@ pragma solidity ^0.8.9;
 import {ShieldedPool} from "@zrclib/sdk/contracts/ShieldedPool.sol";
 import {DefiantDeposit} from "./DefiantDeposit.sol";
 import {WithdrawalAmountManagerImpl} from "./WithdrawalAmountManagerImpl.sol";
-import "hardhat/console.sol";
+
+// import "hardhat/console.sol";
 
 // Shielded ERC20 example using zrclib's shielded pool
 // Supports shielding, unshielding and private transfers
@@ -61,21 +62,21 @@ contract DefiantPool is ShieldedPool, WithdrawalAmountManagerImpl {
     }
 
     function withdraw(Proof calldata _proof) external onlyWithdrawProxy {
-        console.log("pool.withdraw()");
+        // console.log("pool.withdraw()");
         require(_proof.extData.extAmount < 0, "extAmount must be negative");
 
         _transact(_proof);
 
         uint256 _amount = uint256(-_proof.extData.extAmount);
 
-        console.log("getWithdrawalAmounts");
+        // console.log("getWithdrawalAmounts");
         (Balance[] memory _toPay, uint16 _length) = _getWithdrawalAmounts(
             _amount
         );
 
         _consumeDeposit(_length);
 
-        console.log("Withdrawing loop", _length);
+        // console.log("Withdrawing loop", _length);
         for (uint256 i = 0; i < _length - 1; i++) {
             DefiantDeposit(_toPay[i].account).transfer(
                 _proof.extData.recipient,

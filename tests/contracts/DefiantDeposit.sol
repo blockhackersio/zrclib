@@ -5,7 +5,8 @@ pragma solidity ^0.8.0;
 import {ShieldedPool} from "@zrclib/sdk/contracts/ShieldedPool.sol";
 import {DefiantPool} from "./DefiantPool.sol";
 import {IERC20, ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "hardhat/console.sol";
+
+// import "hardhat/console.sol";
 
 contract DefiantDeposit {
     address immutable pool;
@@ -32,15 +33,15 @@ contract DefiantDeposit {
     // Only the pool can control funds
     function transfer(address _to, uint256 _amount) external onlyPool {
         require(state == State.FULL, "State was not FULL");
-        console.log("DefiantDeposit.transfer() - _to", _to);
-        console.log("DefiantDeposit.transfer() - msg.sender", msg.sender);
-        console.log("DefiantDeposit.transfer() - address(this)", address(this));
+        // console.log("DefiantDeposit.transfer() - _to", _to);
+        // console.log("DefiantDeposit.transfer() - msg.sender", msg.sender);
+        // console.log("DefiantDeposit.transfer() - address(this)", address(this));
         // Approve the pool to spend the deposit
         uint256 _balance = ERC20(token).balanceOf(address(this));
         if (_balance <= _amount) {
             state = State.EMPTY;
         }
-        console.log("token", token);
+        // console.log("token", token);
         IERC20(token).approve(
             pool,
             0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
@@ -49,12 +50,12 @@ contract DefiantDeposit {
     }
 
     function deposit(ShieldedPool.Proof calldata _proof) external {
-        console.log(
-            "deposit()",
-            uint256(_proof.extData.extAmount),
-            "state = ",
-            uint256(state)
-        );
+        // console.log(
+        //     "deposit()",
+        //     uint256(_proof.extData.extAmount),
+        //     "state = ",
+        //     uint256(state)
+        // );
         require(
             _proof.extData.extAmount > 0,
             "extAmount must indicate a deposit"

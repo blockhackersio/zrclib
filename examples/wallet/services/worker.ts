@@ -1,5 +1,5 @@
 import * as Comlink from "comlink";
 
-import { generatePlonkProof } from "@zrclib/sdk";
+import { generateGroth16Proof } from "@zrclib/sdk";
 
-Comlink.expose(generatePlonkProof);
+Comlink.expose(generateGroth16Proof);

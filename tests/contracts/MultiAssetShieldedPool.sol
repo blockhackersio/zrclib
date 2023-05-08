@@ -17,7 +17,7 @@ contract MultiAssetShieldedPool is ShieldedPool {
             IERC20 token = IERC20(_proof.proofArguments.publicAsset);
             token.transferFrom(
                 msg.sender,
-                address(this), 
+                address(this),
                 uint256(_proof.extData.extAmount)
             );
         }
