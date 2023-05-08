@@ -26,12 +26,15 @@ it("UtxoEventDecryptor", async () => {
     utxos.push(n);
   });
 
-  decryptor.start();
+  await decryptor.start();
 
   // gets events after started
   let tx;
+  console.log("Sending new nullifier...0x12345678");
   tx = await contract.newNullifier(toFixedHex("0x12345678"));
   await tx.wait();
+  await sleep(5000);
+  console.log("Sending new nullifier...0x87654321");
   tx = await contract.newNullifier(toFixedHex("0x87654321"));
   await tx.wait();
 

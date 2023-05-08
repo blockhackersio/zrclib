@@ -62,8 +62,8 @@ export class UtxoEventDecryptor {
     };
     const nullifierHandler = async (nullifier: string, event: ethers.Event) => {
       this.runIfUniqueEvent(event, async () => {
-        console.log("=== nullifierHandler ===");
-        console.log(`Received Nullifier ${nullifier}`);
+        // console.log("=== nullifierHandler ===");
+        // console.log(`Received Nullifier ${nullifier}`);
         await this.handleNullifier(nullifier, event.blockNumber);
       });
     };
@@ -115,11 +115,11 @@ export class UtxoEventDecryptor {
   }
 
   public onUtxo(handler: UtxoHandler) {
-    console.log("onUtxo registering handler ");
+    // console.log("onUtxo registering handler ");
     this.handleUtxo = handler;
   }
   public onNullifier(handler: NullifierHandler) {
-    console.log("onNullifier registering handler ");
+    // console.log("onNullifier registering handler ");
     this.handleNullifier = handler;
   }
 
