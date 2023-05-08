@@ -29,7 +29,7 @@ export async function generateGroth16Proof(inputs: object) {
     // from TC
     toFixedHex(proof.pi_a[0]),
     toFixedHex(proof.pi_a[1]),
-    toFixedHex(proof.pi_b[0][1]),
+    toFixedHex(proof.pi_b[0][1]), // NOTE ENDIAN DIFFERENCES!
     toFixedHex(proof.pi_b[0][0]),
     toFixedHex(proof.pi_b[1][1]),
     toFixedHex(proof.pi_b[1][0]),

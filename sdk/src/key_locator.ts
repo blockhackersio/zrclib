@@ -21,7 +21,7 @@ export function getWasmFileLocation() {
 }
 
 export function getZkeyFileLocation() {
-  const base = "/transaction_g16.zkey";
+  const base = "/transaction.zkey";
   if (isNode && !isWebWorker) {
     return require("path").resolve(__dirname, `../compiled${base}`);
   }

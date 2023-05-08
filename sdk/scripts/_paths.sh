@@ -21,7 +21,7 @@ if [ ! -f "$CIRCUIT" ]; then
   exit 1
 fi
 
-G16ZKEY=./compiled/${FNAME}_g16.zkey
+G16ZKEY=./compiled/${FNAME}.zkey
 GENERATE_WITNESS=./compiled/${FNAME}_js/generate_witness.js
 INPUT=./tests/$FNAME.json
 POT=./pot/pot.ptau
