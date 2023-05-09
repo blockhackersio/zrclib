@@ -13,6 +13,7 @@ const chainLookup: Record<number, ChainName> = {
   1: "mainnet",
   31337: "localnet",
   5001: "mantle",
+  1442: "polygon-zkevm"
 };
 
 export function getChainName(chainId: number) {

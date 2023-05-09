@@ -2,7 +2,7 @@ import { Chain } from '@wagmi/core';
 
 export const mantle = {
     id: 5001,
-    name: 'mantle',
+    name: 'Mantle Testnet',
     network: 'mantle',
     nativeCurrency: {
       decimals: 18,
