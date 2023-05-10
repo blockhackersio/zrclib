@@ -40,3 +40,5 @@ template UpdateBlocklist(levels) {
     checkUpdatedPath.pathElements <== pathElements;
     newRoot <== checkUpdatedPath.root;
 }
+
+component main { public [oldRoot] } = UpdateBlocklist(5);
