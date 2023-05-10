@@ -8,6 +8,13 @@ const FILE_TANSFORMS = [
       [`pragma solidity ^0.6.11;`, `pragma solidity ^0.8.0;`],
     ],
   },
+  {
+    filename: "./contracts/generated/BlocklistVerifier.sol",
+    edits:[
+      [`contract Verifier`, `contract BlocklistVerifier`],
+      [`pragma solidity ^0.6.11;`, `pragma solidity ^0.8.0;`],
+    ]
+  },
 ];
 
 transformFile(FILE_TANSFORMS)
