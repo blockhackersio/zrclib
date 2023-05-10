@@ -2,10 +2,10 @@ pragma circom 2.1.4;
 
 include "./merkle.circom";
 
-// all leaves in the blocklist merkle tree is poseidon("allowed")
-// except for blocked leaves, which are poseidon("blocked")
-// the circuit checks that with the given indices of the withdraw leaves, the leaves are poseidon("allowed")
-template Blocklist(levels, nIns) {
+// all leaves in the blocklist merkle tree is poseidon(0)
+// except for blocked leaves, which are poseidon(1)
+// the circuit checks that with the given indices of the withdraw leaves, the leaves are poseidon(0)
+template CheckWithdraw(levels, nIns) {
     signal input leaf;
     signal input inPathIndices[nIns];
     signal input inPathElements[nIns][levels];
@@ -21,4 +21,22 @@ template Blocklist(levels, nIns) {
     }
 }
 
-component main { public [leaf, root] } = Blocklist(5, 2);
+// the circuit checks that blocklist's merkle root is updated correctly
+template UpdateBlocklist(levels) {
+    signal input pathIndices;
+    signal input pathElements[levels];
+    signal input oldRoot;
+    signal output newRoot;
+
+    component checkInitialPath = MerkleProof(levels);
+    checkInitialPath.leaf <== 19014214495641488759237505126948346942972912379615652741039992445865937985820; // poseidon(0) which is allowed leaf
+    checkInitialPath.pathIndices <== pathIndices;
+    checkInitialPath.pathElements <== pathElements;
+    oldRoot === checkInitialPath.root;
+
+    component checkUpdatedPath = MerkleProof(levels);
+    checkUpdatedPath.leaf <== 18586133768512220936620570745912940619677854269274689475585506675881198879027; // poseidon(1) which is blocked leaf
+    checkUpdatedPath.pathIndices <== pathIndices;
+    checkUpdatedPath.pathElements <== pathElements;
+    newRoot <== checkUpdatedPath.root;
+}
