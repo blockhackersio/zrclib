@@ -10,7 +10,7 @@ export type ContractType = "SWAPROUTER" | "MASP" | "SWAPEXEC" | Tokens;
 export type ChainName = keyof typeof addresses;
 
 const chainLookup: Record<number, ChainName> = {
-  1: "mainnet",
+  11155111: "sepolia",
   31337: "localnet",
   5001: "mantle",
   1442: "polygon-zkevm"

@@ -10,7 +10,7 @@ import {
 import { injectedWallet, metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
-import { mainnet, localhost, polygonZkEvmTestnet } from "wagmi/chains";
+import { sepolia, localhost, polygonZkEvmTestnet } from "wagmi/chains";
 import { mantle } from "../components/providers/MantleTestnet";
 import { Flowbite } from "flowbite-react";
 import { theme } from "../styles/theme";
@@ -20,7 +20,7 @@ import { useRouter } from "next/router";
 import { LayoutContext, PlainLayout } from "@/ui/LayoutProvider";
 import { ZrclibProvider } from "@/components/providers/ZrclibProvider";
 const { chains, provider } = configureChains(
-  [mainnet, { ...mantle, iconUrl: '/mantle.jpg'}, { ...polygonZkEvmTestnet, iconUrl: '/polygon.png'}, { ...localhost, id: 31337 }],
+  [sepolia, { ...mantle, iconUrl: '/mantle.jpg'}, { ...polygonZkEvmTestnet, iconUrl: '/polygon.png'}, { ...localhost, id: 31337 }],
   [publicProvider()]
 );
 
