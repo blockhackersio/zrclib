@@ -27,12 +27,12 @@ export function useFaucet() {
       // Trigger mint
       try {
         await zrclib.faucet(fromNumberInput(data.amount));
+        setPageId("success");
       } catch (err) {
         console.log(err);
         setPageId("fail");
         return;
       }
-      setPageId("success");
     },
     [zrclib]
   );
