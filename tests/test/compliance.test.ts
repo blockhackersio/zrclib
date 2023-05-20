@@ -60,6 +60,7 @@ it("Test update blocklist", async function() {
         newRoot: newRoot,
     }
 
+    // TODO: integrate this into the SDK
     // generate proof
     const wasmFileLocation = "../sdk/compiled/blocklist_js/blocklist.wasm";
     const zkeyFileLocation = "../sdk/compiled/blocklist.zkey";
