@@ -11,7 +11,7 @@ contract MerkleTreeForBlocklist {
 
     uint32 public immutable levels;
     bytes32 root; // root of the sparse Merkle Tree
-    mapping(uint256 => bool) blockIndices;
+    mapping(uint256 => bool) public blockIndices;
 
     struct ProofArguments {
         bytes proof;
@@ -28,7 +28,7 @@ contract MerkleTreeForBlocklist {
         require(_levels < 32, "_levels should be less than 32");
         levels = _levels;
         // initialize sparse Merkle Tree where all leaves are poseidon(0)
-        root = 0x2b94cf5e8746b3f5c9631f4c5df32907a699c58c94b2ad4d7b5cec1639183f55;
+        root = 0x2fa27c5cf0185654d6dcf10df1b382324abdf62d73d395be1cc935ab470354f0; // assuming tree is of level 5 TODO: remove hardcoding
         verifier = BlocklistVerifier(_verifier);
     }
 
