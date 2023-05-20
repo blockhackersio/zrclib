@@ -4,23 +4,6 @@ include "./merkle.circom";
 
 // all leaves in the blocklist merkle tree is poseidon(0)
 // except for blocked leaves, which are poseidon(1)
-// the circuit checks that with the given indices of the withdraw leaves, the leaves are poseidon(0)
-template CheckWithdraw(levels, nIns) {
-    signal input leaf;
-    signal input inPathIndices[nIns];
-    signal input inPathElements[nIns][levels];
-    signal input root;
-
-    component checkPath[nIns];
-    for (var i = 0; i < nIns; i++) {
-        checkPath[i] = MerkleProof(levels);
-        checkPath[i].leaf <== leaf;
-        checkPath[i].pathIndices <== inPathIndices[i];
-        checkPath[i].pathElements <== inPathElements[i];
-        root === checkPath[i].root;
-    }
-}
-
 // the circuit checks that blocklist's merkle root is updated correctly
 template UpdateBlocklist(levels) {
     signal input pathIndices;
