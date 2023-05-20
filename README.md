@@ -85,7 +85,7 @@ const transferProof = await account.proveTransfer(5e17, receiver);
 
 // Call the transfer method on the contract which will
 // verify and commit the transaction
-await token.tranfer(transferProof);
+await token.transfer(transferProof);
 
 // Generate proof that burns 0.5 tokens to the receiver address
 const unshieldProof = await account.proveUnshield(5e17, receiver);

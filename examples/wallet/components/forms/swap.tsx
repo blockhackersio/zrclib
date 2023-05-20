@@ -50,23 +50,29 @@ export function useSwapFlow() {
         fromCurrency: zrclib.asset,
       };
       setData(enrichedData);
+      try {
+        setPageId("proofreshield");
+        let reshieldProof = await zrclib.proveSwapReshield(
+          fromNumberInput(toAmount),
+          toCurrency
+        );
 
-      setPageId("proofreshield");
-      let reshieldProof = await zrclib.proveSwapReshield(
-        fromNumberInput(toAmount),
-        toCurrency
-      );
-
-      setPageId("proofunshield");
-      const proof = await zrclib.proveSwapUnshield(
-        fromNumberInput(fromAmount),
-        fromNumberInput(toAmount),
-        enrichedData.fromCurrency,
-        enrichedData.toCurrency,
-        reshieldProof
-      );
-      setPageId("inflight");
-      await zrclib.transactAndSwap(proof);
+        setPageId("proofunshield");
+        const proof = await zrclib.proveSwapUnshield(
+          fromNumberInput(fromAmount),
+          fromNumberInput(toAmount),
+          enrichedData.fromCurrency,
+          enrichedData.toCurrency,
+          reshieldProof
+        );
+        setPageId("inflight");
+        await zrclib.transactAndSwap(proof);
+        setPageId("success");
+      } catch (err) {
+        console.log(err);
+        setPageId("fail");
+        return;
+      }
     },
     [zrclib]
   );

@@ -30,12 +30,12 @@ export function useShield() {
         const proof = await zrclib.proveShield(fromNumberInput(data.amount));
         setPageId("inflight");
         await zrclib.send(proof);
+        setPageId("success");
       } catch (err) {
         console.log(err);
         setPageId("fail");
         return;
       }
-      setPageId("success");
     },
     [zrclib]
   );
