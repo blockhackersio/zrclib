@@ -2,8 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import {TransactionVerifier} from "./generated/TransactionVerifier.sol";
+import {CompliantVerifier} from "./generated/CompliantVerifier.sol";
 import {MerkleTreeWithHistory} from "./MerkleTreeWithHistory.sol";
+import {MerkleTreeForBlocklist} from "./MerkleTreeForBlocklist.sol";
 import {SwapExecutor} from "./SwapExecutor.sol";
 
 contract ShieldedPoolWithBlocklist is MerkleTreeWithHistory {
@@ -11,7 +12,8 @@ contract ShieldedPoolWithBlocklist is MerkleTreeWithHistory {
 
     mapping(bytes32 => bool) public nullifierHashes;
 
-    TransactionVerifier public verifier;
+    MerkleTreeForBlocklist public blocklistTree;
+    CompliantVerifier public verifier;
     SwapExecutor public swapExecutor;
 
     struct Proof {
@@ -35,6 +37,7 @@ contract ShieldedPoolWithBlocklist is MerkleTreeWithHistory {
     struct ProofArguments {
         bytes proof;
         bytes32 root;
+        bytes32 blocklistRoot;
         bytes32[2] inputNullifiers;
         bytes32[2] outputCommitments;
         uint256 publicAmount;
@@ -53,11 +56,13 @@ contract ShieldedPoolWithBlocklist is MerkleTreeWithHistory {
     constructor(
         uint32 _levels,
         address _hasher,
-        address _verifier,
+        address _transactionVerifier,
+        address _blocklistVerifier,
         address _swapExecutor
     ) MerkleTreeWithHistory(_levels, _hasher) {
-        verifier = TransactionVerifier(_verifier);
+        verifier = CompliantVerifier(_transactionVerifier);
         swapExecutor = SwapExecutor(_swapExecutor);
+        blocklistTree = new MerkleTreeForBlocklist(_levels, _blocklistVerifier);
         _initialize(); // initialize the merkle tree
     }
 
@@ -74,7 +79,7 @@ contract ShieldedPoolWithBlocklist is MerkleTreeWithHistory {
 
     function verifyGroth16Proof(
         bytes memory _proof,
-        uint[8] memory _pubSignals
+        uint[9] memory _pubSignals
     ) internal view returns (bool) {
         (uint[2] memory a, uint[2][2] memory b, uint[2] memory c) = parseProof(
             _proof
@@ -150,8 +155,9 @@ contract ShieldedPoolWithBlocklist is MerkleTreeWithHistory {
             "Invalid public amount"
         );
 
-        uint[8] memory pubSignals = [
+        uint[9] memory pubSignals = [
             uint(_proof.proofArguments.root),
+            uint(_proof.proofArguments.blocklistRoot),
             _proof.proofArguments.publicAmount,
             uint160(_proof.proofArguments.publicAsset),
             uint(_proof.proofArguments.extDataHash),
