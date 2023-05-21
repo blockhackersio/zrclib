@@ -15,6 +15,7 @@ import { fieldToString, poseidonHash } from "@zrclib/sdk/src/poseidon";
 import { generateGroth16Proof } from "@zrclib/sdk";
 import { tend, time, waitUntil } from "../utils";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { expect } from "chai";
 
 async function deployERC20Token(name: string, symbol: string) {
     // Prepare signers
@@ -135,9 +136,22 @@ it("Test unable to withdraw from blocked leaf", async function() {
     const blockProof = await generateGroth16Proof(input, "blocklist");
 
     // submit proof to the contract
+    t = time("Governance blocks deposit note");
     await blocklist.blockDeposit({
         proof: blockProof,
         oldRoot: toFixedHex(oldRoot),
         newRoot: toFixedHex(newRoot),
     }, indexToBlock);
+    tend(t);
+
+    /// WITHDRAW FROM BLOCKED NOTE
+    t = time("Alice creates a proof to unshield 10");
+    let throwError = false;
+    try {
+        await alice.proveUnshield(TEN, aliceEth.address, token.address, undefined, true);
+    } catch (e) {
+        throwError = true;
+    }
+    tend(t);
+    expect(throwError).to.be.true;
 });
