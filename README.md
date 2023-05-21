@@ -6,7 +6,7 @@ To bring zero knowledge privacy primitives to all web3 developers.
 
 ## Disclaimer
 
-This code is unaudited and under construction. This is experimental software and is provided on an "as is" and "as available" basis and may not work at all. This code should not be used in production.
+This code is unaudited and under construction. This is experimental software and is provided on an "as is" and "as available" basis and may not work at all. This code is not fit for human or AI consumption and should not be used in production.
 
 ## Roadmap
 
