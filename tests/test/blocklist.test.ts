@@ -6,6 +6,7 @@ import {
 } from "../typechain-types";
 import { toFixedHex } from "@zrclib/sdk";
 import { fieldToString, poseidonHash, poseidonHash2 } from "@zrclib/sdk/src/poseidon";
+import { buildBlocklistMerkleTree } from "@zrclib/sdk/src/merkle_tree";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import MerkleTree from "fixed-merkle-tree";
 import { groth16 } from "snarkjs";
@@ -34,11 +35,7 @@ it("Test update blocklist", async function() {
     const indexToBlock = 8; // a random index value to block the deposit
 
     // create a sparse merkle tree of level 5, where all leaves are poseidon(0)
-    let tree = new MerkleTree(5, Array(32).fill(fieldToString(poseidonHash([0]))), {
-        hashFunction: poseidonHash2,
-        zeroElement:
-          fieldToString(poseidonHash([0])),
-    });
+    let tree = await buildBlocklistMerkleTree(contract);
 
     // console.log("Root: ", toFixedHex(tree.root));
     // console.log("Poseidon(0): ", fieldToString(poseidonHash([0])));

@@ -21,7 +21,7 @@ contract MerkleTreeForBlocklist {
 
     BlocklistVerifier public verifier;
 
-    event newBlockDeposit(uint256 index);
+    event NewBlockDeposit(uint256 index);
 
     constructor(uint32 _levels, address _verifier) {
         require(_levels > 0, "_levels should be greater than zero");
@@ -61,6 +61,6 @@ contract MerkleTreeForBlocklist {
         // update root and indices
         root = proof.newRoot;
         blockIndices[index] = true;
-        emit newBlockDeposit(index);
+        emit NewBlockDeposit(index);
     } 
 }
