@@ -5,7 +5,7 @@ import { PasswordEncryptor } from "./password_encryptor";
 import { AccountStore } from "./account_store";
 import { Utxo } from "./utxo";
 import { ShieldedPoolProver } from "./shielded_pool";
-import { buildMerkleTree } from "./merkle_tree";
+import { buildBlocklistMerkleTree, buildMerkleTree } from "./merkle_tree";
 import { GenerateProofFn, generateGroth16Proof } from "./generate_proof";
 import { SwapParams } from "./types";
 
@@ -18,7 +18,8 @@ export class Account {
     private contract: ethers.Contract,
     public signer: ethers.Signer,
     private encryptor: PasswordEncryptor,
-    private proofGen: GenerateProofFn = generateGroth16Proof
+    private proofGen: GenerateProofFn = generateGroth16Proof,
+    private blocklist: ethers.Contract | null = null
   ) {}
 
   public isLoggedIn() {
@@ -79,6 +80,11 @@ export class Account {
     return await buildMerkleTree(this.contract);
   }
 
+  async getBlocklist() {
+    if (!this.blocklist) throw new Error("NO_BLOCKLIST_CONTRACT");
+    return await buildBlocklistMerkleTree(this.blocklist);
+  }
+
   createUtxo(amount: BigNumberish, asset: BigNumberish) {
     return new Utxo({ asset, amount, keypair: this.getKeypair() });
   }
@@ -93,10 +99,11 @@ export class Account {
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
       transactData: "0x00",
-    }
+    },
+    checkBlocklist = false
   ) {
     console.log("proveShield", JSON.stringify({ amount, asset, swapParams }));
-    return await this.getProver().shield(amount, asset, swapParams);
+    return await this.getProver().shield(amount, asset, swapParams, checkBlocklist);
   }
 
   async proveUnshield(
@@ -110,7 +117,8 @@ export class Account {
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
       transactData: "0x00",
-    }
+    },
+    checkBlocklist = false
   ) {
     console.log(
       "proveUnshield",
@@ -120,7 +128,8 @@ export class Account {
       amount,
       recipient,
       asset,
-      swapParams
+      swapParams,
+      checkBlocklist
     );
   }
 
@@ -135,9 +144,10 @@ export class Account {
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
       transactData: "0x00",
-    }
+    },
+    checkBlocklist = false
   ) {
-    return await this.getProver().transfer(amount, toPubkey, asset, swapParams);
+    return await this.getProver().transfer(amount, toPubkey, asset, swapParams, checkBlocklist);
   }
 
   private getProver() {
@@ -155,10 +165,11 @@ export class Account {
     contract: ethers.Contract,
     signer: ethers.Signer,
     password: string,
-    proofGen: GenerateProofFn = generateGroth16Proof
+    proofGen: GenerateProofFn = generateGroth16Proof,
+    blocklist: ethers.Contract | null = null
   ): Promise<Account> {
     // Ensure password length > 16
     const encryptor = PasswordEncryptor.fromPassword(password);
-    return new Account(contract, signer, encryptor, proofGen);
+    return new Account(contract, signer, encryptor, proofGen, blocklist);
   }
 }

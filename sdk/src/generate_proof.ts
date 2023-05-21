@@ -45,4 +45,4 @@ export async function generateGroth16Proof(inputs: object, circuitName: string =
   return p;
 }
 
-export type GenerateProofFn = (inputs: object) => Promise<string>;
+export type GenerateProofFn = (inputs: object, circuitName?: string) => Promise<string>;

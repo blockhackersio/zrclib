@@ -26,9 +26,15 @@ export class ShieldedPoolProver {
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
       transactData: "0x00",
-    }
+    },
+    checkBlocklist = false
   ): Promise<FormattedProof> {
     await ensurePoseidon();
+
+    let blocklist;
+    if (checkBlocklist) {
+      blocklist = await this.account.getBlocklist();
+    }
 
     const deposit = this.account.createUtxo(amount, asset);
     // console.log("after utxo");
@@ -37,6 +43,7 @@ export class ShieldedPoolProver {
       outputs: [deposit],
       swapParams: swapParams,
       tree: await this.account.getTree(),
+      blocklist: blocklist,
       proofGen: this.proofGen,
     });
     return proof;
@@ -60,9 +67,16 @@ export class ShieldedPoolProver {
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
       transactData: "0x00",
-    }
+    },
+    checkBlocklist = false
   ): Promise<FormattedProof> {
     await ensurePoseidon();
+
+    let blocklist;
+    if (checkBlocklist) {
+      blocklist = await this.account.getBlocklist();
+    }
+
     const inputs = await this.account.getUtxosUpTo(amount, asset);
     const inputsTotal = inputs.reduce(
       (sum, x) => sum.add(x.amount),
@@ -87,6 +101,7 @@ export class ShieldedPoolProver {
       outputs: [toSend, change],
       swapParams: swapParams,
       tree: await this.account.getTree(),
+      blocklist: blocklist,
       proofGen: this.proofGen,
     });
 
@@ -111,9 +126,16 @@ export class ShieldedPoolProver {
       swapRouter: BigNumber.from(0),
       swapData: BigNumber.from(0),
       transactData: "0x00",
-    }
+    },
+    checkBlocklist = false
   ): Promise<FormattedProof> {
     await ensurePoseidon();
+
+    let blocklist;
+    if (checkBlocklist) {
+      blocklist = await this.account.getBlocklist();
+    }
+
     const inputs = await this.account.getUtxosUpTo(amount, asset);
 
     const inputsTotal = inputs.reduce(
@@ -136,6 +158,7 @@ export class ShieldedPoolProver {
       recipient: recipientEthAddress,
       swapParams: swapParams,
       tree: await this.account.getTree(),
+      blocklist: blocklist,
       proofGen: this.proofGen,
     });
 
