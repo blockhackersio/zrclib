@@ -10,6 +10,9 @@ import {
 } from "../typechain-types";
 import { Account } from "@zrclib/sdk";
 import artifact from "@zrclib/sdk/contracts/generated/Hasher.json";
+import { toFixedHex } from "@zrclib/sdk";
+import { fieldToString, poseidonHash } from "@zrclib/sdk/src/poseidon";
+import { generateGroth16Proof } from "@zrclib/sdk";
 import { tend, time, waitUntil } from "../utils";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 
@@ -110,5 +113,31 @@ it("Test unable to withdraw from blocked leaf", async function() {
     tend(t);
 
     /// BLOCK ALICE'S DEPOSIT NOTE
-    
+    const indexToBlock = 0; // Alice's deposit note is at index 0
+    let blocklistTree = await alice.getBlocklist();
+    // get the path siblings for the index
+    const pathElements = blocklistTree.path(indexToBlock).pathElements;
+
+    // get the new root after inserting the blocked leaf
+    const oldRoot = blocklistTree.root;
+    blocklistTree.update(indexToBlock, fieldToString(poseidonHash([1])));
+    const newRoot = blocklistTree.root;
+
+    // form input
+    let input = {
+        pathIndices: indexToBlock,
+        pathElements: pathElements,
+        oldRoot: oldRoot,
+        newRoot: newRoot,
+    }
+
+    // generate proof
+    const blockProof = await generateGroth16Proof(input, "blocklist");
+
+    // submit proof to the contract
+    await blocklist.blockDeposit({
+        proof: blockProof,
+        oldRoot: toFixedHex(oldRoot),
+        newRoot: toFixedHex(newRoot),
+    }, indexToBlock);
 });
