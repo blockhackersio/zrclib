@@ -162,6 +162,7 @@ export async function getProof({
     }
     let updatedInput = {
       ...input,
+      blocklistRoot: blocklist.root,
       blocklistElements: blocklistMerklePathElements,
     }
     const istring = stringifyBigInts(updatedInput);

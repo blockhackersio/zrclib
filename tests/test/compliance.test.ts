@@ -1,6 +1,7 @@
 import { ethers } from "hardhat";
 import { AbiCoder } from "ethers/lib/utils";
 import { 
+    Blocklist,
     BlocklistVerifier__factory,
     CompliantShieldedPool__factory,
     CompliantTransactionVerifier__factory,
@@ -9,7 +10,7 @@ import {
 } from "../typechain-types";
 import { Account } from "@zrclib/sdk";
 import artifact from "@zrclib/sdk/contracts/generated/Hasher.json";
-import { tend, time } from "../utils";
+import { tend, time, waitUntil } from "../utils";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 
 async function deployERC20Token(name: string, symbol: string) {
@@ -50,20 +51,24 @@ async function setup() {
         swapExecutor.address
     );
 
+    // Get the blocklist contract
+    const blocklistAddress = await contract.blocklistTree();
+    const blocklist = await ethers.getContractAt("Blocklist", blocklistAddress) as Blocklist;
+
     let token = await deployERC20Token("TEST", "TEST");
 
-    return { contract, token };
+    return { contract, blocklist, token };
 }
   
-it.skip("Test deposit", async function() {
+it("Test unable to withdraw from blocked leaf", async function() {
     const TEN = 10 * 1_000_000;
 
     const [deployer, aliceEth] = await ethers.getSigners();
 
-    let { contract, token } = await loadFixture(setup);
+    let { contract, blocklist, token } = await loadFixture(setup);
 
-    // CREATE ACCOUNTS
-    const alice = await Account.create(contract, aliceEth, "password123");
+        // CREATE ACCOUNTS
+    const alice = await Account.create(contract, aliceEth, "password123", undefined, blocklist);
     await alice.login();
 
     let tx, t, proof, publicBalance, privateBalance;
@@ -77,23 +82,33 @@ it.skip("Test deposit", async function() {
     token = token.connect(aliceEth);
 
     /// DEPOSIT
-    // t = time("Alice creates shield proof for 10 coins");
-    // proof = await alice.proveShield(TEN, token.address);
-    // tend(t);
+    t = time("Alice creates shield proof for 10 coins");
+    proof = await alice.proveShield(TEN, token.address, undefined, true);
+    tend(t);
 
-    // t = time("Alice approves ERC20 payment");
-    // await token.approve(contract.address, TEN);
-    // tend(t);
+    t = time("Alice approves ERC20 payment");
+    await token.approve(contract.address, TEN);
+    tend(t);
 
-    // t = time("Alice submits transaction");
-    // await contract.transact(proof);
-    // tend(t);
-});
+    t = time("Alice submits transaction");
+    await contract.transact(proof);
+    tend(t);
 
-it("Test add leaf to blocklist", async function() {
+    /// Check balances
+    t = time("Check that Alice's ERC20 balance is 0");
+    await waitUntil(
+        () => token.balanceOf(aliceEth.address),
+        (bal) => bal.eq(0)
+    );
+    tend(t);
 
-});
+    t = time("Check Alice's private balance is 10");
+    await waitUntil(
+        () => alice.getBalance(token.address),
+        (bal) => bal.eq(TEN) // Transfer to the darkside worked! :)
+    );
+    tend(t);
 
-it("Test unable to withdraw from blocked leaf", async function() {
-
+    /// BLOCK ALICE'S DEPOSIT NOTE
+    
 });
