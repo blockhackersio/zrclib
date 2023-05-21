@@ -1,14 +1,13 @@
 import { ethers } from "hardhat";
-import { AbiCoder } from "ethers/lib/utils";
 import { 
     BlocklistVerifier__factory,
     Blocklist__factory
 } from "../typechain-types";
 import { toFixedHex } from "@zrclib/sdk";
-import { fieldToString, poseidonHash, poseidonHash2 } from "@zrclib/sdk/src/poseidon";
+import { fieldToString, poseidonHash } from "@zrclib/sdk/src/poseidon";
 import { buildBlocklistMerkleTree } from "@zrclib/sdk/src/merkle_tree";
+import { generateGroth16Proof } from "@zrclib/sdk";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { groth16 } from "snarkjs";
 import { expect } from "chai";
 
 async function setup() {
@@ -56,33 +55,12 @@ it("Test update blocklist", async function() {
         newRoot: newRoot,
     }
 
-    // TODO: integrate this into the SDK
     // generate proof
-    const wasmFileLocation = "../sdk/compiled/blocklist_js/blocklist.wasm";
-    const zkeyFileLocation = "../sdk/compiled/blocklist.zkey";
-    const { proof } = await groth16.fullProve(input, wasmFileLocation, zkeyFileLocation);
-
-    const abi = new AbiCoder();
-    const nums = [
-        // from TC
-        toFixedHex(proof.pi_a[0]),
-        toFixedHex(proof.pi_a[1]),
-        toFixedHex(proof.pi_b[0][1]), // NOTE ENDIAN DIFFERENCES!
-        toFixedHex(proof.pi_b[0][0]),
-        toFixedHex(proof.pi_b[1][1]),
-        toFixedHex(proof.pi_b[1][0]),
-        toFixedHex(proof.pi_c[0]),
-        toFixedHex(proof.pi_c[1]),
-    ];
-    
-    const encodedProof = abi.encode(
-        ["uint", "uint", "uint", "uint", "uint", "uint", "uint", "uint"],
-        nums
-    );
+    const proof = await generateGroth16Proof(input, "blocklist");
 
     // submit proof to the contract
     await contract.blockDeposit({
-        proof: encodedProof,
+        proof: proof,
         oldRoot: toFixedHex(oldRoot),
         newRoot: toFixedHex(newRoot),
     }, indexToBlock);
