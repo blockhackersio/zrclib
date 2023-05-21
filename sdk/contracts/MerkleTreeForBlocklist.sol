@@ -10,7 +10,7 @@ contract MerkleTreeForBlocklist {
     /// @dev leaves that are subsequently blocked are set to poseidon(1)
 
     uint32 public immutable levels;
-    bytes32 root; // root of the sparse Merkle Tree
+    bytes32 public root; // root of the sparse Merkle Tree
     mapping(uint256 => bool) public blockIndices;
 
     struct ProofArguments {

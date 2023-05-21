@@ -37,7 +37,6 @@ contract ShieldedPoolWithBlocklist is MerkleTreeWithHistory {
     struct ProofArguments {
         bytes proof;
         bytes32 root;
-        bytes32 blocklistRoot;
         bytes32[2] inputNullifiers;
         bytes32[2] outputCommitments;
         uint256 publicAmount;
@@ -157,7 +156,7 @@ contract ShieldedPoolWithBlocklist is MerkleTreeWithHistory {
 
         uint[9] memory pubSignals = [
             uint(_proof.proofArguments.root),
-            uint(_proof.proofArguments.blocklistRoot),
+            uint(blocklistTree.root()), // blocklist root always come from the blocklist merkle tree
             _proof.proofArguments.publicAmount,
             uint160(_proof.proofArguments.publicAsset),
             uint(_proof.proofArguments.extDataHash),
