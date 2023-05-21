@@ -8,7 +8,6 @@ import { toFixedHex } from "@zrclib/sdk";
 import { fieldToString, poseidonHash, poseidonHash2 } from "@zrclib/sdk/src/poseidon";
 import { buildBlocklistMerkleTree } from "@zrclib/sdk/src/merkle_tree";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import MerkleTree from "fixed-merkle-tree";
 import { groth16 } from "snarkjs";
 import { expect } from "chai";
 
