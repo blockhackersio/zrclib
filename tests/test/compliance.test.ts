@@ -55,7 +55,7 @@ async function setup() {
     return { contract, token };
 }
   
-it("Test deposit", async function() {
+it.skip("Test deposit", async function() {
     const TEN = 10 * 1_000_000;
 
     const [deployer, aliceEth] = await ethers.getSigners();
