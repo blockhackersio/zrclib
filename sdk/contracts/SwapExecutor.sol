@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "./ShieldedPool.sol";
+import "./AbstractShieldedPool.sol";
 
 // This contract is used to execute external swap, leading to an arbitrary external call.
 // It should never hold any funds, get any token allowance, or manage any contracts.
@@ -41,16 +41,16 @@ contract SwapExecutor {
             // re-shield token
             // user should generate proof in advance
             (
-                ShieldedPool.ProofArguments memory _args,
-                ShieldedPool.ExtData memory _extData
+                AbstractShieldedPool.ProofArguments memory _args,
+                AbstractShieldedPool.ExtData memory _extData
             ) = abi.decode(
                     _transactData,
-                    (ShieldedPool.ProofArguments, ShieldedPool.ExtData)
+                    (AbstractShieldedPool.ProofArguments, AbstractShieldedPool.ExtData)
                 );
             IERC20(_tokenOut).safeApprove(msg.sender, 0);
             IERC20(_tokenOut).safeApprove(msg.sender, _amountOutMin);
-            ShieldedPool(msg.sender).transact(
-                ShieldedPool.Proof(_args, _extData)
+            AbstractShieldedPool(msg.sender).transact(
+                AbstractShieldedPool.Proof(_args, _extData)
             );
             // TODO: there would be some changes in the swap, we transfer it to tx.origin to reward relayer.
         } else {
