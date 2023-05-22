@@ -13,7 +13,7 @@ export function tend(started: number) {
 export async function waitUntil<T>(
   task: () => Promise<T>,
   isEqual: (v: T) => boolean,
-  timeout = 30_000
+  timeout = 10_000
 ) {
   let start = Date.now();
 

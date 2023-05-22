@@ -22,6 +22,7 @@ export async function prepareTransaction({
     transactData: "0x00",
   },
   tree,
+  blocklist,
   proofGen = generateGroth16Proof,
 }: {
   asset?: BigNumber;
@@ -30,6 +31,7 @@ export async function prepareTransaction({
   recipient?: string | 0;
   swapParams?: SwapParams;
   tree: MerkleTree;
+  blocklist?: MerkleTree;
   proofGen?: GenerateProofFn;
 }): Promise<FormattedProof> {
   while (inputs.length < 2) {
@@ -74,6 +76,7 @@ export async function prepareTransaction({
     swapRouter,
     swapData,
     transactData,
+    blocklist,
     proofGen,
   });
 

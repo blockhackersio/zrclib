@@ -3,9 +3,9 @@ import { getWasmFileLocation, getZkeyFileLocation } from "./key_locator";
 import { toFixedHex } from "./utils";
 import { AbiCoder } from "ethers/lib/utils";
 
-export async function generatePlonkProof(inputs: object) {
-  const wasmLocation = getWasmFileLocation();
-  const zkeyLocation = getZkeyFileLocation();
+export async function generatePlonkProof(inputs: object, circuitName: string = "transaction") {
+  const wasmLocation = getWasmFileLocation(circuitName);
+  const zkeyLocation = getZkeyFileLocation(circuitName);
   console.log("=generatePlonkProof=========");
   console.log(JSON.stringify(inputs));
   console.log("/generatePlonkProof=========");
@@ -16,9 +16,9 @@ export async function generatePlonkProof(inputs: object) {
   return proofString;
 }
 
-export async function generateGroth16Proof(inputs: object) {
-  const wasmLocation = getWasmFileLocation();
-  const zkeyLocation = getZkeyFileLocation();
+export async function generateGroth16Proof(inputs: object, circuitName: string = "transaction") {
+  const wasmLocation = getWasmFileLocation(circuitName);
+  const zkeyLocation = getZkeyFileLocation(circuitName);
   console.log("=generateGroth16Proof=========");
   console.log(JSON.stringify(inputs));
   console.log("/generateGroth16Proof=========");
@@ -45,4 +45,4 @@ export async function generateGroth16Proof(inputs: object) {
   return p;
 }
 
-export type GenerateProofFn = (inputs: object) => Promise<string>;
+export type GenerateProofFn = (inputs: object, circuitName?: string) => Promise<string>;

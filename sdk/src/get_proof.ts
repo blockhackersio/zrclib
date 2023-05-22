@@ -22,6 +22,7 @@ export type ProofParams = {
   swapRouter: BigNumber;
   swapData: BigNumber;
   transactData: string;
+  blocklist?: MerkleTree;
   proofGen?: GenerateProofFn;
 };
 
@@ -66,6 +67,7 @@ export async function getProof({
   swapRouter,
   swapData,
   transactData,
+  blocklist,
   proofGen = generateGroth16Proof,
 }: ProofParams): Promise<FormattedProof> {
   inputs = shuffle(inputs);
@@ -150,10 +152,26 @@ export async function getProof({
     outBlinding: outputs.map((x) => BigInt(x.blinding.toString())),
     outPubkey: outputs.map((x) => fieldToObject(x.keypair!.pubkey)),
   };
-  const istring = stringifyBigInts(input);
 
-  const proof = await proofGen(istring);
-
+  let proof;
+  if (blocklist) {
+    // get the blocklist path elements of the input indices
+    const blocklistMerklePathElements: Element[][] = [];
+    for (const index of input.inPathIndices) {
+      blocklistMerklePathElements.push(blocklist.path(index).pathElements);
+    }
+    let updatedInput = {
+      ...input,
+      blocklistRoot: blocklist.root,
+      blocklistElements: blocklistMerklePathElements,
+    }
+    const istring = stringifyBigInts(updatedInput);
+    proof = await proofGen(istring, "compliant");
+  } else {
+    const istring = stringifyBigInts(input);
+    proof = await proofGen(istring);
+  }
+  
   const args: ZrcProof["args"] = {
     proof,
     root: input.root,

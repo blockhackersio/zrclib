@@ -12,16 +12,16 @@ export const isWebWorker =
 // Not the best way to do this as these paths should
 // be injected outside the context but drilling this
 // down might take time so doing it this way for now
-export function getWasmFileLocation() {
-  const base = "/transaction_js/transaction.wasm";
+export function getWasmFileLocation(circuitName: string) {
+  const base = `/${circuitName}_js/${circuitName}.wasm`;
   if (isNode && !isWebWorker) {
     return require("path").resolve(__dirname, `../compiled${base}`);
   }
   return `/circuits${base}`;
 }
 
-export function getZkeyFileLocation() {
-  const base = "/transaction.zkey";
+export function getZkeyFileLocation(circuitName: string) {
+  const base = `/${circuitName}.zkey`;
   if (isNode && !isWebWorker) {
     return require("path").resolve(__dirname, `../compiled${base}`);
   }

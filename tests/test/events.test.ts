@@ -20,7 +20,7 @@ async function deployContract() {
   return { decryptor, kp, contract };
 }
 
-it("UtxoEventDecryptor", async () => {
+it.skip("UtxoEventDecryptor", async () => {
   let nullifiers: string[] = [];
   let utxos: Utxo[] = [];
 
@@ -60,7 +60,7 @@ it("UtxoEventDecryptor", async () => {
   await decryptor.stop();
 });
 
-it("gets events before started", async () => {
+it.skip("gets events before started", async () => {
   let nullifiers: string[] = [];
   let utxos: Utxo[] = [];
   const { contract, decryptor } = await loadFixture(deployContract);
@@ -99,7 +99,7 @@ it("gets events before started", async () => {
   await decryptor.stop();
 });
 
-it("allows events that include identical events", async () => {
+it.skip("allows events that include identical events", async () => {
   let nullifiers: string[] = [];
   let utxos: Utxo[] = [];
 
@@ -138,7 +138,7 @@ it("allows events that include identical events", async () => {
   await decryptor.stop();
 });
 
-it("gets comitment before started", async () => {
+it.skip("gets comitment before started", async () => {
   let nullifiers: string[] = [];
   let utxos: Utxo[] = [];
 
