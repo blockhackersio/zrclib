@@ -4,21 +4,31 @@ import ERC20_JSON from "./MockErc20.json";
 import MASP_JSON from "./MultiAssetShieldedPool.json";
 import SWAPROUTER_JSON from "./MockSwapRouter.json";
 import SWAPEXEC_JSON from "./SwapExecutor.json";
+import { Tokens } from "@/config/constants";
 
-export type Tokens = "LUSD" | "DAI";
 export type ContractType = "SWAPROUTER" | "MASP" | "SWAPEXEC" | Tokens;
 export type ChainName = keyof typeof addresses;
 
 const chainLookup: Record<number, ChainName> = {
+  1: "mainnet",
   11155111: "sepolia",
   31337: "localnet",
   5001: "mantle",
-  1442: "polygon-zkevm"
+  1442: "polygon-zkevm",
 };
+
+export function getChainIds(): number[] {
+  return Object.entries(chainLookup).map(([k]) => Number(k));
+}
 
 export function getChainName(chainId: number) {
   const chainName: ChainName = chainLookup[chainId];
+  if (!chainName) throw new Error("CHAIN_NOT_SUPPORTED" + " " + chainId);
   return chainName;
+}
+
+export function isChainSupported(chainId: number) {
+  return !!chainLookup[chainId];
 }
 
 export function getAddress(chainName: ChainName, type: ContractType) {

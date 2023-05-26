@@ -1,9 +1,9 @@
 import { PageLayout } from "@/components/Layout";
-import { HomePanel } from "@/components/HomePanel";
+import { Main } from "@/components/Main";
 export default function Home() {
   return (
     <PageLayout title="coinshield">
-      <HomePanel />
+      <Main />
     </PageLayout>
   );
 }

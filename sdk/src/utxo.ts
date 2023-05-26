@@ -5,6 +5,9 @@ import { randomBN, toBuffer } from "./utils";
 import { poseidonHash } from "./poseidon";
 import { Serializer } from "./serializer";
 
+export function printIntArray(v: Uint8Array) {
+  return Buffer.from(v).toString("hex");
+}
 export class Utxo {
   public keypair: Keypair;
   public amount: BigNumber;
@@ -47,7 +50,7 @@ export class Utxo {
         this.amount,
         this.keypair.pubkey,
         this.blinding,
-        this.asset
+        this.asset,
       ]);
     }
     return this.commitment;

@@ -10,7 +10,6 @@ import { Spacer } from "@/ui/Spacer";
 import { IconBaseProps } from "react-icons";
 import { BsFillEmojiSunglassesFill } from "react-icons/bs";
 import { ShieldedTabs } from "./ShieldedMode";
-import { AccountBalances } from "@/services/zrclib";
 import { ReactNode, useCallback } from "react";
 import { Vertical } from "@/ui/Vertical";
 import { getTokenFromAddress } from "@/contracts/get_contract";
@@ -18,6 +17,7 @@ import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { BigText } from "@/ui/BigText";
 import { formatAmount } from "@/utils";
 import { FaSadCry } from "react-icons/fa";
+import { AccountBalances } from "./providers/hooks/useBalances";
 export function NormalizedSunglasses(p: IconBaseProps) {
   return (
     <div className={`h-${p.size} w-${p.size} p-[2px]`}>
@@ -69,22 +69,25 @@ function AssetRow({
 }
 
 function ProfileLayout({
-  isPrivate,
   address,
-  title,
+  asset,
   balances,
   chainId,
-  asset,
+  isPrivate,
+  pubkey,
   setAsset,
+  title,
 }: {
-  isPrivate: boolean;
-  title: ReactNode;
   address: `0x${string}` | undefined;
+  asset: string | undefined;
   balances: Map<string, BigNumber>;
   chainId: number;
-  asset: string | undefined;
+  isPrivate: boolean;
+  pubkey: string | undefined;
   setAsset?: (asset?: string) => void;
+  title: ReactNode;
 }) {
+  console.log({ pubkey });
   const entries = Array.from(balances.entries());
   const handleBackClicked = useCallback(() => {
     setAsset && setAsset();
@@ -98,7 +101,20 @@ function ProfileLayout({
       <Horizontal>
         <div className="text-2xl mb-4">{title}</div>
       </Horizontal>
-      <div>{address}</div>
+
+      <div className="flex flex-col items-center justify-center">
+        <table className="text-left w-full ">
+          <tr>
+            <td className="p-2">address: </td>
+            <td className="p-2 text-right">{address}</td>
+          </tr>
+          <tr>
+            <td className="p-2">sendingkey:</td>
+            <td className="p-2 text-right">{pubkey}</td>
+          </tr>
+        </table>
+      </div>
+
       <Spacer space={"small"} />
       {asset && (
         <>
@@ -119,12 +135,21 @@ function ProfileLayout({
                 label="Faucet"
               />
             )}
-            <WalletActionButton
-              href="/send"
-              title="Send Funds"
-              icon={MdArrowCircleRight}
-              label="Send"
-            />
+            {isPrivate ? (
+              <WalletActionButton
+                href="/send"
+                title="Send Funds"
+                icon={MdArrowCircleRight}
+                label="Send"
+              />
+            ) : (
+              <WalletActionButton
+                href="/send-public"
+                title="Send Funds"
+                icon={MdArrowCircleRight}
+                label="Send"
+              />
+            )}
             {isPrivate ? (
               <WalletActionButton
                 href="/unshield"
@@ -175,40 +200,45 @@ function ProfileLayout({
 }
 
 export function Profile({
+  pubkey,
   address,
   balances,
   chainId,
   asset,
   setAsset,
 }: {
+  pubkey: string | undefined;
   address: `0x${string}` | undefined;
   balances: AccountBalances;
   chainId: number;
   asset: string | undefined;
   setAsset: (asset?: string) => void;
 }) {
+  console.log("Profile:", { pubkey });
   return (
     <ShieldedTabs
       public={
         <ProfileLayout
-          isPrivate={false}
-          asset={asset}
-          title={"Public Account"}
-          chainId={chainId}
           address={address}
+          asset={asset}
           balances={balances.publicBalances}
+          chainId={chainId}
+          isPrivate={false}
+          pubkey={pubkey}
           setAsset={setAsset}
+          title={"Public Account"}
         />
       }
       private={
         <ProfileLayout
-          isPrivate={true}
-          asset={asset}
-          title={"Private Account"}
-          chainId={chainId}
           address={address}
+          asset={asset}
           balances={balances.privateBalances}
+          chainId={chainId}
+          isPrivate={true}
+          pubkey={pubkey}
           setAsset={setAsset}
+          title={"Private Account"}
         />
       }
     ></ShieldedTabs>

@@ -1,31 +1,26 @@
-import { BigNumber, ethers, providers } from "ethers";
+import { BigNumber } from "ethers";
 import { Utxo } from "./utxo";
 import { UtxoEventDecryptor } from "./utxo_event_decryptor";
-import { Keypair } from "./keypair";
-import { PasswordEncryptor } from "./password_encryptor";
-import { AccountStore } from "./account_store";
+import { AccountStore } from "./store/account_store";
 
+/**
+ * Connect a contract with an account store and passing events to the account store
+ */
 export class EventStoreWriter {
   constructor(
-    contract: ethers.Contract,
-    keypair: Keypair,
-    storeKey: PasswordEncryptor,
-    private _store: AccountStore = new AccountStore(storeKey),
-    private utxoEventDecryptor: UtxoEventDecryptor = new UtxoEventDecryptor(
-      contract,
-      keypair
-    )
+    private store: AccountStore,
+    private utxoEventDecryptor: UtxoEventDecryptor
   ) {
     this.utxoEventDecryptor.onUtxo(async (utxo, blockheight) => {
       console.log("onUtxo()");
-      await this._store.setLatestBlock(blockheight);
-      await this._store.addUtxo(utxo);
+      await this.store.setLatestBlock(blockheight);
+      await this.store.addUtxo(utxo);
     });
 
     this.utxoEventDecryptor.onNullifier(async (nullifier, blockheight) => {
       console.log("onNullifier", nullifier);
-      await this._store.setLatestBlock(blockheight);
-      await this._store.addNullifier(nullifier);
+      await this.store.setLatestBlock(blockheight);
+      await this.store.addNullifier(nullifier);
     });
   }
 
@@ -37,18 +32,14 @@ export class EventStoreWriter {
     await this.utxoEventDecryptor.stop();
   }
 
-  store() {
-    return this._store;
-  }
-
   async getUnspentUtxos() {
-    return this._store.getUnspentUtxos();
+    return this.store.getUnspentUtxos();
   }
 
   async getUtxosUpTo(
     amount: number | BigNumber,
     asset: number | BigNumber
   ): Promise<Utxo[]> {
-    return this._store.getUtxosUpTo(amount, asset);
+    return this.store.getUtxosUpTo(amount, asset);
   }
 }

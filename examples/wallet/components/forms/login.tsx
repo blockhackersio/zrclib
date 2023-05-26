@@ -5,7 +5,7 @@ import { useLayoutTemplate } from "@/ui/LayoutProvider";
 export type LoginData = { password: string };
 
 const form: FormDataInput<LoginData> = {
-  title: "Select a password with which to lock your data!",
+  title: "Signin to unlock your data!",
   fields: [
     {
       type: "password",

@@ -9,7 +9,7 @@ export function useLayoutTemplate() {
 export function PlainLayout(p: LayoutProps) {
   return (
     <div>
-      {p.header && <div>{p.header}</div>}
+      {p.header && <div className="text-xl">{p.header}</div>}
       {p.body && <div>{p.body}</div>}
       {p.footer && <div>{p.footer}</div>}
     </div>

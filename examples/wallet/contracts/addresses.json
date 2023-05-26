@@ -1,4 +1,11 @@
 {
+  "mainnet": {
+    "MASP": "",
+    "SWAPEXEC": "",
+    "SWAPROUTER": "",
+    "DAI": "",
+    "LUSD": ""
+  },
   "localnet": {
     "MASP": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
     "SWAPEXEC": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
@@ -14,7 +21,7 @@
     "LUSD": "0x3C93352D1c37c727463187c3364f8E23fA73c46f"
   },
   "mantle": {
-    "MASP" : "0xc9C448060B5e89cb7375f78c6BE869C5111e1f30",
+    "MASP": "0xc9C448060B5e89cb7375f78c6BE869C5111e1f30",
     "SWAPEXEC": "0x87aB84A96772a0da5289cf89c796dc9e3eE01078",
     "SWAPROUTER": "0x4dA12DE6FF8Fb36839faBE318A33820F1e456dB8",
     "DAI": "0x757BB34482DF74445b1bf1C8b14Ba0c92FA25E88",

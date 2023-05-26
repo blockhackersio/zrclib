@@ -2,45 +2,119 @@ import { EventStoreWriter } from "./event_store_writer";
 import { Keypair } from "./keypair";
 import { BigNumber, BigNumberish, ethers } from "ethers";
 import { PasswordEncryptor } from "./password_encryptor";
-import { AccountStore } from "./account_store";
+import { AccountStore } from "./store/account_store";
 import { Utxo } from "./utxo";
 import { ShieldedPoolProver } from "./shielded_pool";
 import { buildBlocklistMerkleTree, buildMerkleTree } from "./merkle_tree";
 import { GenerateProofFn, generateGroth16Proof } from "./generate_proof";
 import { SwapParams } from "./types";
+import { EncryptedDb } from "./store/db";
+import { UtxoEventDecryptor } from "./utxo_event_decryptor";
+import { TypedEventTarget } from "typescript-event-target";
+class BlockEvent extends Event {
+  constructor(public blockHeight: number) {
+    super("block");
+  }
+}
+type AccountEventMap = {
+  loggedIn: Event;
+  loggedOut: Event;
+  block: BlockEvent;
+};
 
-export class Account {
+export class Account extends TypedEventTarget<AccountEventMap> {
   private keypair?: Keypair;
   private prover?: ShieldedPoolProver;
+  private store?: AccountStore;
   private eventStoreWriter?: EventStoreWriter;
   public unsubscribeBlocks: () => void = () => {};
+
   constructor(
-    private contract: ethers.Contract,
-    public signer: ethers.Signer,
-    private encryptor: PasswordEncryptor,
-    private proofGen: GenerateProofFn = generateGroth16Proof,
+    private readonly contract: ethers.Contract,
+    public readonly signer: ethers.Signer,
+    private readonly encryptor: PasswordEncryptor,
+    private readonly chainId: number,
+    private readonly proofGen: GenerateProofFn = generateGroth16Proof,
     private blocklist: ethers.Contract | null = null
-  ) {}
+  ) {
+    super();
+  }
 
   public isLoggedIn() {
-    return !!this.keypair && !!this.encryptor && !!this.eventStoreWriter;
+    return !!this.eventStoreWriter;
   }
 
   async login() {
     try {
-      const state = new AccountStore(this.encryptor);
-      const keypair =
-        (await state.getKeypair()) ?? (await Keypair.fromSigner(this.signer));
+      const { encryptor, contract, chainId } = this;
+      console.log("login(): Extract data", { encryptor, contract, chainId });
+      const address = await this.getEthAddress();
+      const keypair = await this.getLocalOrSignedKeypair();
+      console.log("login(): Keypair and address", { address, keypair });
+      const db = await EncryptedDb.create(encryptor, chainId);
+      const store = new AccountStore(db);
+      const storeKeypair = await store.getKeypair(address);
+      console.log("login(): storeKeypair", { storeKeypair });
+      if (!storeKeypair) {
+        await store.setKeypair(address, keypair);
+        console.log("login(): storeKeypair has been set");
+      }
+      console.log("login(): creating UtxoEventDecryptor");
+      const decryptor = new UtxoEventDecryptor(contract, keypair);
+      console.log("login(): creating EventStoreWriter");
+      const eventStoreWriter = new EventStoreWriter(store, decryptor);
+      console.log("login(): EventStoreWriter.start()");
+      await eventStoreWriter.start();
+      console.log("login(): storing data");
       this.keypair = keypair;
-      this.eventStoreWriter = new EventStoreWriter(
-        this.contract,
-        keypair,
-        this.encryptor
-      );
-      await this.eventStoreWriter.start();
+      this.store = store;
+      this.eventStoreWriter = eventStoreWriter;
+      console.log("this.keypair:" + this.keypair);
+      this.listenForBlocks();
+      this.dispatchTypedEvent("loggedIn", new Event("loggedIn"));
     } catch (err) {
       throw new Error("LOGIN_FAILURE");
     }
+  }
+
+  private listenForBlocks() {
+    const { provider } = this.signer;
+    if (!provider) {
+      throw new Error("CANNOT_LISTEN_WITHOUT_PROVIDER");
+    }
+
+    const blockHandler = (blockHeight: number) => {
+      this.dispatchTypedEvent("block", new BlockEvent(blockHeight));
+    };
+
+    provider.on("block", blockHandler);
+    this.unsubscribeBlocks = () => {
+      provider.off("block", blockHandler);
+    };
+  }
+
+  private async getEthAddress() {
+    return this.signer.getAddress();
+  }
+
+  private async getLocalOrSignedKeypair() {
+    let keypair = await this.getKeypairFromLocalDb();
+    if (keypair) return keypair;
+
+    return await this.getKeypairFromSigner();
+  }
+
+  async getDb() {
+    return EncryptedDb.create(this.encryptor, this.chainId);
+  }
+
+  async getKeypairFromLocalDb() {
+    const db = await this.getDb();
+    return await new AccountStore(db).getKeypair(await this.getEthAddress());
+  }
+
+  private async getKeypairFromSigner() {
+    return await Keypair.fromSigner(this.signer);
   }
 
   private getEventStoreWriter() {
@@ -49,22 +123,15 @@ export class Account {
   }
 
   private getStore() {
-    return this.getEventStoreWriter().store();
-  }
-
-  onBlock(handler: (blocknumber: number) => void) {
-    if (!this.signer.provider) throw new Error("NO_PROVIDER");
-    const provider = this.signer.provider;
-    provider.on("block", handler);
-    this.unsubscribeBlocks = () => {
-      provider.off("block", handler);
-    };
+    if (!this.store) throw new Error("STORE_NOT_CREATED_YET");
+    return this.store;
   }
 
   getKeypair() {
     if (this.keypair) {
       return this.keypair;
     }
+    console.log("User not logged in");
     throw new Error("USER_NOT_LOGGED_IN");
   }
 
@@ -103,7 +170,12 @@ export class Account {
     checkBlocklist = false
   ) {
     console.log("proveShield", JSON.stringify({ amount, asset, swapParams }));
-    return await this.getProver().shield(amount, asset, swapParams, checkBlocklist);
+    return await this.getProver().shield(
+      amount,
+      asset,
+      swapParams,
+      checkBlocklist
+    );
   }
 
   async proveUnshield(
@@ -147,7 +219,13 @@ export class Account {
     },
     checkBlocklist = false
   ) {
-    return await this.getProver().transfer(amount, toPubkey, asset, swapParams, checkBlocklist);
+    return await this.getProver().transfer(
+      amount,
+      toPubkey,
+      asset,
+      swapParams,
+      checkBlocklist
+    );
   }
 
   private getProver() {
@@ -156,20 +234,33 @@ export class Account {
     return this.prover;
   }
 
-  async destroy() {
+  async logout() {
     this.unsubscribeBlocks();
     await this.getEventStoreWriter().stop();
+    this.dispatchTypedEvent("loggedOut", new Event("loggedOut"));
   }
 
   static async create(
     contract: ethers.Contract,
     signer: ethers.Signer,
     password: string,
+    chainId: number = 1,
     proofGen: GenerateProofFn = generateGroth16Proof,
     blocklist: ethers.Contract | null = null
   ): Promise<Account> {
     // Ensure password length > 16
     const encryptor = PasswordEncryptor.fromPassword(password);
-    return new Account(contract, signer, encryptor, proofGen, blocklist);
+    return new Account(
+      contract,
+      signer,
+      encryptor,
+      chainId,
+      proofGen,
+      blocklist
+    );
   }
+
+  // static async localAccountExists() {
+  //   return await AccountStore.hasStoredKeypair();
+  // }
 }
