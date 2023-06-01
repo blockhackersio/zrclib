@@ -1,12 +1,12 @@
 import { PageLayout } from "@/components/Layout";
-import { HomePanel } from "@/components/HomePanel";
+import { Main } from "@/components/Main";
 import { useSend } from "@/components/forms/send";
 
 export default function Home() {
-  const dialog = useSend();
+  const dialog = useSend(true);
   return (
     <PageLayout dialogContent={dialog} title="coinshield">
-      <HomePanel />
+      <Main />
     </PageLayout>
   );
 }

@@ -4,8 +4,9 @@ import { BigNumber, utils } from "ethers";
 import { FIELD_SIZE } from "./constants";
 import { EthEncryptedData } from "@metamask/eth-sig-util";
 import { Utxo } from "./utxo";
+import { PlaintextDB } from "./store/db";
 
-function randomBN(nbytes = 31) {
+export function randomBN(nbytes = 31) {
   return BigNumber.from(crypto.randomBytes(nbytes));
 }
 
@@ -22,7 +23,7 @@ interface Params {
   transactData: string;
 }
 
-function getExtDataHash({
+export function getExtDataHash({
   recipient,
   extAmount,
   encryptedOutput1,
@@ -32,7 +33,7 @@ function getExtDataHash({
   swapRecipient,
   swapRouter,
   swapData,
-  transactData
+  transactData,
 }: Params) {
   const abi = new utils.AbiCoder();
 
@@ -59,7 +60,7 @@ function getExtDataHash({
   return BigNumber.from(hash).mod(FIELD_SIZE);
 }
 
-function toFixedHex(
+export function toFixedHex(
   number?: number | Buffer | BigNumber | string | bigint | Uint8Array,
   length = 32
 ) {
@@ -75,7 +76,7 @@ function toFixedHex(
   return result;
 }
 
-function toBuffer(value: string | number | BigNumber, length: number) {
+export function toBuffer(value: string | number | BigNumber, length: number) {
   return Buffer.from(
     BigNumber.from(value)
       .toHexString()
@@ -85,7 +86,7 @@ function toBuffer(value: string | number | BigNumber, length: number) {
   );
 }
 
-function shuffle(array: Utxo[]) {
+export function shuffle(array: Utxo[]) {
   let currentIndex = array.length;
   let randomIndex;
 
@@ -138,8 +139,12 @@ export function unpackEncryptedMessage(encryptedMessage: string) {
   };
 }
 
+export async function storeExistsInDb(chainId: number) {
+  const db = await PlaintextDB.create(chainId);
+  const keys = await db.publicKeys.getAll();
+  return keys.length > 0;
+}
+
 export function stringifyBigInts<T>(input: T): T {
   return ff.utils.stringifyBigInts(input) as T;
 }
-
-export { randomBN, toFixedHex, toBuffer, getExtDataHash, shuffle };

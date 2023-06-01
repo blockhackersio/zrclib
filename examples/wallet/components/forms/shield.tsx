@@ -34,7 +34,6 @@ export function useShield() {
       } catch (err) {
         console.log(err);
         setPageId("fail");
-        return;
       }
     },
     [zrclib]

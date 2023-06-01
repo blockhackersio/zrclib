@@ -4,6 +4,7 @@ import { Alert, Label, Select, TextInput } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import { Button } from "@/ui/Button";
 import { Horizontal } from "@/ui/Horizontal";
+import classNames from "classnames";
 type FieldDescriptor<T extends string | number | symbol> =
   | {
       label?: string;
@@ -100,6 +101,10 @@ function renderField<T extends FieldValues>(
           <Horizontal gap>
             <TextInput
               type="password"
+              className={classNames(
+                controller.formState.errors[field.name] &&
+                  "border-l-4 pl-2 border-red-300"
+              )}
               {...controller.register(field.name, {
                 required: field.required,
                 pattern: field.pattern,

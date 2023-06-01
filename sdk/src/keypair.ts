@@ -85,6 +85,12 @@ export class Keypair {
     return new Keypair();
   }
 
+  /**
+   * Generate a Keypair by signing a login message with the provider. This will trigger a wallet sign flow
+   *
+   * @param signer Ethers signer
+   * @returns
+   */
   public static async fromSigner(signer: ethers.Signer): Promise<Keypair> {
     await ensurePoseidon();
     const signedMessage = await signer.signMessage(LOGIN_MESSAGE);

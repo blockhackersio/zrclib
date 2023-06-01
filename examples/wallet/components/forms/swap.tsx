@@ -6,15 +6,10 @@ import { useForm } from "react-hook-form";
 import { Vertical } from "@/ui/Vertical";
 import { useLayoutTemplate } from "@/ui/LayoutProvider";
 import { useZrclib } from "../providers/ZrclibProvider";
-import {
-  getAssets,
-  getTokenFromAddress,
-  getTokens,
-} from "@/contracts/get_contract";
+import { getAssets, getTokenFromAddress } from "@/contracts/get_contract";
 import { ReactNode, useCallback, useState } from "react";
 import { useRouter } from "next/router";
 import { fromNumberInput } from "@/utils";
-import { FormattedProof } from "@/../../sdk/src/types";
 
 export type SwapData = {
   fromAmount: string;

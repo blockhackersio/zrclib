@@ -3,6 +3,7 @@ import Header from "./Header";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Dialog } from "@/ui/Dialog";
 import { useRouter } from "next/router";
+import { useAccount } from "wagmi";
 
 export function PageLayout(p: {
   subtitle?: ReactNode;
@@ -10,6 +11,7 @@ export function PageLayout(p: {
   children: ReactNode;
   dialogContent?: ReactNode;
 }) {
+  const { isConnected } = useAccount();
   const router = useRouter();
 
   const onClose = () => {
@@ -21,7 +23,7 @@ export function PageLayout(p: {
       <Header
         title={p.title}
         subtitle={p.subtitle}
-        rightpanel={<ConnectButton />}
+        rightpanel={isConnected ? <ConnectButton /> : null}
       />
       {p.children}
       <Dialog content={p.dialogContent} onClose={onClose} />

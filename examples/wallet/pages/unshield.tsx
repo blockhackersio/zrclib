@@ -1,5 +1,5 @@
 import { PageLayout } from "@/components/Layout";
-import { HomePanel } from "@/components/HomePanel";
+import { Main } from "@/components/Main";
 import { ReactNode, useCallback, useState } from "react";
 import { useRouter } from "next/router";
 import * as Unshield from "@/components/forms/unshield";
@@ -47,7 +47,7 @@ export default function Home() {
 
   return (
     <PageLayout dialogContent={dialog} title="coinshield">
-      <HomePanel />
+      <Main />
     </PageLayout>
   );
 }

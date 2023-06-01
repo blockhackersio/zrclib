@@ -7,3 +7,4 @@ cp ../../tests/artifacts/contracts/mocks/MockErc20.sol/MockErc20.json ./contract
 cp ../../tests/artifacts/contracts/MultiAssetShieldedPool.sol/MultiAssetShieldedPool.json ./contracts/
 cp ../../tests/artifacts/contracts/mocks/MockSwapRouter.sol/MockSwapRouter.json ./contracts/
 cp ../../tests/artifacts/@zrclib/sdk/contracts/SwapExecutor.sol/SwapExecutor.json ./contracts/
+cp -r ../../tests/typechain-types ./typechain-types
