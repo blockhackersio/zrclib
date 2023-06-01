@@ -15,7 +15,7 @@ This code is unaudited and under construction. This is experimental software and
 - [x] Defi Swaps
 - [x] Defiant Pools Prototype (Zero Knowledge Deposit Addresses pt I)
 - [x] Refactor to groth16
-- [ ] Implement encrypted store in indexDB
+- [x] Implement encrypted store in indexDB
 - [ ] Test that utxo store recovers from partial hydration
 
 ## Future goals
