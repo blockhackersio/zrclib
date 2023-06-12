@@ -15,7 +15,8 @@
     "postinstall": "./scripts/install.sh",
     "clean": "./scripts/clean.sh",
     "test": "jest",
-    "test-circuit": "pnpm build && ./scripts/test_circuit.sh transaction"
+    "test-circuit": "pnpm build && ./scripts/test_circuit.sh transaction",
+    "docs": "typedoc ./src/index.ts --out ../docs/sdk"
   },
   "keywords": [],
   "author": "",
@@ -48,6 +49,7 @@
     "rollup": "^3.20.4",
     "ts-jest": "^29.1.0",
     "tslib": "^2.5.0",
+    "typedoc": "^0.24.8",
     "typescript": "5.0.4"
   }
 }

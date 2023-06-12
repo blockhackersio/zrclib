@@ -17,6 +17,9 @@
     "test": {
       "dependsOn": ["^test"]
     },
+    "docs": {
+      "dependsOn": ["^docs"]
+    },
     "clean": {
       "dependsOn": ["^clean"]
     }
