@@ -16,7 +16,7 @@
     "clean": "./scripts/clean.sh",
     "test": "jest",
     "test-circuit": "pnpm build && ./scripts/test_circuit.sh transaction",
-    "docs": "typedoc ./src/index.ts --out ../docs/sdk"
+    "doc": "typedoc ./src/index.ts --out ../docs/sdk"
   },
   "keywords": [],
   "author": "",
