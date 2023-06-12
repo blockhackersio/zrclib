@@ -31,6 +31,10 @@ This code is unaudited and under construction. This is experimental software and
 - circom (2.1.5+)
 - b2sum (8.3.2+)
 
+### API reference
+
+https://docs.zrclib.com
+
 ### Install dependencies
 
 ```
