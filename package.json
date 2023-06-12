@@ -7,7 +7,8 @@
     "build": "turbo run build --force --no-daemon",
     "test": "pnpm build && turbo run test --force --no-daemon",
     "clean": "turbo run clean --no-daemon",
-    "wallet": "pnpm build && concurrently -r \"cd tests && pnpm dev\" \"cd examples/wallet && pnpm dev\" \"cd sdk && pnpm dev\""
+    "wallet": "pnpm build && concurrently -r \"cd tests && pnpm dev\" \"cd examples/wallet && pnpm dev\" \"cd sdk && pnpm dev\"",
+    "frontend": "SKIP_CIRCOM=1 pnpm install && cd ./sdk && SKIP_CIRCOM=1 pnpm build && cd ../examples/wallet && pnpm build-deploy && pnpm next export"
   },
   "keywords": [],
   "author": "",
