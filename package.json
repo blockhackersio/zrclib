@@ -17,6 +17,9 @@
     "gh-pages": "^5.0.0",
     "turbo": "^1.9.3"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "packageManager": "pnpm@7.22.0",
   "dependencies": {
     "concurrently": "^8.0.1"
