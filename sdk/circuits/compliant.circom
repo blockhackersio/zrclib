@@ -72,7 +72,7 @@ template CompliantTransaction(levels, nIns, nOuts, zeroLeaf) {
     inCheckAsset = ForceEqualIfEnabled();
     inCheckAsset.in[0] <== asset;
     inCheckAsset.in[1] <== publicAsset;
-    inCheckAsset.enabled <-- (publicAsset == 0) ? 0 : 1;
+    inCheckAsset.enabled <== publicAsset; // publicAsset as zero means not enabled
 
     // check that inputs are not in blocklist
     component checkInputs = CheckBlocklist(levels, nIns);
