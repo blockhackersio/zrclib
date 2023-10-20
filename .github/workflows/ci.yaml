@@ -44,7 +44,7 @@ jobs:
 
       - name: Build circom repository
         run: cd circom && cargo build --release && cargo install --path circom
-        if: steps.circom-cache.outputs.cache_changed == 'true'
+        if: steps.circom-cache.outputs.cache-hit != 'true'
         env:
           CARGO_HOME: ${{ runner.workspace }}/cargo
           RUSTUP_HOME: ${{ runner.workspace }}/rustup

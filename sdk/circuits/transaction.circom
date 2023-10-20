@@ -54,7 +54,7 @@ template Transaction(levels, nIns, nOuts, zeroLeaf) {
     inCheckAsset = ForceEqualIfEnabled();
     inCheckAsset.in[0] <== asset;
     inCheckAsset.in[1] <== publicAsset;
-    inCheckAsset.enabled <-- (publicAsset == 0) ? 0 : 1;
+    inCheckAsset.enabled <== publicAsset; // publicAsset as zero means not enabled
 
     // verify correctness of transaction inputs
     for (var tx = 0; tx < nIns; tx++) {
